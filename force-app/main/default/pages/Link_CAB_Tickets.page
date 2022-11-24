@@ -1,0 +1,3 @@
+<apex:page standardController="Meeting__c" extensions="Link_CAB_Tickets_ctr" action="{!addCabCases}">
+
+</apex:page>

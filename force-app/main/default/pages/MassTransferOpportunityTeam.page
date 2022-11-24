@@ -1,0 +1,106 @@
+<apex:page controller="MassTransferOpportunityTeam"  cache="false" >
+   
+   <style>  
+    .hideDropdown select{
+        visibility: hidden !important;
+        //display: block !important;
+    }
+
+</style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script type="text/javascript"> 
+
+        function toggleSelectAll(checkbox){ 
+            //all checkbox is selected 
+            if(checkbox.checked){ 
+                //set all row level checkboxes selected 
+                $( ".oppRec" ).prop('checked', true); 
+            } 
+            else{ 
+                //set all row level checkboxes de-selected 
+                 $( ".oppRec" ).prop('checked', false); 
+            } 
+        } 
+       
+        function getOppId(){
+            var $boxes = $('input[class=oppRec]:checked');
+            var hdnOpp= $('[id$=":hdnOppId"]');
+            var ids='';  
+            $boxes.each(function(){
+                if($(this).is(':checked')){
+                   ids += ids==''? $(this).prop("id") : ','+$(this).prop("id");
+                } 
+            });//end loop 
+            if(ids !=''){
+                hdnOpp.val(ids);
+                //alert(hdnOpp.val());
+            }
+            else{
+                //alert('Please select at least one record !');
+                return false;
+            }
+            
+        }
+         
+  </script>
+  <apex:form >
+      
+      <apex:inputHidden id="hdnOppId" value="{!strSelectedOppId}"/>
+       
+        <apex:pageBlock id="details" title="Mass Add/Tranfer Role">
+
+         <apex:pageMessages ></apex:pageMessages>
+       <apex:pageBlockSection title="Enter Team Role Details" columns="4">
+           <apex:inputField label="Select User" value="{!opportunity.Lead_Passed_From__c}"  /> 
+           <apex:inputField value="{!oOppTeamMem.TeamMemberRole}"   />
+           <apex:inputField value="{!oOppTeamMem.OpportunityAccessLevel}"  />
+       </apex:pageBlockSection>
+       
+       <apex:pageblockSection title="Search Opportunity" columns="3">
+           <apex:inputField label="Select User" value="{!oppSearch.Lead_Passed_From__c}"  /> 
+           <!-- Adding Volume Year and Shipping Country List as a filter Ref case no 01035423  -->
+               <apex:inputField label="Volume Year" value="{!oppSearch.Volume_Year__c}"  /> 
+               <apex:inputField label="Shipping Country List" value="{!acct.Shipping_Country_List__c}"  />           
+               <apex:inputField label="Select Role" value="{!teamSearch.TeamMemberRole}"   /> 
+          <apex:pageBlockSectionItem >
+               <apex:commandButton value="Search" />
+           </apex:pageBlockSectionItem>
+           
+       </apex:pageblockSection>
+       
+            <apex:pageBlockTable title=""  value="{!Opportunities}" var="opp" id="Table">
+                    <apex:column >
+                        <apex:facet name="header">
+                           <input  type="checkbox" id="selectAll1" onchange="toggleSelectAll(this);"/> 
+                        </apex:facet>
+                       <!-- <apex:inputCheckbox id="{!opp.Id}" styleClass="oppRec" />  -->
+                        <input  type="checkbox" id="{!opp.Id}" class="oppRec" />
+                    </apex:column>
+                    <apex:column headerValue="Opportunity" title="Opportunity" >
+                        <a href="/{!opp.OpportunityId}"> {!opp.Opportunity.name} </a>
+                    </apex:column>
+                    <apex:column value="{!opp.Opportunity.Volume_Year__c}"/>
+                    <apex:column value="{!opp.User.Name}"/>
+                    <apex:column value="{!opp.TeamMemberRole}"/>
+                     <apex:column headerValue="Account" title="Account" >
+                        <a href="/{!opp.Opportunity.Account}"> {!opp.Opportunity.Account.Name} </a>
+                    </apex:column>
+                    <apex:column value="{!opp.Opportunity.Amount}" />
+                    <apex:column value="{!opp.Opportunity.StageName}" /> 
+                    <apex:column headerValue="Shipping Country List" title="Shipping Country List" value="{!opp.Opportunity.Account.Shipping_Country_List__c}" /> 
+                    <apex:column value="{!opp.Opportunity.RecordType.Name}"/>
+            </apex:pageBlockTable>
+           <apex:commandButton value="First Page" rerender="details" action="{!FirstPage}" disabled="{!prev}" />
+                <apex:commandButton value="Previous" rerender="details" action="{!previous}" disabled="{!prev}" />
+                <apex:commandButton value="Next" rerender="details" action="{!next}" disabled="{!nxt}" />
+                <apex:commandButton value="Last Page" rerender="details" action="{!LastPage}" disabled="{!nxt}"/>
+            <apex:pageblockButtons >
+             <apex:commandButton value="Save" action="{!Save}" onclick="getOppId()"/>   
+            </apex:pageblockButtons>
+            
+           </apex:pageBlock>
+        
+         
+      
+    </apex:form>
+</apex:page>

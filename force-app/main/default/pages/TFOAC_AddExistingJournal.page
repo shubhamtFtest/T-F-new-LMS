@@ -1,0 +1,67 @@
+<apex:page showHeader="true" sidebar="true" standardController="TFOAC_Opportunity__c"  tabStyle="TFOAC_Opportunity__c" extensions="TFOAC_AddExistingJournalController">
+	<apex:form >
+		<apex:actionFunction status="searchStatus"  name="searchProducts" action="{!searchProducts}"  reRender="productSelectedList"/>
+		<apex:actionFunction status="addingProducts"  name="addingProducts" action="{!addJournals}"  />
+		<apex:pageBlock id="topBlock" mode="view">
+	                <apex:pageBlockButtons location="Top">
+	                    <apex:commandButton value="Add Journals" action="{!addJournals}"/>
+	                    <apex:commandButton value="Cancel" action="{!cancel}"/>
+	                </apex:pageBlockButtons>
+	                <apex:pageBlockSection columns="1">
+	                    <apex:outputPanel layout="block">
+	                       <apex:outputLabel style="font-weight: bold" value="Journal Name "/>
+	                       <apex:inputText value="{!productNameToSearch}"/>
+	                        
+	                        <div class="btn">
+	                            <a  style="text-decoration: blink;" onclick="searchProducts();" href="#"><span>Search</span></a> 
+	                        </div>
+	                        <apex:actionStatus startStyle="font-weight: bold;color: green;" startText="Searching products...." stopText="" id="searchStatus"/>
+	                        <div class="btn">
+	                            <a  style="text-decoration: blink;" onclick="addingProducts();" href="#"><span>Add Products</span></a> 
+	                        </div>
+	                        <apex:actionStatus startStyle="font-weight: bold;color: green;" startText="Adding Products...." stopText="" id="addingProducts"/>
+	                        <div class="btn">
+	                            <a  style="text-decoration: blink;" onclick="closeSearch();" href="#"><span>Close</span></a> 
+	                        </div>
+	                    </apex:outputPanel>
+	                    
+	                   
+	                </apex:pageBlockSection>
+	                <apex:pageBlockTable id="productSelectedList" value="{!listOfProducts}" var="product">
+	                    
+	                    <apex:column width="50px;" id="productToSelect">
+	                        <apex:facet name="header">Select</apex:facet>
+	                        <apex:inputCheckbox rendered="{!productSearchMap[product.id].message == 'ok'}"  value="{!productSearchMap[product.id].selectedToAdd}" />    
+	                    </apex:column>
+	                    
+	                    <apex:column id="productName" >
+	                        <apex:facet name="header">Journal Name</apex:facet>
+	                        <apex:outputLink target="_blank" value="/{!product.id}">{!product.Name}</apex:outputLink>
+	                    </apex:column>
+	                    
+	                    <apex:column id="startDate">
+	                        <apex:facet name="header">Host Area</apex:facet>
+	                        <apex:outputField value="{!product.Host_AreaCode__r.Name}"/>
+	                    </apex:column>
+	                    <apex:column width="300px;" id="message">
+	                        <apex:facet name="header">Message</apex:facet>
+	                        <apex:outputText value="{!productSearchMap[product.id].message}"/>
+	                    </apex:column>
+	                    <apex:facet name="footer">
+	                        <apex:outputPanel layout="block" style="text-align:center;">
+	                            <apex:commandButton action="{!first}" disabled="{!NOT(hasPrevious)}" value="First" reRender="productList"/>
+	                            <apex:commandButton action="{!previous}" disabled="{!NOT(hasPrevious)}" value="Previous" reRender="productList"/>
+	                            
+	                            <apex:outputText value="Page {0} of {1}">
+	                                <apex:param value="{!pageNumber}" />
+	                                <apex:param value="{!totalPages}" />
+	                            </apex:outputText>
+	                            
+	                            <apex:commandButton action="{!next}" disabled="{!NOT(hasNext)}"  value="Next" reRender="productList"/>
+	                            <apex:commandButton action="{!last}" disabled="{!NOT(hasNext)}" value="Last" reRender="productList"/>
+	                        </apex:outputPanel>    
+	                    </apex:facet>    
+	                </apex:pageBlockTable>     
+	    </apex:pageblock>
+	</apex:form>
+</apex:page>

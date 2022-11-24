@@ -1,0 +1,149 @@
+<!------------------------------------------------------------------- 
+    Campus Page for page CustomLeadConversion to create Campus pop-up
+    Created Date: 2017/02/01
+-------------------------------------------------------------------->
+
+<apex:page Controller="CampusController" id="createCampus" sidebar="false" showHeader="false">
+    <apex:form id="cForm">
+        <apex:pageBlock id="pbID" rendered="{!isCampus}">
+        
+            <center>
+                <apex:commandButton value="Save" onComplete="closeWidnowCampus()" reRender="cForm"/> &nbsp;
+                <apex:commandButton value="Cancel" onClick="cancelWindow();"/>
+            </center>
+            <script>
+            
+            </script>
+            <apex:pageBlockSection collapsible="false" showHeader="false" columns="1"  id="pbsID">
+                <apex:pageBlockSectionItem >
+                    <apex:outputlabel value="Institution"/>
+                    {!accountName}
+                </apex:pageBlockSectionItem>
+                <apex:inputHidden value="{!accountId}" id="cAccountID"/>
+                <apex:inputField value="{!campObj.Name}" id="nameID"/>
+                <apex:inputField value="{!campObj.Phone__c}" id="phoneID"/>
+                <apex:inputField value="{!campObj.Mailing_Street__c}" id="msID"/>
+                <apex:inputField value="{!campObj.Mailing_City__c}" id="mcID"/>
+                <apex:inputField value="{!campObj.Mailing_Country_List__c}" id="mclID" required="true" />
+                <apex:inputField value="{!campObj.Mailing_State_Province_List__c}" id="msplID"/>
+                <apex:inputField value="{!campObj.Mailing_ZIP_Postal_Code__c }" id="mzpcID"/>
+            </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+        
+        <apex:pageBlock id="pbID1"  rendered="{!!isCampus}">
+            
+            <center>
+                <apex:commandButton value="Save" onComplete="closeWidnowDepartment()" reRender="cForm"/> &nbsp;
+                <apex:commandButton value="Cancel" onClick="cancelWindow()" reRender="cForm"/>
+            </center>
+            
+            <apex:pageBlockSection collapsible="false" showHeader="false" columns="1" id="pbsID1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputlabel value="Institution"/>
+                        {!accountName}
+                    </apex:pageBlockSectionItem>
+                    <apex:inputHidden value="{!accountId}" id="dAccountID"/>
+                    
+                        
+                    <apex:outputField value="{!deptObj.Campus__c}" rendered="{!isNewCampusId}" />
+                    
+                    <apex:outputPanel rendered="{!!isNewCampusId}">  
+                         <label for="CampusName" style="color: #4a4a56;font-weight: 600;margin-left: 4%;">Campus</label>
+                         <apex:outputText style="margin-left: 5%;" id="CampusName" value="{!campusName}"/>
+                        
+                         
+                        
+                    </apex:outputPanel>                    
+                    <apex:inputField value="{!deptObj.Name}" id="dName"/>
+                    <apex:inputField value="{!deptObj.Phone__c}" id="dPhone"/>
+                    <apex:inputField value="{!deptObj.Mailing_Street__c}" id="dMS"/>
+                    <apex:inputField value="{!deptObj.Mailing_City__c}" id="dMC"/>
+                    <apex:inputField value="{!deptObj.Mailing_Country_List__c}" id="dMCL" required="true" />
+                    <apex:inputField value="{!deptObj.Mailing_State_Province_List__c}" id="dMSPL"/>
+                    <apex:inputField value="{!deptObj.Mailing_ZIP_Postal_Code__c}" id="dMZPC"/>
+            </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+    </apex:form>
+    
+    <script>
+        function cancelWindow(){
+            window.close();
+        }
+        
+        function closeWidnowCampus(){
+            var accountID = document.getElementById('createCampus:cForm:pbID:pbsID:cAccountID').value;
+            var nameID = document.getElementById('createCampus:cForm:pbID:pbsID:nameID').value;
+            var phoneID = document.getElementById('createCampus:cForm:pbID:pbsID:phoneID').value;
+            var msID = document.getElementById('createCampus:cForm:pbID:pbsID:msID').value;
+            var mcID = document.getElementById('createCampus:cForm:pbID:pbsID:mcID').value;
+            var mclID = document.getElementById('createCampus:cForm:pbID:pbsID:mclID').value;
+            var msplID = document.getElementById('createCampus:cForm:pbID:pbsID:msplID').value;
+            var mzpcID = document.getElementById('createCampus:cForm:pbID:pbsID:mzpcID').value;
+            
+            if(mclID == null || mclID == '--None--' || mclID ==''){
+                window.reLoad();
+            }else{
+                var map = new Object();
+                map['Account__c'] = accountID;
+                map['Name'] = nameID;
+                map['Phone__c'] = phoneID;
+                map['Mailing_Street__c'] = msID;
+                map['Mailing_City__c'] = mcID;
+                map['Mailing_Country_List__c'] = mclID;
+                map['Mailing_State_Province_List__c'] = msplID;
+                map['Mailing_ZIP_Postal_Code__c'] = mzpcID;
+                
+                var doc = window.opener.document;
+                doc.getElementById('LeadConversion:frm:pbLead:cjs').value = JSON.stringify(map);
+                //doc.getElementById('cn').value = nameID;
+                try {
+                     window.opener.updateSelectList(nameID,{!index},'Y');
+                }catch (err) {
+                }
+                window.close();
+            }
+        }
+        
+        function OncloseTest(result){
+            var dd = document.getElementById('');
+            var option = document.createElement("option");
+            option.text = result;
+            dd.add(option);
+        }
+        
+        function closeWidnowDepartment(){
+            var accountID = document.getElementById('createCampus:cForm:pbID1:pbsID1:dAccountID').value;
+            var nameID = document.getElementById('createCampus:cForm:pbID1:pbsID1:dName').value;
+            var phoneID = document.getElementById('createCampus:cForm:pbID1:pbsID1:dPhone').value;
+            var msID = document.getElementById('createCampus:cForm:pbID1:pbsID1:dMS').value;
+            var mcID = document.getElementById('createCampus:cForm:pbID1:pbsID1:dMC').value;
+            var mclID = document.getElementById('createCampus:cForm:pbID1:pbsID1:dMCL').value;
+            var msplID = document.getElementById('createCampus:cForm:pbID1:pbsID1:dMSPL').value;
+            var mzpcID = document.getElementById('createCampus:cForm:pbID1:pbsID1:dMZPC').value;
+            if(mclID == null || mclID == '--None--' || mclID ==''){
+                window.location.reLoad();
+            }
+            var map = new Object();
+            map['Account__c'] = accountID;
+            map['Name'] = nameID;
+            map['Phone__c'] = phoneID;
+            map['Mailing_Street__c'] = msID;
+            map['Mailing_City__c'] = mcID;
+            map['Mailing_Country_List__c'] = mclID;
+            map['Mailing_State_Province_List__c'] = msplID;
+            map['Mailing_ZIP_Postal_Code__c'] = mzpcID;
+            
+            var doc = window.opener.document; 
+            doc.getElementById('LeadConversion:frm:pbLead:djs').value = JSON.stringify(map);
+            
+           try {
+                     window.opener.updateSelectList(nameID, {!index},'N');
+                }catch (err) {
+                }
+                window.close();
+        }
+        
+    </script>
+</apex:page>

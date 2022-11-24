@@ -1,0 +1,17 @@
+<!-- When placing on a standard page, set width = 100%, height = 25, scrollbars = NO, label = YES -->
+
+<!--
+Modified by Jeff Lup - 2016.03.28 - CHG0072245 - Errors on New Opportunity in Lightning
+-->
+<apex:page standardController="Opportunity" extensions="TFOpportunityParentOpportunityController">
+    <apex:outputText value="You may select a parent opportunity after first saving this opportunity." rendered="{!Opportunity.Id == null}" /> <!-- CHG0072245 -->
+    <apex:form rendered="{!NOT(Opportunity.Id == null)}"> <!-- CHG0072245 -->
+        <apex:outputLink value="/{!tfParentOpp}" target="_parent" rendered="{!isDisplayMode}">{!tfParentOppName}</apex:outputLink>
+        <apex:commandLink action="{!changeParentOpportunity}" value="[Change]" rendered="{!isDisplayMode}"/>
+        <apex:selectList value="{!tfParentOpp}" size="1" id="dmSalesTeam"  rendered="{!isEditMode}">
+            <apex:selectOptions value="{!tfParentOppOptions}"/>
+        </apex:selectList>
+        <apex:commandButton value="Save" action="{!updateParentOpp}" rendered="{!isEditMode}"/>
+        <apex:commandButton value="Cancel" action="{!cancel}" rendered="{!isEditMode}" />
+    </apex:form>
+</apex:page>

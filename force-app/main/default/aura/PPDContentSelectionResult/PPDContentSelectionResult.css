@@ -1,0 +1,32 @@
+.THIS.SearchRes{
+    overflow-y: scroll;
+    border: 1px solid lightgray;
+    padding-left: 16px;
+    width: 98%;
+}
+
+.THIS .right {
+    text-align: right;
+}
+
+.THIS .center {
+    text-align: center;
+}
+
+.THIS .hideCmp {
+    display: none;
+}
+.THIS .showCmp {
+    display: block;
+}
+.THIS .border { 
+    border-style: outset;
+}
+
+.THIS .formattedText {
+   color: rgb(194, 57, 52);
+}
+
+.THIS .formattedTextInfo {
+   color: red;
+}

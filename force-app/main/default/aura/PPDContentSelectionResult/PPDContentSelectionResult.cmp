@@ -1,0 +1,359 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="TF_PPDProcessController">
+    <!-- Attributes --> 
+    <aura:attribute name="products" type="Product2[]"/>
+    <aura:attribute name="fullData" type="List"/>
+    <aura:attribute name="OriginalfullData" type="List"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="ShowModal" type="Boolean" default="false"/>
+    <aura:attribute name="showDetailButton" type="Boolean" default="true"/>
+     <aura:attribute name="IsClonedRecord" type="Boolean" default="false"/>
+    
+    <aura:attribute name="columns" type="List"/> 
+    <aura:attribute name="columns_Book" type="List"/> 
+    <aura:attribute name="columns_Chapters" type="List"/> 
+    <aura:attribute name="columns_Collections" type="List"/> 
+    <aura:attribute name="columns_CreativeWs" type="List"/>
+    <aura:attribute name="columns_Articles" type="List"/>
+    <aura:attribute name="columns_Set" type="List"/>
+    <aura:attribute name="columns_Series" type="List"/>
+     <aura:attribute name="columns_EntryVersion" type="List"/>
+    
+    <aura:attribute name="columns_Book_full" type="List"/> 
+    <aura:attribute name="columns_Chapters_full" type="List"/> 
+    <aura:attribute name="columns_Collections_full" type="List"/> 
+    <aura:attribute name="columns_CreativeWs_full" type="List"/>
+    <aura:attribute name="columns_Articles_full" type="List"/>
+    <aura:attribute name="columns_Set_full" type="List"/>
+    <aura:attribute name="columns_Series_full" type="List"/>
+    <aura:attribute name="columns_EntryVersion_full" type="List"/>
+    
+    <aura:attribute name="columns_Book_Optns" type="List"/> 
+    <aura:attribute name="columns_Chapters_Optns" type="List"/> 
+    <aura:attribute name="columns_Collections_Optns" type="List"/> 
+    <aura:attribute name="columns_CreativeWs_Optns" type="List"/>
+    <aura:attribute name="columns_Articles_Optns" type="List"/>
+    <aura:attribute name="columns_Set_Optns" type="List"/>
+    <aura:attribute name="columns_Series_Optns" type="List"/>
+    <aura:attribute name="columns_EntryVersion_Optns" type="List"/>
+    
+    <aura:attribute name="selected_Book_Optns" type="List"/> 
+    <aura:attribute name="selected_Chapters_Optns" type="List"/> 
+    <aura:attribute name="selected_Collections_Optns" type="List"/> 
+    <aura:attribute name="selected_CreativeWs_Optns" type="List"/>
+    <aura:attribute name="selected_Articles_Optns" type="List"/>
+    <aura:attribute name="selected_Set_Optns" type="List"/>
+    <aura:attribute name="selected_Series_Optns" type="List"/>
+    <aura:attribute name="selected_EntryVersion_Optns" type="List"/>
+    
+    <aura:attribute name="required_Optns" type="List" default="['Name']"/>
+    <aura:attribute name="selected_Optns" type="List"/> 
+    <aura:attribute name="colOptions" type="List"/>
+    <aura:attribute name="max" type="Integer" default="10"/>
+    <aura:attribute name="availableIds" type="List" default="[]"/>
+    <aura:attribute name="uploadedIds" type="List" default="[]"/>
+    <aura:attribute name="uniqueId" type="String" default="identifiers.doi"/> 
+    <aura:attribute name="showDownloadBtn" type="Boolean"  default= "false"/>
+    <aura:attribute name="unAvailableIds" type="String"/>
+    <aura:attribute name="hasFileUpload" type="String" default="false"/>
+     <aura:attribute name="errorMessage" type="String" default=""/>
+    
+    <aura:attribute name="disableDownload" type="Boolean" default="false"/>
+    
+    <aura:attribute name="filterObject" type="Object" access="global"/>
+    <aura:attribute name="queryObject" type="Object[]" access="global"/>
+    <aura:attribute name="ruleElementList" type="Object[]" access="global"/>
+    <aura:attribute name="queryElement" type="Object" access="global"/>
+    <aura:attribute name="filterElement" type="Object" access="global"/>
+    <aura:attribute name="filterObjectLst" type="Object[]" access="global"/>
+    <aura:attribute name="typeOfCollection" type="String" default="Manual Curation"/>
+    <aura:attribute name="totalRowsMsg" type="String"/>
+    <aura:attribute name="selectedRows" type="List"/> 
+    <aura:attribute name="selectedFullRows" type="List"/> 
+    <aura:attribute name="selectedRowsList" type="List"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="selectedProductsDetails" type="Object" />
+    <aura:attribute name="IsSpinner" type="Boolean" />
+    <aura:attribute name="data" type="Object[]"/>
+    <aura:attribute type="String" name="showingConsent" default = "false" />
+    <aura:attribute name="filter" type="String" />   
+    <aura:attribute name="recordCount" type="Integer" default="0"/> 
+    <aura:attribute name="IsSearch" type="String" default = "false"/>
+    <aura:attribute name="totalRecordCount" type="Integer" default="0"/>
+    <aura:attribute name="totalPriceUSD" type="Decimal" default="0"/>
+    <aura:attribute name="totalPriceGBP" type="Decimal" default="0"/> 
+    <aura:attribute name="activeAccordion" type="String"/>
+    <aura:attribute type="Boolean" name="isStatic" default = "true"/>
+    <aura:attribute type="Boolean" name="hideCheckbox" default = "false" />
+    <aura:attribute type="String" name="queryString" default = "" />
+    <aura:attribute name="querySaveElement" type="Object" access="global"/>
+    <aura:attribute name="calledFrom" type="String" default = ""/>
+    <aura:attribute type="String" name="searchCurrency" default = "USD" />
+    <aura:attribute name="addAllFromPCM" type="String" default = "false"/>
+    <aura:attribute name="productType" type="String"/>
+    <aura:attribute name="isDynamicUI" type="String" default = "false"/>
+    <aura:attribute name="returnProductType" type="String"/>
+    <aura:attribute name="countLst" type="Object[]" access="global"/>
+    <aura:attribute name="radioOptions" type="List"/>
+    <aura:attribute name="radioValue" type="String"/>
+    <aura:attribute type="Boolean" name="showProductTypes" default = "false"/>
+    <aura:attribute name="hideCheckboxColumn" type="Boolean" default="True"/>
+    <aura:attribute name="consumer" type="String"/>
+    
+    
+    
+    <!-- New Pagination and sorting attributes --> 
+    <aura:attribute type="Boolean" name="sortAsc" />
+    <aura:attribute type="Integer" name="pageNumber" default="1" />
+    <aura:attribute type="Integer" name="maxPage"	default="1" />
+    <aura:attribute name="pageSize" type="Integer" default="20"/>
+    <aura:attribute name="queryLimit" type="Integer" default="500"/>
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute name="sortedBy" type="String"/>
+    <aura:attribute name="sortedDirection" type="String"/>
+    <aura:attribute type="Integer" name="prevPageNum" default="1" />
+    <aura:attribute name="allSelected" type="Object" /> 
+    <!-- pagesPerQuery value should be queryLimit/pageSize -->
+    <aura:attribute name="pagesPerQuery" type="Integer" default="25"/> 
+    
+    <aura:attribute type="Integer" name="pstn"	default="0" />
+    <aura:attribute type="Integer" name="paginationPstn" default="0" />
+    <aura:attribute name="nxtClked" type="String" default="false"/>
+    <aura:attribute name="prevClked" type="String" default="false"/>
+    <aura:attribute name="firstClicked" type="String" default="false"/>
+    <aura:attribute name="lastClicked" type="String" default="false"/>
+    
+    <!-- calculating offset cursor values for pagination -->
+    	<aura:attribute name="nextPageCursorValue" type="String" default=""/>
+    	<aura:attribute name="PrevPageCursorValue" type="String" default=""/>
+    	<aura:attribute name= "lastPageCursor" type="String" default=""/>
+    <!--End-->
+    
+    
+    <!-- Handlers -->  
+    <aura:handler event="c:PPDProductSearchEvent" action="{!c.productFilterChangeHandler}"/>
+    <aura:handler event="c:PPDDynamicUiSearchEvent" action="{!c.dynamicUISearch}"/>
+    
+    <aura:handler event="c:productSearchResetEvent" action="{!c.resetSearch}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+    <aura:handler name="change" value="{!v.returnProductType}" action="{!c.assignColumns}" />
+    <aura:handler event="c:PPDRuleRefresh" action="{!c.refreshDynamicTitleList}"/>
+    <aura:handler event="c:PPDGenericEvent" action="{!c.addAllItemsEvt}"/>
+    
+    
+    
+    <!-- Events -->
+    <aura:registerEvent name="refreshTitleListComponent" type="c:PPDTitleRefreshEvent"/>
+    <aura:registerEvent name="refreshUnsiloDocListComponent" type="c:PPDRefreshListEvent"/>
+    <aura:registerEvent name="ruleRefresh" type="c:PPDRuleRefresh"/>
+    <aura:registerEvent name="ppdPcmSearchEvent" type="c:PPDPCMSearchEvent"/>
+    <aura:registerEvent name="PPDProgressEvent" type="c:PPDProgressEvent"/>
+    <aura:registerEvent name="PPDTotalPriceRefreshEvent" type="c:PPDTotalPriceRefreshEvent"/>
+    
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    
+    <!-- body -->
+    <lightning:layout  multipleRows="true">
+        <lightning:layoutItem size="12" padding="horizontal-small">
+            <div>
+                <lightning:layout horizontalAlign="spread">
+                    <aura:if isTrue="{!v.isStatic}">
+                        <lightning:layoutItem size="5" padding="around-small">
+                            
+                            <!--<aura:if isTrue="{!v.showProductTypes}">
+                                <p class="slds-p-horizontal_small">
+                                    <b>Total records returned : </b> {!v.totalRecordCount}
+                                </p>
+                                <br/>
+                            </aura:if>
+                            <p class="slds-p-horizontal_small">
+                                <b> Showing {!v.recordCount +' '+ v.returnProductType} records returned </b>
+                            </p>
+                            <br/>-->
+                            
+                            <aura:if isTrue="{!v.recordId}">                                
+                                <lightning:button label="Add Selected" variant="brand" onclick="{!c.showMultiSelectMsg}" disabled="{!empty(v.data)}"/>
+                                <lightning:button label="Add All" variant="brand" onclick="{!c.showMultiSelectMsgAll}" disabled="{!empty(v.data)}" />
+                                 <aura:if isTrue="{!v.consumer == 'Collections'}">
+                                     
+                              <!-- <aura:if isTrue="{!or(v.consumer == 'Collections',v.consumer == 'OPC_External')}">-->
+                                    <!--<aura:if isTrue="{(!v.consumer == 'Collections'|| !v.consumer == 'OPC_External')}">-->
+                                     
+                                <lightning:button label="Download results" variant="brand" onclick="{!c.downloadSearchResults}" disabled="{!empty(v.data)}"/>
+
+                                <!--<aura:if isTrue="{(!v.consumer == 'OPC_External')}"></aura:if>-->
+                                
+                                </aura:if>
+                                    <!-- </aura:if>-->
+                                </aura:if>
+                            
+                             <aura:if isTrue="{!v.consumer == 'OPC_External'}">
+                           <lightning:button label="Download results" iconName="utility:download" variant="brand" onclick="{!c.downloadSearchResults}" disabled="{!empty(v.data)}"/>
+                                
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.showDownloadBtn=='true'}">
+                                <div class="slds-p-top_small"></div>
+ 
+                <lightning:button label="Download unmatched results" iconName="utility:download" variant="brand" onclick = "{! c.downloadIds}"/>
+            </aura:if>
+                            
+                            <aura:if isTrue="{!!v.hideCheckboxColumn}" >
+                                <lightning:button label="Add" variant="brand" onclick="{!c.showSelectedRecordDetails}"  disabled="{!empty(v.data)}"/> 
+                                
+                            </aura:if>
+                            
+                            <div padding="around-medium" class="slds-box hideCmp" aura:id="dispMultiMsg">
+                                <p class="slds-p-horizontal_small">
+                                    Are you sure you want to add {!v.selectedRowsCount} selected records ?
+                                </p>
+                                <lightning:button label="Cancel" variant="brand" onclick="{!c.hideMultiMsg}"/>
+                                <lightning:button label="Ok" variant="brand" onclick="{!c.addMultipleProducts}"/>
+                            </div>
+                            <div padding="around-medium" class="slds-box hideCmp" aura:id="dispMultiMsgAll">
+                                <p class="slds-p-horizontal_small">
+                                    Are you sure you want to add all {!v.recordCount} {!v.returnProductType} records ?
+                                </p>
+                                <lightning:button label="Cancel" variant="brand" onclick="{!c.hideMultiMsg}"/>
+                                <lightning:button label="Ok" variant="brand" onclick="{!c.addAllItems}"/>
+                            </div>
+                        </lightning:layoutItem>
+                    </aura:if>
+                    <aura:if isTrue="{!!v.isStatic}">
+                        <lightning:layoutItem size="3" padding="around-small">
+                            <!-- <aura:if isTrue="{!v.showProductTypes}">
+                                <p class="slds-p-horizontal_small">
+                                    <b>Total records returned : </b> {!v.totalRecordCount}
+                                </p>
+                                <br/>
+                            </aura:if>
+                            <div class="slds-border_left">
+                                <p class="slds-p-horizontal_small">
+                                    Showing {!v.recordCount +' '+ v.returnProductType} records returned
+                                </p>
+                            </div>-->
+                            <aura:if isTrue="{!v.calledFrom=='ContentSelection'}">
+                                <!-- <br/>-->
+                                 <aura:if isTrue="{!v.IsClonedRecord==False}">
+                                
+                                <lightning:button label="Save Rule" variant="brand" onclick="{!c.saveRule}" disabled="{!empty(v.OriginalfullData)}"/>
+                                  
+                                     <aura:if isTrue="{!v.consumer == 'Collections'}">
+                                   <!-- <aura:if isTrue="{!or(v.consumer == 'Collections',v.consumer == 'OPC_External')}">-->
+                                         <!-- <aura:if isTrue="{(!v.consumer == 'Collections'|| !v.consumer == 'OPC_External')}">-->
+ 
+                                     <lightning:button label="Download results" variant="brand" onclick="{!c.downloadSearchResults}" disabled="{!empty(v.data)}"/>
+                                     </aura:if>
+                                      <aura:if isTrue="{!v.consumer == 'OPC_External'}">
+                           <lightning:button label="Download results" variant="brand" onclick="{!c.downloadSearchResults}" disabled="{!empty(v.data)}"/>
+                                </aura:if>
+                                      <aura:if isTrue="{!v.showDownloadBtn=='true'}">
+                                          <div class="slds-p-top_small"></div>
+                <lightning:button label="Download unmatched results" iconName="utility:download" variant="brand" onclick = "{! c.downloadIds}"/>
+            </aura:if>
+                                         <!--</aura:if>-->
+                                     </aura:if>
+                                </aura:if>
+                        </lightning:layoutItem>    
+                    </aura:if>
+                    
+                    <lightning:layoutItem size="3">
+                        <aura:if isTrue="{!v.showProductTypes}">
+                            <div class="slds-border_bottom slds-m-top_x-small">
+                                <lightning:layout  multipleRows="true">
+                                    <lightning:layoutItem flexibility="auto" padding="horizontal-small">
+                                        <div class="slds-m-top_x-small">
+                                            <p><strong><span style="color: #339966;">{! 'Total : '+ v.totalRecordCount}</span></strong></p>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <aura:iteration items="{!v.radioOptions}" var="optn">
+                                        <lightning:layoutItem flexibility="auto" padding="horizontal-small">
+                                            <div class="center">
+                                                <lightning:button variant="base" label="{!optn.value}" value = "{!optn.value}" title="{!'Click to view '+ optn.value +' products'}" onclick="{! c.handleProductTypeClick}"/>
+                                                <b> : {!optn.label}</b>
+                                            </div>
+                                        </lightning:layoutItem>
+                                    </aura:iteration>
+                                </lightning:layout>
+                            </div>
+                        </aura:if>
+                    </lightning:layoutItem>
+                    
+                    <lightning:layoutItem size="4" padding="around-small">
+                        <div class="right">
+                            <c:PPDPagination prevPageNumber= "{!v.prevPageNum}" currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" nextClicked="{!v.nxtClked}" prevClicked="{!v.prevClked}" lastClicked="{!v.lastClicked}" firstClicked="{!v.firstClicked}"/>
+                        </div>
+                    </lightning:layoutItem>
+                    
+                </lightning:layout>
+            </div>
+        </lightning:layoutItem>
+        
+        <!--Open column selection modal -->
+        <aura:if isTrue="{!v.ShowModal}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideMe }" 
+                                              alternativeText="Close" class="slds-modal__close" />    
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:dualListbox name="columnOptions"  
+                                               label= "Select columns to display" 
+                                               sourceLabel="Available" 
+                                               selectedLabel="Selected" 
+                                               options="{!v.colOptions}" 
+                                               value="{!v.selected_Optns}" 
+                                               max="{!v.max}" 
+                                               requiredOptions="{!v.required_Optns}"/>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button label="Ok" variant="brand" onclick="{!c.HideMe}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if> 
+        
+        <lightning:layoutItem size="12" padding="horizontal-small">
+            <lightning:layout>
+                <lightning:layoutItem > 
+                    <div class="slds-border_left">
+                        <p><strong><span style="color: #006DCC;">Showing {!v.recordCount +' '+ v.returnProductType} records.     </span></strong></p>
+                    </div>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem alignmentBump="left"> 
+                    <lightning:button label="Select Fields to Display" variant="base" iconName="utility:settings" iconPosition="left" disabled="{!empty(v.OriginalfullData)}" onclick="{! c.ShowModal }" />
+                </lightning:layoutItem>
+            </lightning:layout>
+            <div> 
+                <lightning:datatable
+                                     aura:id="productTable"
+                                     columns="{! v.columns }"
+                                     data="{! v.data }"
+                                     keyField="id"
+                                     onrowselection="{!c.handleSelectedRow}"
+                                     selectedRows="{! v.selectedRows }" 
+                                     hideCheckboxColumn="{! v.hideCheckbox}"
+                                     onrowaction="{! c.handleRowAction }"/>
+                
+            </div>	
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <p>
+        <lightning:formattedRichText aura:id="infoMessage" class="formattedTextInfo" ></lightning:formattedRichText>
+    </p> 
+    <p>&nbsp;</p>
+    
+           <!-- <aura:if isTrue="{!v.showDownloadBtn=='true'}">
+                <lightning:button label="Download" iconName="utility:download" variant="brand" onclick = "{! c.downloadIds}"/>
+            </aura:if>-->
+            
+            <p>
+                <lightning:formattedRichText aura:id="errorMessage" class="formattedText"></lightning:formattedRichText>
+            </p> 
+</aura:component>

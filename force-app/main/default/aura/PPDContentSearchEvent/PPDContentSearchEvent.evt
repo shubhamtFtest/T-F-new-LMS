@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="searchText" type="String"/>
+    <aura:attribute name="calledFrom" type="String" default = ""/>
+</aura:event>

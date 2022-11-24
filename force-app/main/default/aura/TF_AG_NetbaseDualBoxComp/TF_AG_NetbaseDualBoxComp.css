@@ -1,0 +1,36 @@
+.THIS .slds-form-element {
+    margin-left: -6px;
+}
+.THIS .slds-p-around_small.slds-size_12-of-12.slds-small-size_6-of-12.slds-medium-size_4-of-12.slds-large-size_3-of-12
+{
+    /* width: 102%;
+    margin-top: -9%;*/
+}
+
+.THIS .slds-button.slds-button_brand
+{
+    float:right;
+}
+.THIS .slds-grow{width: 105%;}
+.THIS .fltrCode{
+    border-radius: unset;
+}
+.THIS.Netbases{
+    height: 350px;
+    overflow-y: scroll;
+    border: 1px solid lightgray;
+    padding-left: 16px;
+    width: 98%;
+}
+.THIS .slds-grid.slds-wrap {
+    height:40px;
+}
+.THIS .slds-p-around_medium.slds-size_12-of-12.slds-small-size_6-of-12.slds-medium-size_4-of-12.slds-large-size_3-of-12{
+    width: auto;
+}
+.THIS .countSelected{
+    margin-top: 3px;
+}
+.THIS .viewSelected{
+    margin-top: 5px;
+}

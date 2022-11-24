@@ -1,0 +1,114 @@
+<aura:component controller="TF_AG_OrderSearchCtr" implements="forceCommunity:availableForAllPageTypes" >
+        <aura:attribute name="orderData" type="object" /> 
+        <aura:attribute name="orderid" type="string" /> 
+        <aura:attribute name="mycolumns" type="List"/>
+        <aura:attribute name="wrapperData" type="List" default="[]"/> 
+        <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+        <aura:attribute name="Spinner" type="boolean" default="false"/>
+        <aura:attribute name="modalPopup" type="boolean" default="false"/>
+        <!--Define Spinner-->
+        <aura:if isTrue="{!v.Spinner}">
+        <div class="demo-only" style="height:6rem">
+        <div class="slds-spinner_container">
+        <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+        <span class="slds-assistive-text">Loading</span>
+        <div class="slds-spinner__dot-a"></div>
+        <div class="slds-spinner__dot-b"></div>
+        </div>
+        </div>
+        </div>
+        </aura:if>
+      <aura:if isTrue="{!v.modalPopup}">
+        <div class="demo-only" style="height: 640px;" >
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate slds-text-title_bold" style="font-size: 20px">Alert</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                      <p class="slds-align_absolute-center slds-text-title_bold">Something went wrong please try again</p>
+                      </div>
+                    <footer class="slds-modal__footer">
+                      <button class="slds-button slds-button_brand" onclick="{!c.refreshPage}">OK</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+       <lightning:card footer="" title="">
+        <p class="slds-p-horizontal_large">
+        <div id="container">
+            <div class="left">
+                
+                
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                        <thead>
+                        <tr class="slds-line-height_reset">
+                        <th width="13%" class="" scope="col">
+                         <div class="slds-truncate" title="ISBN">Order Id</div>
+                         </th>
+                        <th width="13%" class="" scope="col">
+                        <div class="slds-truncate" title="ISBN">ISBN</div>
+                        </th>
+                        <th width="30%" class="" scope="col">
+                        <div class="slds-truncate" title="Title">Title</div>
+                        </th>
+                        <th width= "13%" class="" scope="col">
+                         <div class="slds-truncate" title="Quantity">Quantity</div>
+                         </th>
+                       <th width=" 14%" class="" scope="col">
+                        <div class="slds-truncate" title="Title Status">Title Status</div>
+                        </th>
+                       <!-- <th width="15%" class="" scope="col">
+                        <div class="slds-truncate" title="tracking numbers">Tracking Numbers</div>
+                        </th>
+                        <th width="15%" class="" scope="col">
+                        <div class="slds-truncate" title="Order Status">Order Status</div>
+                        </th>-->
+                        <th width="15%" class="" scope="col">
+                         <div class="slds-truncate" title="Line Value">Line Value</div>
+                         </th>
+                        </tr>
+                        </thead>
+                        <aura:iteration items="{!v.wrapperData}" var="ordr" indexVar="ordIndex">
+                        <tbody>
+                        <tr class="slds-hint-parent">
+                                <td data-label="Account Name">
+                                        <div class="slds-truncate" title="{!ordr.orderId}">{!ordr.orderId}</div>
+                                        </td>   
+                        <td data-label="Account Name">
+                        <div class="slds-truncate" title="Title">{!ordr.isbn}</div>
+                        </td>
+                        <td data-label="Close Date">
+                        <div class="wrapTitle" title="{!ordr.titleFull}">{!ordr.titleFull}</div>
+                        </td>
+                        <td data-label="Prospecting">
+                        <div class="slds-truncate" title="{!ordr.quantity }">{!ordr.quantity }</div>
+                        </td>
+                        <td data-label="Confidence">
+                        <div class="slds-truncate" title="{!ordr.titleStatus }">{!ordr.titleStatus }</div>
+                        </td>
+                       <!-- <td data-label="Amount">
+                        <div class="slds-truncate" title="{!ordr.trackingNumbers }">{!ordr.trackingNumbers }</div>
+                        </td>
+                        <td data-label="Contact">
+                        <div class="slds-truncate" title="{!ordr.orderStatus }">{!ordr.orderStatus }</div>
+                        </td>-->
+                        <td data-label="Contact">
+                        <div class="slds-truncate" title="{!ordr.orderValue>'0'?'Invoice':'Credit'}" >{!ordr.orderValue }</div>
+                        </td>
+                         </tr>
+                        </tbody>
+                   </aura:iteration> 
+                </table>
+                 <!--   <lightning:datatable data="{! v.wrapperData }"
+                    columns="{! v.mycolumns }"
+                    keyField="id"
+                    hideCheckboxColumn="true"/> -->
+                </div>
+            
+        </div>
+        </p>
+        </lightning:card>
+        </aura:component>

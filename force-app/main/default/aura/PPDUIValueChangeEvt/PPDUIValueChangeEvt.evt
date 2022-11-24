@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT">
+    <aura:attribute name="bookRequiredField" type="String"/>
+    <aura:attribute name="value" type="String"/>
+</aura:event>

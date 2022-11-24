@@ -1,0 +1,9 @@
+<!--
+Modified by Jeff Lup - 2016.03.28 - CHG0072245 - Errors on New Account in Lightning
+-->
+<apex:page standardController="Account" standardStylesheets="true" lightningStylesheets="true" showHeader="false" sidebar="false" tabStyle="Account">
+    <apex:outputText value="You may work with consortiums after first saving the account." rendered="{!Account.Id == null}" /> <!-- CHG0072245 -->
+    <apex:outputPanel Title="Account Consortia Membership" rendered="{!AND(IF(Account.Type!='Consortium',true,false),NOT(Account.Id == null))}"> <!-- CHG0072245 -->
+        <c:TFConsortiumMembership />
+    </apex:outputPanel>
+</apex:page>

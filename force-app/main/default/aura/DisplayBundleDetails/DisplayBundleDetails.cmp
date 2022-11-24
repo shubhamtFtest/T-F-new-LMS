@@ -1,0 +1,109 @@
+<aura:component Controller="TF_GetBundleData" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global">  
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:attribute name="productBundle" type="Product2" />
+    <aura:attribute name="uuId" type="String"/>
+    <aura:attribute name="typeOfCollection" type="String" default="Manual Curation"/>
+    <aura:attribute name="SelectCriteria" type="String" default="Search"/>
+    <aura:attribute name="FileUpload" type="String" default="Identifiers File Upload"/>
+    <aura:attribute name="isRulePresent" type="String" default="false"/>
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="updatedFromDate" type="Date"/>
+    <aura:attribute name="updatedToDate" type="Date"/>
+    <aura:attribute name="updatedFromDateTime" type="DateTime"/>
+    <aura:attribute name="updatedToDateTime" type="DateTime"/>
+    <aura:attribute name="collectionType" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div> 
+            </div>
+        </div>
+    </aura:if>
+    
+    <div class="slds-box" > 
+        <lightning:layout pullToBoundary="small">
+            <lightning:layoutItem  size="6" padding="around-small" flexibility="auto">
+                <div class="slds-box">
+                    <lightning:recordEditForm recordId="{!v.uuId}" objectApiName="Product2" onsubmit="{!c.handleSubmit}" onsuccess="{!c.handleSuccess}" onerror="{!c.handleError}">
+                        <lightning:badge label="Details" class="align"/>
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_2-of-4"> 
+                                
+                                <lightning:inputField fieldName="Name" required="true"/>
+                                
+                                <lightning:inputField fieldName="List_Price__c"  readonly="true"/>
+                                
+                                <lightning:inputField fieldName="Applicable_Customer_Types__c" required="true"/>
+                                
+                                <!--lightning:inputField fieldName="Collection_Valid_From__c" required="true"/-->
+                                
+                                <aura:if isTrue="{!v.typeOfCollection=='Rule based'}">
+                                    
+                                    <lightning:input type="date" 
+                                                     label="Collection updatedFrom" 
+                                                     Name="Collection_updateddFrom__c" 
+                                                     aura:id="Collection_updateddFrom__c"
+                                                     value="{!v.updatedFromDate}"
+                                                     onchange="{!c.handleFromDate}"
+                                                     required="true"
+                                                     dateStyle="short"/>
+                                    
+                                    <lightning:inputField fieldName="Collection_updatedFrom__c" value="{!v.updatedFromDateTime}" disabled="true" variant="label-hidden" class="none"/>
+                                    
+                                    <!--lightning:inputField fieldName="Collection_Valid_To__c" required="true"/-->
+                                    
+                                </aura:if>
+                                
+                            </div>
+                            <div class="slds-col slds-size_2-of-4">
+                                <!--lightning:inputField fieldName="businessId__c" value="BD.EBOOK" readonly="true"/>
+                                
+                                <lightning:inputField fieldName="copyrightyear__c" required="true"/-->
+                                
+                                <lightning:inputField fieldName="Product_Type_Author_Facing__c"  disabled="true"/>
+                                
+                                <lightning:inputField fieldName="Sales_Price__c" required="true"/> 
+                                
+                                <lightning:inputField fieldName="Applicable_License_Types__c" required="true"/>
+                                
+                                <!--lightning:inputField fieldName="Applicable_Channels__c" required="true"/-->
+                                
+                                <!--lightning:inputField fieldName="Sales_Channels__c" required="true"/-->
+                                <aura:if isTrue="{!v.typeOfCollection=='Rule based'}">
+                                    
+                                    <lightning:input type="date" 
+                                                     label="Collection updatedTo" 
+                                                     Name="Collection_updateddTo__c" 
+                                                     aura:id="Collection_updateddTo__c"
+                                                     value="{!v.updatedToDate}"
+                                                     onchange="{!c.handleToDate}"
+                                                     required="true"
+                                                     dateStyle="short"/>
+                                    
+                                    <lightning:inputField fieldName="Collection_updatedTo__c" value="{!v.updatedToDateTime}" disabled="true" variant="label-hidden" class="none"/>
+                                    
+                                </aura:if>
+                            </div>   
+                        </div>
+                        
+                        <div style="margin-left:45%">
+                            <lightning:button class="slds-m-top_small" variant="brand" type="submit" name="update" label="Update" />
+                        </div>
+                    </lightning:recordEditForm>
+                </div>
+            </lightning:layoutItem>
+            
+            
+            <lightning:layoutItem size="6" padding="around-small" flexibility="auto">
+                <aura:if isTrue="{!v.typeOfCollection=='Rule based'}">
+                    <c:PPDRuleForRuleBasedCollection recordId="{!v.uuId}" IsRecordLocked="{!v.IsRecordLocked}"/>					
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

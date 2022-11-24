@@ -1,0 +1,43 @@
+<!-- 
+ Created by Jeff Lup on 2014.04.08, for TF Journals, CHG0057797
+-->
+
+<apex:page id="pg" standardController="Opportunity" extensions="OppRenewalPrompt_TFJournalsController" >
+
+<c:jQuery />
+
+    <apex:form id="frm">
+    
+        <apex:pageBlock title="Hidden Fields" rendered="false">
+            <apex:outputField value="{!Opportunity.LastModifiedDate}" />
+            <apex:outputField value="{!Opportunity.Next_Renewal__c}" />
+            <apex:outputField value="{!Opportunity.Volume_Year__c}" />
+            <apex:outputField value="{!Opportunity.Reason_No_Renewal__c}" />
+            <apex:outputField value="{!Opportunity.StageName}" />
+            <apex:outputField value="{!Opportunity.ReVisit_Date__c}" />
+            <apex:outputField value="{!Opportunity.Opportunity_for_Renewal__c}"/>
+        </apex:pageBlock>
+        
+        <!-- <c:lightbox rendered="{!ShowPrompt}" function="LaunchLightbox" width="600" title="Create Next Year's Renewal Opportunity for {!Opportunity.Account.Name}?" duration="0" showCancel="false" -->
+        <!--    content="<iframe src='/apex/Opp_RenewalPromptLb_TFJournals?id={!Opportunity.Id}' style='border:0; width:568px; height: 235px' &gt;&lt;/iframe&gt;" />  -->
+        
+        <script type="text/javascript">
+            var j$ = jQuery.noConflict();
+            
+            j$(document).ready(function(){
+                //LaunchLightbox();
+                             
+                if ("{!ShowPrompt}" == "true") {
+                     if (isLightningExperienceOrSalesforce1())
+                         sforce.one.navigateToURL("/apex/Opp_RenewalPromptLb_TFJournals?id={!Opportunity.Id}"); //todo: build a lightning version
+                     else
+                         parent.window.location.href = '/apex/Opp_RenewalPromptLb_TFJournals?id={!Opportunity.Id}';
+                }
+            });
+            function isLightningExperienceOrSalesforce1() {
+                return((typeof sforce != 'undefined') && sforce && (!!sforce.one));
+            }
+        </script>
+        
+    </apex:form>
+</apex:page>

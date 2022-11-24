@@ -1,0 +1,9 @@
+<apex:page showheader="false" controller="OrgMessageRedirectController">
+ 
+<apex:outputpanel id="pnlRedirect" rendered="{!DisplayRedirect}">
+<script type="text/javascript">
+    window.top.location.replace("{!URLFOR('/apex/OrganizationMessage')}");
+</script> 
+</apex:outputpanel> 
+
+</apex:page>

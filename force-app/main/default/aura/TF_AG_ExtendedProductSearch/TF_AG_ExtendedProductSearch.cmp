@@ -1,0 +1,1078 @@
+<aura:component controller="TF_AG_ExtendedProductSearchCtr" implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="IsbnLabel" type="String" required="false" default="ISBN"/>
+    <aura:attribute name="FirstPublishedYearLabel" type="String" required="false" default="First Published Year"/>
+    <aura:attribute name="TitleLabel" type="String" required="false" default="Title"/>
+    <aura:attribute name="AuthorLabel" type="String" required="false" default="Author"/>
+    <aura:attribute name="NetbaseLabel" type="String" required="false" default="Subject Code"/>
+    <aura:attribute name="SubjectAreaLabel" type="String" required="false" default="Subject Area"/>
+    <aura:attribute name="SeriesLabel" type="String" required="false" default="Series"/>
+    <aura:attribute name="CatalogueNumberLabel" type="String" required="false" default="Catalogue Number"/>
+    <aura:attribute name="defaultPubPriceValue" type="String" default="USD"/>
+    <aura:attribute name="defaultCountryCode" type="String" default="None"/>
+    <aura:attribute name="showproductSearch" type="boolean" default="false"/>
+    <aura:attribute name="showSearchData" type="boolean" default="false"/>
+    <aura:attribute name="showZeroData" type="boolean" default="false"/>
+    <aura:attribute name="ProductText" type="String" default="Product Search"/>
+    <aura:attribute name="ISBNValue" type="Integer"/>
+    <aura:attribute name="FirstPublishedYearValue" type="String"/>
+    <aura:attribute name="productTitle" type="String"/>
+    <aura:attribute name="productAuthor" type="String"/>
+    <aura:attribute name="lstProductData" type="Product2[]"/> 
+    <aura:attribute name="lstProductDataWrapper" type="List" default="[]"/> 
+    <aura:attribute name="allProductDataWrapper" type="List" default="[]"/> 
+    <aura:attribute name="lstProductNotNullData" type="Product2[]"/> 
+    <aura:attribute name="productDetailData" type="Object"/> 
+    <aura:attribute name="Spinner" type="Boolean" default="true"/>
+    <aura:attribute name="latitude" type="String" default=""/>
+    <aura:attribute name="longitude" type="String" default=""/>
+    <aura:attribute name="country" type="String" default=""/>
+    <aura:attribute name="lstNetbases" type="AggregateResult[]" default=""/>
+    <aura:attribute name="lstSubjectList" type="AggregateResult[]" default=""/>
+    <aura:attribute name="lstSelectedNetbase" type="List[]" default="[]"/> 
+    <aura:attribute name="lstSelectedSubjectList" type="List[]" default="[]"/> 
+    <aura:attribute name="lstMedium" type="List[]" default="[]"/>
+    <aura:attribute name="lstPublicationPrice" type="List[]" default="[]"/>
+    <aura:attribute name="lstCountryCode" type="List[]" default="[]"/>
+    <aura:attribute name="lstHasDRM" type="List[]" default="[]"/> 
+    <aura:attribute name="lstSelectedMedium" type="List[]" default="e-Book"/>
+    <aura:attribute name="lstPublished" type="List[]" default="[]"/> 
+    <aura:attribute name="selectPublishedRadio" type="String"/>
+    <aura:attribute name="selectPriceRadio" type="String" default="USD"/>
+    <aura:attribute name="selectCountryRadio" type="String" default="None"/>
+    <aura:attribute name="selectDRMRadio" type="String" default="False"/> 
+    <aura:attribute name="disableSearch" type="Boolean"/>
+    <aura:attribute name="disableCSVSearchBtn" type="Boolean"/>
+    <aura:attribute name="pubFromDate" type="Date" />
+    <aura:attribute name="pubToDate" type="Date" />
+    <aura:attribute name="minPrice" type="Integer" />
+    <aura:attribute name="maxPrice" type="Integer" />
+    <aura:attribute name="multiResultList" type="List" default="[]"/>
+    <aura:attribute name="multiResultCodes" type="List" default="[]"/>
+    <aura:attribute name="selectedNetbaseValues" type="List" default="[]" />
+    <aura:attribute name="selectedSubjectListValues" type="List" default="[]" />
+    <aura:attribute name="IsLoggedInUser" type="Boolean"/>
+    <aura:attribute name="setSelectedTab" type="String" />
+    <aura:attribute name="setSelectedChildTab" type="String" />
+    <aura:attribute name="storeSelectedTabValue" type="String" />
+    <aura:attribute name="lstMultiIsbnProductData" type="List" default="[]"/>
+    <aura:attribute name="allLstMultiIsbnProductData" type="List" default="[]"/>  
+    <aura:attribute name="lstUploadCsvData" type="List" default="[]"/> 
+    <aura:attribute name="csvData" type="String"/>   
+    <aura:attribute name="lstProductTableData" type="List" default="[]"/> 
+    <aura:attribute name="disableMultiIsbnSearchBtn" type="Boolean"/> 
+    <aura:attribute name="multiISBNValues" type="String"/> 
+    <aura:attribute name="fileName" type="String"/> 
+    <aura:attribute name="searchProductTitle" type="String" default="Search"/>
+    <aura:attribute name="multiIsbnListData" type="String"/> 
+    <aura:attribute name="csvMultiData" type="String"/>
+    <aura:attribute name="searchProductMultiISBN" type="String" default="Search"/>
+    <aura:attribute name="csvReadFileData" type="String"/>
+    <aura:attribute name="uploadCsvListData" type="String[]"/>
+    <aura:attribute name="downloadCsvListData" type="String[]"/> 
+    <aura:attribute name="searchProductCSV" type="String" default="Search"/>
+    <aura:attribute name="fileObject" type="Object"/>
+    <aura:attribute name="eventFromProdDetail" type="Boolean" default="false"/>
+    <!-- Start Paginations attributes --> 
+    <aura:attribute name="selectedValue" type="Integer" default="1"/>  
+    <aura:attribute name="displayOnePageData" type="Integer" default="50"/> 
+    <aura:attribute name="totalSearchResultCount" type="Integer" default="0"/> 
+    <aura:attribute name="firstShowRangeIndex" type="Integer" default="1"/> 
+    <aura:attribute name="secondShowRangeIndex" type="Integer" default="1"/> 
+    <aura:attribute name="lstPageIterationCount" type="List" default="[]"/> 
+    <aura:attribute name="lstDisplayPages" type="List" default="[]" />
+    <aura:attribute name="fixShowPageValues" type="Integer" default="9"/>
+    <aura:attribute name="offsetValue" type="String" default="0"/>
+    <!--<aura:attribute name="showPages" type="Boolean" default="false"/>-->
+    <aura:attribute name="showResultCount" type="Boolean" default="false"/>
+    <aura:attribute name="showProductSearchPages" type="Boolean" default="false"/>
+    <!-- Sorting Icon Flags-->
+    <!-- ProductTab-->
+    <aura:attribute name="noOfRecordValidationCheck" type="Boolean" default="false"/>
+    <aura:attribute name="showISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showTitleArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showAuthorArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showPubDateArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showPlanPubArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showListPriceArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showCurrentAvailArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showEBookISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showPriceTypeArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showPaperbackISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showHardbackISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showEditionNumberArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showcopyrightyearArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showDiscountPercentArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showDiscountPriceArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="moreThanTwoThousandRecord" type="Boolean" default="false"/>
+    <aura:attribute name="moreThanFiftyThousandRecord" type="Boolean" default="false"/>
+    <aura:attribute name="sortOrderByField" type="String" default="Name"/>
+    <aura:attribute name="sortOrder" type="String" default="desc"/>
+    <aura:attribute name="isSortingAscDiscountPrice" type="Boolean" default="false"/>
+    <aura:attribute name="isSortingDescDiscountPrice" type="Boolean" default="false"/>
+    <aura:attribute name="lstProductDiscountSortAsc" type="List" default="[]"/>
+    <aura:attribute name="lstProductDiscountSortDesc" type="List" default="[]"/>
+    <aura:attribute name="isSortingAscDiscountPercent" type="Boolean" default="false"/>
+    <aura:attribute name="isSortingDescDiscountPercent" type="Boolean" default="false"/>
+    <!-- MultiISBNlist-->
+    <aura:attribute name="showMultiISBNTabISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabTitleArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabAuthorArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabPubDateArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabPlanPubArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabListPriceArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabCurrentAvailArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabEBookISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabPriceTypeArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabPaperbackISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabHardbackISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabEditionNumberArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabcopyrightyearArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabDiscountPriceArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNTabDiscountPercentArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="multiISBNTabSortOrder" type="String" default="desc"/>
+    <aura:attribute name="multiISBNTabSortOrderByField" type="String" default="Name"/>
+    <aura:attribute name="isSortingAscMultiISBNDiscountPrice" type="Boolean" default="false"/>
+    <aura:attribute name="isSortingDescMultiISBNDiscountPrice" type="Boolean" default="false"/>
+    <aura:attribute name="isSortingAscMultiISBNDiscountPercent" type="Boolean" default="false"/>
+    <aura:attribute name="isSortingDescMultiISBNDiscountPercent" type="Boolean" default="false"/>
+    <aura:attribute name="paginationMultuIsbnDataSearch" type="Boolean" default="false"/>
+    <!-- MultiISBNCSV-->
+    <aura:attribute name="showMultiISBNCsvTabISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabTitleArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabAuthorArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabPubDateArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabPlanPubArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabListPriceArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabCurrentAvailArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabEBookISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabPriceTypeArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabPaperbackISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabHardbackISBNArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabEditionNumberArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabcopyrightyearArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabDiscountPriceArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiISBNCsvTabDiscountPercentArrownUp" type="Boolean" default="false"/>
+    <aura:attribute name="multiISBNCsvTabSortOrder" type="String" default="desc"/>
+    <aura:attribute name="multiISBNCsvTabSortOrderByField" type="String" default="Name"/>
+    <aura:attribute name="isSortingAscCSVDiscountPrice" type="Boolean" default="false"/>
+    <aura:attribute name="isSortingDescCSVDiscountPrice" type="Boolean" default="false"/>
+    <aura:attribute name="isSortingAscCSVDiscountPercent" type="Boolean" default="false"/>
+    <aura:attribute name="isSortingDescCSVDiscountPercent" type="Boolean" default="false"/>
+    <!-- End of Sorting Icon Flags -->
+    <!-- MultiIsbn Pagination Attributes -->
+    <aura:attribute name="firstMulltiIsbnShowRangeIndex" type="Integer" default="1"/> 
+    <aura:attribute name="secondMulltiIsbnShowRangeIndex" type="Integer" default="1"/> 
+    <aura:attribute name="lstDisplayMultiIsbnPages" type="List" default="[]" />
+    <aura:attribute name="showMultiIsbnPages" type="Boolean" default="false"/>
+    <aura:attribute name="showMultiIsbnResultCount" type="Boolean" default="false"/>
+    <aura:attribute name="selectedISBNValue" type="Integer" default="1"/>
+    <aura:attribute name="totalMultiIsbnSearchResultCount" type="Integer" default="0"/> 
+    <aura:attribute name="lstMultiIsbnPageIterationCount" type="List" default="[]"/>    
+    <!--Upload Csv Pagination -->
+    <aura:attribute name="firstUploadCsvShowRangeIndex" type="Integer" default="1"/> 
+    <aura:attribute name="secondUploadCsvShowRangeIndex" type="Integer" default="1"/> 
+    <aura:attribute name="lstDisplayUploadCsv" type="List" default="[]" />
+    <aura:attribute name="showUploadCsvPages" type="Boolean" default="false"/>
+    <aura:attribute name="showUploadCsvResultCount" type="Boolean" default="false"/>
+    <aura:attribute name="totalUploadCsvResultCount" type="Integer" default="0"/> 
+    <aura:attribute name="selectedCSVPageValue" type="Integer" default="1"/>
+    <aura:attribute name="lstUploadCSVPageIterationCount" type="List" default="[]"/>
+    <!-- End Paginations attributes -->
+    <!-- Event handling -->
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:handler event="c:TF_AG_BackToResultEvt" action="{!c.handleBackToResultEvt}"/>
+    <aura:handler event="c:TF_AG_SendSelectSubjectClassifyEvt" action="{!c.handleSelectedListEvt}"/>
+    <aura:handler event="c:TF_AG_SendSelectNetbaseEvt" action="{!c.handleSelectedNetbaseEvt}"/>
+    <aura:registerEvent name="appResetAllEvt" type="c:PPDSearchProductResetComp"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <div class="slds-m-top_small">
+        <aura:if isTrue="{!!v.showproductSearch}">
+            <lightning:tabset variant="horizontal" selectedTabId="{!v.setSelectedTab}" >
+                <lightning:tab label="Product Search" id="productTab" onactive="{!c.handleActive }">
+                    <aura:if isTrue="{!!v.showproductSearch}">
+                        <div class="c-container">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <lightning:input name="input8" value="{!v.ISBNValue}" placeholder="{!v.IsbnLabel}" label="{!v.IsbnLabel}" class="sfdc_usernameinput"/>
+                                    </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <lightning:input name="input8" value="{!v.productTitle}" placeholder="{!v.TitleLabel}" label="{!v.TitleLabel}" class="sfdc_usernameinput"/>
+                                    </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <lightning:input name="input8" value="{!v.productAuthor}" placeholder="{!v.AuthorLabel}" label="{!v.AuthorLabel}" class="sfdc_usernameinput"/>
+                                    </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <!--<div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <lightning:input name="input8" value="" placeholder="{!v.CatalogueNumberLabel}" label="{!v.CatalogueNumberLabel}" class="sfdc_usernameinput"/>
+                                    </div>-->
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="6" padding="around-small">
+                                    <c:TF_AG_NetbaseDualBoxComp values="{!v.selectedNetbaseValues}" backToProductDetail="{!v.eventFromProdDetail}" checkedValuesListBox="{!v.multiResultCodes}"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="6" padding="around-small">
+                                    <c:SubjectGrid checkedValuesListBox="{!v.multiResultList}"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <p class="title">Not Yet Published</p>
+                                        <aura:iteration items="{!v.lstPublished}" var="published">
+                                            <lightning:input type="radio" label="{!published.name}" name="radio1" value="{!published.value}" checked="{!published.isChecked}" onchange="{!c.selectpublish}"/>
+                                        </aura:iteration>
+                                    </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <p class="title">Medium</p>
+                                        <aura:iteration items="{!v.lstMedium}" var="medium">
+                                            <lightning:input disabled = "true" type="radio" label="{!medium.name}" name="radio" value="{!medium.value}" onchange="{!c.selectMedium}" checked="{!medium.isChecked}"/>
+                                        </aura:iteration>
+                                    </div>
+                                </lightning:layoutItem>
+                                
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <p class="title">Publication Price</p>
+                                        <lightning:input type="number" label="" variant = "label-hidden" name="input1" placeholder="Minimum" value="{!v.minPrice}"/><br/>
+                                        <lightning:input type="number" label="" variant = "label-hidden" name="input1" placeholder="Maximum" value="{!v.maxPrice}"/>
+                                    </div> 
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <p class="title">Publication Date</p>
+                                        <lightning:input type="date" variant = "label-hidden" placeholder="From" value="{!v.pubFromDate}" max="{!v.pubToDate}" /><br/>
+                                        <lightning:input type="date" variant = "label-hidden" placeholder="To" value="{!v.pubToDate}" min="{!v.pubFromDate}"/>
+                                    </div>
+                                </lightning:layoutItem>
+                                
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <p class="title">Has DRM</p>
+                                        <aura:iteration items="{!v.lstHasDRM}" var="DRM">
+                                            <lightning:input type="radio" label="{!DRM.name}" name="radio3" value="{!DRM.value}" checked="{!DRM.isChecked}" onchange="{!c.selectDRM}"/>
+                                        </aura:iteration>
+                                    </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <lightning:combobox class="" name="Excluded Country" label="Excluded Country" value="{!v.defaultCountryCode}" placeholder="Select Country" options="{! v.lstCountryCode}" onchange="{! c.selectCountry }"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <!--<div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <p class="title">Publication Price</p>
+                                        <aura:iteration items="{!v.lstPublicationPrice}" var="pubprice">
+                                            <lightning:input type="radio" label="{!pubprice.name}" name="radio2" value="{!pubprice.value}" checked="{!pubprice.isChecked}" onchange="{!c.selectCurrency}"/>
+                                        </aura:iteration>
+                                    </div>-->
+                                    <lightning:combobox class="" name="Publication Price" label="Publication Price" value="{!v.defaultPubPriceValue}" placeholder="Select Publication Price" options="{! v.lstPublicationPrice}" onchange="{! c.selectCurrency }"/>
+                                </lightning:layoutItem>
+                                
+                                
+                                
+                                
+                                
+                               <!-- <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                    <div class="slds-form-element" onkeypress="{!c.searchProductEnter}">
+                                        <lightning:input name="input50" value="{!v.FirstPublishedYearValue}" placeholder="{!v.FirstPublishedYearLabel}" label="{!v.FirstPublishedYearLabel}" class="sfdc_usernameinput"/>
+                                    </div>
+                                </lightning:layoutItem> -->
+                            </lightning:layout>
+                            <br/>
+                            <div class="srchBtn">
+                                 <lightning:button variant="brand" label="Reset All" title="Reset All" onclick="{!c.ResetAllData}"/>
+                                <lightning:button variant="brand" label="{!v.searchProductTitle}" title="{!v.searchProductTitle}" onclick="{! c.searchProduct}" disabled="{!v.disableSearch}"/>
+                                <lightning:button variant="brand" label="Product Data Report" title="Product Data Report" onclick="{!c.openProductDataReport}"/>
+                            </div>
+                            
+                        </div>
+                        
+                    </aura:if>
+                    
+                </lightning:tab>
+                <lightning:tab label="Multi ISBN Search" id="multiIsbnTab" onactive="{! c.handleActive }"> 
+                    <lightning:tabset variant="vertical" selectedTabId="{!v.setSelectedChildTab}">
+                        <lightning:tab label="ISBN List" id="isbnListTab" onactive="{! c.handleChildTabActive }">
+                            <div class="c-container">
+                                <lightning:layout multipleRows="true">
+                                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                                        <div id="container">
+                                            <div class="left">
+                                                <ui:inputTextArea aura:id="multiIsbn" placeholder="ISBN List" value="{!v.multiISBNValues}" rows="5" maxlength="1900"/>
+                                            </div>
+                                            <div class="right">
+                                                <lightning:helptext content="ISBNs must be on separate lines."/>
+                                            </div>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                                        <lightning:button variant="brand" label="{!v.searchProductMultiISBN}" title="{!v.searchProductMultiISBN}" onclick="{!c.searchMultiIsbn}" disabled="{!v.disableMultiIsbnSearchBtn}"/>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </div>
+                            
+                        </lightning:tab>
+                        <lightning:tab label="Upload CSV" id="uploadCsvTab" onactive="{!c.handleChildTabActive }">
+                            <lightning:layout multipleRows="true">
+                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                                    <div class="mainDiv">
+                                        <div class="leftDiv" >
+                                            <lightning:input aura:id="fileId" name="file1" type="file" label="Upload CSV" multiple="true" accept=".csv" onchange="{!c.displayFile}"/>{!v.fileName} 
+                                        </div> 
+                                        <div class="centerDiv">
+                                            <lightning:helptext content="ISBN should be in first column of CSV."/>
+                                        </div>
+                                        <div class="rightDiv">
+                                            <lightning:button variant="brand" label="{!v.searchProductCSV}" title="{!v.searchProductCSV}" onclick="{! c.handleFilesChange }" disabled="{!v.disableCSVSearchBtn}" />
+                                        </div> 
+                                    </div>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:tab>
+                    </lightning:tabset>
+                    
+                </lightning:tab>
+            </lightning:tabset>
+        </aura:if>
+        
+    </div>
+    <aura:if isTrue="{!v.showZeroData}">
+        <div id="container_Paging">
+            <div class="left_paging">
+                
+                    <table>
+                        <tr>
+                            <br/>
+                            <td>
+                    
+                        <b>Showing Results 0 - 0 of 0</b>
+                    
+							</td>
+                            <td>
+                               <td>
+                                 <aura:if isTrue="{!v.moreThanFiftyThousandRecord}">
+                            
+                            <b><div style="color: red;border: 1px solid red !important;padding: 1.01em 16px;border-radius: 16px;width: 475px;margin-top: 6px;">
+                               <label>Return datacount is too large,Please refine your search to get the exact data.</label>
+                            </div></b>
+                   				</aura:if>
+                            </td> 
+                            </td>
+                            <br/>
+						</tr>
+					</table>
+			</div>
+		</div>
+	</aura:if>
+    <aura:if isTrue="{!v.showSearchData}">
+        <div id="container_Paging">
+            <div class="left_paging">
+                <aura:if isTrue="{!v.showProductSearchPages}">
+                    <table>
+                        <tr>
+                            <td>
+                    <aura:if isTrue="{!v.showResultCount}">
+                        <b>Showing Results {!v.firstShowRangeIndex} - {!v.secondShowRangeIndex} of {!v.totalSearchResultCount}</b><br/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.totalSearchResultCount>v.displayOnePageData}">
+                        <lightning:button variant="base" label="Prev" title="Prev" onclick="{!c.showPrevPage}" disabled="{!v.selectedValue==1?true:false}"/> | 
+                        <lightning:button variant="base" label="Next" title="Next" onclick="{!c.showNextPage}" disabled="{!v.selectedValue==v.lstPageIterationCount.length?true:false}"/>
+                        <aura:iteration items="{!v.lstDisplayPages}" var="page" indexVar="pageIndex">
+                            <aura:if isTrue="{!equals(page,v.selectedValue)}">
+                                <span class="showPage2">{!page}</span>
+                                <aura:set attribute="else">
+                                    <lightning:button variant="base" label="{!page}" value="{!page}" title="{!page}" onclick="{!c.handlePageDisplay}" class="{!(page==v.selectedValue)?'':''}"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:iteration>
+                    </aura:if>
+                   
+                            </td>
+                            <td>
+                                 <aura:if isTrue="{!v.moreThanTwoThousandRecord}">
+                            
+                            <b><div style="color: red;border: 1px solid red !important;padding: 1.01em 16px;border-radius: 16px;width: 691px;margin-top: 6px;">
+                               <label>Please note that only 2,000 records have been displayed. To view all results please use the Export to Excel feature.</label>
+                            </div></b>
+                   </aura:if>
+                            </td>
+                        </tr>
+                    </table>
+                </aura:if>
+                <!-- Multi Isbn pagination -->
+                <aura:if isTrue="{!v.showMultiIsbnPages}">
+                    <aura:if isTrue="{!v.showMultiIsbnResultCount}">
+                        <b>Showing Results {!v.firstMulltiIsbnShowRangeIndex} - {!v.secondMulltiIsbnShowRangeIndex} of {!v.totalMultiIsbnSearchResultCount}</b> <br/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.totalMultiIsbnSearchResultCount>v.displayOnePageData}">
+                        <lightning:button variant="base" label="Prev" title="Prev" onclick="{!c.showPrevPage}" disabled="{!v.selectedISBNValue==1?true:false}"/> | 
+                        <lightning:button variant="base" label="Next" title="Next" onclick="{!c.showNextPage}" disabled="{!v.selectedISBNValue==v.lstMultiIsbnPageIterationCount.length?true:false}"/>
+                        <aura:iteration items="{!v.lstDisplayMultiIsbnPages}" var="page" indexVar="pageIndex">
+                            <aura:if isTrue="{!equals(page,v.selectedISBNValue)}">
+                                <span class="showPage2">{!page}</span>
+                                <aura:set attribute="else">
+                                    <lightning:button variant="base" label="{!page}" value="{!page}" title="{!page}" onclick="{!c.handlePageDisplay}" class="{!(page==v.selectedISBNValue)?'':''}"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:iteration>
+                    </aura:if> 
+                </aura:if>
+                <!-- Upload Csv pagination -->
+                <aura:if isTrue="{!v.showUploadCsvPages}">
+                    <aura:if isTrue="{!v.showUploadCsvResultCount}">
+                        <b>Showing Result {!v.firstUploadCsvShowRangeIndex} - {!v.secondUploadCsvShowRangeIndex} of {!v.totalUploadCsvResultCount}</b> <br/>
+                    </aura:if>
+                    <aura:if isTrue="{!v.totalUploadCsvResultCount>v.displayOnePageData}">
+                        <lightning:button variant="base" label="Prev" title="Prev" onclick="{!c.showPrevPage}" disabled="{!v.selectedCSVPageValue==1?true:false}"/> | 
+                        <lightning:button variant="base" label="Next" title="Next" onclick="{!c.showNextPage}" disabled="{!v.selectedCSVPageValue==v.lstUploadCSVPageIterationCount.length?true:false}"/>
+                        <aura:iteration items="{!v.lstDisplayUploadCsv}" var="page" indexVar="pageIndex">
+                            <aura:if isTrue="{!equals(page,v.selectedCSVPageValue)}">
+                                <span class="showPage2">{!page}</span>
+                                <aura:set attribute="else">
+                                    <lightning:button variant="base" label="{!page}" value="{!page}" title="{!page}" onclick="{!c.handlePageDisplay}" class="{!(page==v.selectedISBNValue)?'':''}"/>
+                                </aura:set>
+                            </aura:if>
+                        </aura:iteration>
+                    </aura:if>
+                </aura:if>
+            </div>
+            <div class="right_paging">
+                <br/>
+                <button class="slds-button-Exel"><lightning:icon iconName="doctype:excel" alternativeText="Audio file" /></button>
+                <a onclick="{!c.downloadExcel}" style="color:#04accc" class="clickDownload">Export To Excel</a>
+            </div>
+        </div>
+        
+        <div class="c-container" style="width:100%;overflow:auto;transform: rotateX(180deg);">
+            <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal" style=" transform: rotateX(180deg);overflow:auto;margin-top: 50px;">
+                <thead>
+                    <aura:if isTrue="{!v.storeSelectedTabValue == 'productTab'}"> 
+                        <tr class="slds-text-title_caps">
+                            <th scope="col" data-id="isbn" onclick="{!c.sorting}">
+                                <div class="slds-truncate" title="ISBN" data-id="isbn">
+                                    ISBN
+                                    <aura:if isTrue="{!v.showISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Ascending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Descending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" data-id="title" onclick="{!c.sorting}">
+                                <div class="slds-truncate titlewidth" title="Title" data-id="title">
+                                    Title
+                                    <aura:if isTrue="{!v.showTitleArrownUp}" >
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="author">
+                                <div class="slds-truncate" title="Author" data-id="author">
+                                    Author
+                                    <aura:if isTrue="{!v.showAuthorArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="pubDate">
+                                <div class="slds-truncate" title="Pub Date" data-id="pubDate">
+                                    Pub Date
+                                    <aura:if isTrue="{!v.showPubDateArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="planPubDate">
+                                <div class="slds-truncate" title="Plan Pub Date" data-id="planPubDate">
+                                    Plan Pub Date
+                                    <aura:if isTrue="{!v.showPlanPubArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="currentAvailability">
+                                <div class="slds-truncate" title="Current Availability" data-id="currentAvailability">
+                                    Current Availability
+                                    <aura:if isTrue="{!v.showCurrentAvailArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="eBookISBN">
+                                <div class="slds-truncate" title="eBook ISBN" data-id="eBookISBN">
+                                    eBook ISBN
+                                    <aura:if isTrue="{!v.showEBookISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="PaperbackISBN">
+                                <div class="slds-truncate" title="Paperback ISBN" data-id="PaperbackISBN">
+                                    Paperback ISBN
+                                    <aura:if isTrue="{!v.showPaperbackISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="HardbackISBN">
+                                <div class="slds-truncate" title="Hardback ISBN" data-id="HardbackISBN">
+                                    Hardback ISBN
+                                    <aura:if isTrue="{!v.showHardbackISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="editionNumber">
+                                <div class="slds-truncate" title="Edition" data-id="editionNumber">
+                                    Edition
+                                    <aura:if isTrue="{!v.showEditionNumberArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="copyrightyear">
+                                <div class="slds-truncate" title="Copyright Year" data-id="copyrightyear">
+                                    Copyright Year
+                                    <aura:if isTrue="{!v.showcopyrightyearArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="listPrice">
+                                <div class="slds-truncate" title="List Price" data-id="listPrice">
+                                    List Price
+                                    <aura:if isTrue="{!v.showListPriceArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="pricingType">
+                                <div class="slds-truncate" title="Pricing Type" data-id="pricingType">
+                                    Pricing Type
+                                    <aura:if isTrue="{!v.showMultiISBNTabPriceTypeArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="discountPercent" style="{!v.IsLoggedInUser == true ? 'display:' : 'display:none'}">
+                                <div class="slds-truncate" title="Discount Percentage" data-id="discountPercent">
+                                    Discount Percentage
+                                    <aura:if isTrue="{!v.showDiscountPercentArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="discountPrice"  style="{!v.IsLoggedInUser == true ? 'display:' : 'display:none'}">
+                                <div class="slds-truncate" title="Discount Price" data-id="discountPrice">
+                                    Discount Price
+                                    <aura:if isTrue="{!v.showDiscountPriceArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                        </tr>
+                   </aura:if>
+                    
+                   <aura:if isTrue="{!and(v.storeSelectedTabValue == 'multiIsbnTab',v.setSelectedChildTab == 'isbnListTab')}"> 
+                        <tr class="slds-text-title_caps">
+                            <th scope="col" data-id="isbn" onclick="{!c.sorting}">
+                                <div class="slds-truncate" title="ISBN" data-id="isbn">
+                                    ISBN
+                                    <aura:if isTrue="{!v.showMultiISBNTabISBNArrownUp}" >
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Ascending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Descending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" data-id="title" onclick="{!c.sorting}">
+                                <div class="slds-truncate titlewidth" title="Title" data-id="title">
+                                    Title
+                                    <aura:if isTrue="{!v.showMultiISBNTabTitleArrownUp}" >
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="author">
+                                <div class="slds-truncate" title="Author" data-id="author">
+                                    Author
+                                    <aura:if isTrue="{!v.showMultiISBNTabAuthorArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="pubDate">
+                                <div class="slds-truncate" title="Pub Date" data-id="pubDate">
+                                    Pub Date
+                                    <aura:if isTrue="{!v.showMultiISBNTabPubDateArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="planPubDate">
+                                <div class="slds-truncate" title="Plan Pub Date" data-id="planPubDate">
+                                    Plan Pub Date
+                                    <aura:if isTrue="{!v.showMultiISBNTabPlanPubArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="currentAvailability">
+                                <div class="slds-truncate" title="Current Availability" data-id="currentAvailability">
+                                    Current Availability
+                                    <aura:if isTrue="{!v.showMultiISBNTabCurrentAvailArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="eBookISBN">
+                                <div class="slds-truncate" title="eBook ISBN" data-id="eBookISBN">
+                                    eBook ISBN
+                                    <aura:if isTrue="{!v.showMultiISBNTabEBookISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="PaperbackISBN">
+                                <div class="slds-truncate" title="Paperback ISBN" data-id="PaperbackISBN">
+                                    Paperback ISBN
+                                    <aura:if isTrue="{!v.showMultiISBNTabPaperbackISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="HardbackISBN">
+                                <div class="slds-truncate" title="Hardback ISBN" data-id="HardbackISBN">
+                                    Hardback ISBN
+                                    <aura:if isTrue="{!v.showMultiISBNTabHardbackISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="editionNumber">
+                                <div class="slds-truncate" title="Edition" data-id="editionNumber">
+                                    Edition
+                                    <aura:if isTrue="{!v.showMultiISBNTabEditionNumberArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="copyrightyear">
+                                <div class="slds-truncate" title="Copyright Year" data-id="copyrightyear">
+                                    Copyright Year
+                                    <aura:if isTrue="{!v.showMultiISBNTabcopyrightyearArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="listPrice">
+                                <div class="slds-truncate" title="List Price" data-id="listPrice">
+                                    List Price
+                                    <aura:if isTrue="{!v.showMultiISBNTabListPriceArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="pricingType">
+                                <div class="slds-truncate" title="Pricing Type" data-id="pricingType">
+                                    Pricing Type
+                                    <aura:if isTrue="{!v.showMultiISBNTabPriceTypeArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="discountPercent" style="{!v.IsLoggedInUser == true ? 'display:' : 'display:none'}">
+                                <div class="slds-truncate" title="Discount Percentage" data-id="discountPercent">
+                                    Discount Percentage
+                                    <aura:if isTrue="{!v.showMultiISBNTabDiscountPercentArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="discountPrice" style="{!v.IsLoggedInUser == true ? 'display:' : 'display:none'}">
+                                <div class="slds-truncate" title="Discount Price" data-id="discountPrice">
+                                    Discount Price
+                                    <aura:if isTrue="{!v.showMultiISBNTabDiscountPriceArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                        </tr>
+                   </aura:if>
+                    
+                   <aura:if isTrue="{!and(v.storeSelectedTabValue == 'multiIsbnTab',v.setSelectedChildTab == 'uploadCsvTab')}"> 
+                        <tr class="slds-text-title_caps">
+                            <th scope="col" data-id="isbn" onclick="{!c.sorting}">
+                                <div class="slds-truncate" title="ISBN" data-id="isbn">
+                                    ISBN
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabISBNArrownUp}" >
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Ascending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Descending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" data-id="title" onclick="{!c.sorting}">
+                                <div class="slds-truncate titlewidth" title="Title" data-id="title">
+                                    Title
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabTitleArrownUp}" >
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="author">
+                                <div class="slds-truncate" title="Author" data-id="author">
+                                    Author
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabAuthorArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="pubDate">
+                                <div class="slds-truncate" title="Pub Date" data-id="pubDate">
+                                    Pub Date
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabPubDateArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="planPubDate">
+                                <div class="slds-truncate" title="Plan Pub Date" data-id="planPubDate">
+                                    Plan Pub Date
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabPlanPubArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="currentAvailability">
+                                <div class="slds-truncate" title="Current Availability" data-id="currentAvailability">
+                                    Current Availability
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabCurrentAvailArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="eBookISBN">
+                                <div class="slds-truncate" title="eBook ISBN" data-id="eBookISBN">
+                                    eBook ISBN
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabEBookISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="PaperbackISBN">
+                                <div class="slds-truncate" title="Paperback ISBN" data-id="PaperbackISBN">
+                                    Paperback ISBN
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabPaperbackISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="HardbackISBN">
+                                <div class="slds-truncate" title="Hardback ISBN" data-id="HardbackISBN">
+                                    Hardback ISBN
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabHardbackISBNArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="editionNumber">
+                                <div class="slds-truncate" title="Edition" data-id="editionNumber">
+                                    Edition
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabEditionNumberArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="copyrightyear">
+                                <div class="slds-truncate" title="Copyright Year" data-id="copyrightyear">
+                                    Copyright Year
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabcopyrightyearArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="listPrice">
+                                <div class="slds-truncate" title="List Price" data-id="listPrice">
+                                    List Price
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabListPriceArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="pricingType">
+                                <div class="slds-truncate" title="Pricing Type" data-id="pricingType">
+                                    Pricing Type
+                                    <aura:if isTrue="{!v.showMultiISBNTabPriceTypeArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="discountPercent" style="{!v.IsLoggedInUser == true ? 'display:' : 'display:none'}">
+                                <div class="slds-truncate" title="Discount Percentage" data-id="discountPercent">
+                                    Discount Percentage
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabDiscountPercentArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                            <th scope="col" onclick="{!c.sorting}" data-id="discountPrice" style="{!v.IsLoggedInUser == true ? 'display:' : 'display:none'}">
+                                <div class="slds-truncate" title="Discount Price" data-id="discountPrice">
+                                    Discount Price
+                                    <aura:if isTrue="{!v.showMultiISBNCsvTabDiscountPriceArrownUp}">
+                                        <lightning:icon iconName="utility:arrowup" size="xx-small" alternativeText="Descending" />
+                                        <aura:set attribute="else">
+                                            <lightning:icon iconName="utility:arrowdown" size="xx-small" alternativeText="Ascending" />
+                                        </aura:set>
+                                    </aura:if>
+                                </div>
+                            </th>
+                        </tr>
+                    </aura:if>
+                </thead>
+                <tbody class="tableBody">
+                    <aura:iteration items="{!v.lstProductDataWrapper}" var="priceBk" indexVar="prodIndex">
+                        <aura:if isTrue="{!not(empty(priceBk.pricebook.Product2.Name))}">
+                            <tr class="slds-hint-parent">
+                                <td data-label="ISBN">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.ISBN__c}">{!priceBk.pricebook.Product2.ISBN__c}</div>
+                                </td>
+                                <td data-label="Title">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.Name}">
+                                        <lightning:button variant="base" label="{!priceBk.pricebook.Product2.Name}" title="{!priceBk.pricebook.Product2.Name}" onclick="{! c.openProductDetailPage }" value="{!prodIndex}" class="titleLeft titlewidth"/>
+                                        <!--<u><a onclick="{!c.openProductDetailPage}">{!product.Name}</a></u>-->
+                                    </div>
+                                </td>
+                                <td data-label="Author">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.Lead_Author_Editor__c}">{!priceBk.pricebook.Product2.Lead_Author_Editor__c}</div>
+                                </td>
+                                <td data-label="Pub Date">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.US_Publication_Date__c}"><lightning:formattedDateTime value="{!priceBk.pricebook.Product2.US_Publication_Date__c}" year="numeric" day="2-digit" month="long"/></div>
+                                </td>
+                                <td data-label="Plan Pub Date">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.US_Planned_Publication_Date__c}">
+                                        <lightning:formattedDateTime value="{!priceBk.pricebook.Product2.US_Planned_Publication_Date__c}" year="numeric" day="2-digit" month="long"/>
+                                    </div>
+                                </td>
+                                <td data-label="Current Availability">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.US_Inventory_Status__c}">
+                                        <aura:if isTrue="{!priceBk.pricebook.Product2.POD__c == true}">
+                                            Print On Demand
+                                        <aura:set attribute="else">
+                                                {!priceBk.pricebook.Product2.US_Inventory_Status__c}
+                                            </aura:set>
+                                        </aura:if>
+                                        <!--{!priceBk.pricebook.Product2.US_Inventory_Status__c}-->
+                                    </div>
+                                </td>
+                                <td data-label="eBook ISBN">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.eBook_ISBN__c}">{!priceBk.pricebook.Product2.eBook_ISBN__c}</div>
+                                </td>
+                                <td data-label="Paperback ISBN">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.Paperback_ISBN__c}">{!priceBk.pricebook.Product2.Paperback_ISBN__c}</div>
+                                </td>
+                                <td data-label="Hardback ISBN">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.Hardback_ISBN__c}">{!priceBk.pricebook.Product2.Hardback_ISBN__c}</div>
+                                </td>
+                                <td data-label="Edition">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.Edition_Number__c}">{!priceBk.pricebook.Product2.Edition_Number__c}</div>
+                                </td>
+                                <td data-label="Copyright Year">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Product2.copyrightyear__c}">{!priceBk.pricebook.Product2.copyrightyear__c}</div>
+                                </td>
+                                <td data-label="List Price">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.UnitPrice}">
+                                        <aura:if isTrue="{!priceBk.pricebook.UnitPrice!=undefined}">
+                                            <aura:if isTrue="{!priceBk.pricebook.CurrencyIsoCode=='GBP'}">
+                                            GBP{!priceBk.pricebook.UnitPrice}
+                                            <aura:set attribute="else">
+                                                ${!priceBk.pricebook.UnitPrice}
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+                                        
+                                    </div>
+                                </td>
+                                <td data-label="Pricing Type">
+                                    <div class="slds-truncate" title="{!priceBk.pricebook.Pricing_Type__c}">{!priceBk.pricebook.Pricing_Type__c}</div>
+                                </td>
+                                <td data-label="Discount Percent" style="{!v.IsLoggedInUser == true ? 'display:' : 'display:none'}">
+                                    <div class="slds-truncate" title="">
+                                        <aura:if isTrue="{!priceBk.discountPercent == null}">
+                                            0%
+                                            <aura:set attribute="else">
+                                                {!priceBk.discountPercent}%
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                </td>
+                                <td data-label="discountValue" style="{!v.IsLoggedInUser == true ? 'display:' : 'display:none'}">
+                                    <div class="slds-truncate" title="">
+                                        ${!priceBk.discountValue}
+                                        <!--<aura:if isTrue="{!priceBk.discountValue == 0}">
+                                            ${!priceBk.pricebook.UnitPrice}
+                                            <aura:set attribute="else">
+                                                ${!priceBk.discountValue}
+                                            </aura:set>
+                                        </aura:if>-->
+                                        
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                            
+                        </aura:if>
+                        
+                    </aura:iteration>
+                   
+                </tbody>
+            </table>
+        </div>
+    </aura:if> 
+    
+    <aura:if isTrue="{!v.showproductSearch}">
+        <c:TF_AG_ExtendedProductDetail priceBookData='{!v.productDetailData}'/>
+        
+    </aura:if>
+    
+</aura:component>

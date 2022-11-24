@@ -1,0 +1,24 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="IR_Controller" access="global" >
+    <c:IR_CommonServerAction aura:id="server" />
+    <c:IR_CommonToastService aura:id="toast" />
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" /> 
+    <aura:attribute name="isdisabled" type="boolean" default="true"/>
+    <lightning:layoutItem size="12" padding="around-small">
+        <div class="slds-p-left_small hideCmp" aura:id="showFileUpload">
+            <div class="slds-text-heading_large">Do you want to Send  Notification Email TO UK?</div>
+            <div aura:id="fileName" class="fileNameOk"> 
+                <button class="slds-button slds-button_brand" onclick="{!c.Sendemail}" disabled="{!v.isdisabled}">Send Email</button>
+            </div>
+        </div>  
+    </lightning:layoutItem>
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

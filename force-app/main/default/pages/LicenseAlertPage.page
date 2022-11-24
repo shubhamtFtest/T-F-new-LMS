@@ -1,0 +1,13 @@
+<apex:page standardController="License__c" extensions="TF_LicenseAlertPageExtension">
+    <script>
+        var updateTypeValue = '{!License__c.Update_Type__c}';
+        if ( updateTypeValue == "Dynamic" && !{!License__c.Stop_Alert_Msg__c}) {
+            alert('Extending “Dynamic License End Date” will update license type.');
+            onload = function() { stopAlert(); };
+        }
+    </script>
+    
+    <apex:form >
+        <apex:actionFunction name="stopAlert" action="{!stopLicenseAlert}" />
+    </apex:form>
+</apex:page>

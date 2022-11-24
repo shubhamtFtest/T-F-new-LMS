@@ -1,0 +1,32 @@
+<!-- 
+ Created by Jeff Douglas
+ jeff.douglas@informausa.com / 941-554-3584
+ Notes: The page is essentially the same as CAS_Contact_Subject_Codes_2
+ but are slightly different as each uses a different standard controller
+ due to the way the are called within the UI.
+ -->
+
+<apex:page standardController="Contact" tabStyle="Contact">
+
+	<apex:sectionHeader title="Subject Codes"/>
+
+	<apex:form >
+	<apex:pageBlock title="Maintain Subject Codes" mode="edit">
+		
+		<apex:pageBlockButtons >
+		     <apex:commandButton value="Return to Contact" action="{!cancel}" />
+		</apex:pageBlockButtons>
+		
+		<param name="wmode" value="transparent" />
+		<param name="FlashVars" value="contactId={!$CurrentPage.parameters.id}&userId={!$User.Id}&session_id={!$Api.Session_ID}&server_url={!$Api.Partner_Server_URL_130}"/>
+		<embed wmode="transparent" pluginspage="http://www.macromedia.com/go/getflashplayer"
+			type="application/x-shockwave-flash" menu="false" loop="true" play="true"
+			src="{!$Resource.CAS_Flex_Contact_Subject_Codes}"
+			flashvars="contactId={!$CurrentPage.parameters.id}&userId={!$User.Id}&session_id={!$Api.Session_ID}&server_url={!$Api.Partner_Server_URL_130}" 
+			style="width: 975px; height: 400px">
+		</embed>
+		
+	</apex:pageBlock>
+	</apex:form>	
+
+</apex:page>

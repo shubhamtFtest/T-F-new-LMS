@@ -1,0 +1,244 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="priceBookData" type="Object"/> 
+    <aura:attribute name="isbn" type="String"/> 
+    <aura:attribute name="coverImageUrl" type="String"/> 
+    <!-- Events -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:registerEvent name="appEvent" type="c:TF_AG_BackToResultEvt"/>
+    <lightning:card footer="" title="{!v.productData.Name}">
+        
+            <lightning:button class="ButtonStyle" label="Back to result" onclick="{!c.backToSearchProduct}"/>
+        
+        <p class="slds-p-horizontal_large">
+            <div id="container">
+                <div class="left">
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>ISBN</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value="{!v.priceBookData.pricebook.Product2.ISBN__c}"/>
+                        </lightning:layoutItem>
+                        
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>View Book</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <a href="javascript:void(0)" onclick="{!c.IsbnRedirectLink}">
+                                 www.taylorfrancis.com 
+                            </a>
+                        </lightning:layoutItem>
+                        
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >   
+                            <b>Title</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >  
+                            <ui:outputText value="{!v.priceBookData.pricebook.Product2.Name}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Author/Editor</b>	
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value="{!v.priceBookData.pricebook.Product2.Lead_Author_Editor__c}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Published</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <lightning:formattedDateTime value="{!v.priceBookData.pricebook.Product2.US_Publication_Date__c}" year="numeric" day="2-digit" month="long"/>
+                            
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >   
+                            <b>Edition</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >  
+                            <ui:outputText value="{!v.priceBookData.pricebook.Product2.Edition_Number__c}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Medium</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value="{!v.priceBookData.pricebook.Product2.Version_Type__c}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Price</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                             <aura:if isTrue="{!v.priceBookData.pricebook.CurrencyIsoCode=='GBP'}">
+                                 GBP<ui:outputText value="{!v.priceBookData.pricebook.UnitPrice}"/>
+                                <aura:set attribute="else">
+                            $<ui:outputText value="{!v.priceBookData.pricebook.UnitPrice}"/>
+                        </aura:set>
+                        </aura:if>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                   <!-- <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Discount	Price</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <aura:if isTrue="{!v.priceBookData.discountValue == 0}">
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!v.priceBookData.pricebook.CurrencyIsoCode=='GBP'}">
+                                        GBP<ui:outputText value="{!v.priceBookData.discountValue}"/>
+                                        <aura:set attribute="else">
+                                    $<ui:outputText value="{!v.priceBookData.discountValue}"/>
+                                </aura:set>
+                                </aura:if>
+                                </aura:set>
+                            </aura:if>
+                            
+                        </lightning:layoutItem>
+                    </lightning:layout> -->
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >
+                            <b>Status</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >    
+                            <ui:outputText value="{!v.priceBookData.pricebook.Product2.US_Inventory_Status__c}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                   <!-- <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >   
+                            <b>Imprint</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >  
+                            <ui:outputText value="{!v.priceBookData.pricebook.Product2.Imprint__c}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >   
+                            <b>List</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >  
+                            <ui:outputText value=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >   
+                            <b>Carton qty</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >  
+                            <ui:outputText value=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >
+                            <b>Subject 1</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >    
+                            
+                            <lightning:formattedDateTime value="" year="numeric" day="2-digit" month="long"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >
+                            <b>Subject 2</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >    
+                            
+                            <lightning:formattedDateTime value="" year="numeric" day="2-digit" month="long"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small" >
+                            <b>Subject 3</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >    
+                            
+                            <lightning:formattedDateTime value="" year="numeric" day="2-digit" month="long"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Series></b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value="{!v.priceBookData.pricebook.Product2.Books_Series_Title__c	}"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>POD Status</b>	
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>POD Wait time</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value="1 - 3 weeks"/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Market Restriction (Canada)</b>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Market Restriction (Latin America)</b>		
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Market Restriction (US)</b>		
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Market Restriction (Rest of World)</b>	
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <lightning:layout multipleRows="true">
+                        <lightning:layoutItem size="12" smallDeviceSize="2" mediumDeviceSize="2" largeDeviceSize="2" padding="around-small">
+                            <b>Notes</b>	
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                            <ui:outputText value=""/>
+                        </lightning:layoutItem>
+                    </lightning:layout> -->
+                </div>
+                <div class="right">
+                    <aura:if isTrue="{!(v.coverImageUrl)!=null}">
+                         <img src="{!v.coverImageUrl}"/>
+                        <aura:set attribute="else">
+                        <img src="{!$Resource.Cover_Not_Available}"/>   
+                        </aura:set>
+                    </aura:if>
+                </div>
+            </div>
+            
+        </p>
+    </lightning:card>
+</aura:component>

@@ -1,0 +1,5 @@
+<!-- *** common event for businessId check and collection Title check ***-->
+<aura:event type="APPLICATION" description="Event template">
+    <aura:attribute name="IsBusinessIdExist" type="boolean"/>
+    <aura:attribute name="IsCollectionNameExist" type="boolean"/>
+</aura:event>

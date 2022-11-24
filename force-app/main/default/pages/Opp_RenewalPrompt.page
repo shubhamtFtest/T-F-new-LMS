@@ -1,0 +1,31 @@
+<!-- 
+ Created by Jeff Lup on 2013.03.20, CHG0048679
+-->
+
+<apex:page id="pg" standardController="Opportunity" extensions="OppRenewalPromptController" >
+
+<c:jQuery />
+
+    <apex:form id="frm">
+    
+        <apex:pageBlock title="Hidden Fields" rendered="false">
+            <apex:outputField value="{!Opportunity.LastModifiedDate}" />
+            <apex:outputField value="{!Opportunity.Next_Renewal__c}" />
+        </apex:pageBlock>
+        
+        <c:lightbox rendered="{!ShowPrompt}" function="LaunchLightbox" width="250" title="Create Renewal?" duration="0" showCancel="false"
+            content="<iframe src='/apex/Opp_RenewalPromptLb?id={!Opportunity.Id}' style='border:0; width:218px; height: 80px' &gt;&lt;/iframe&gt;" />
+        
+        <script type="text/javascript">
+            var j$ = jQuery.noConflict();
+            
+            j$(document).ready(function(){
+                LaunchLightbox();
+            });
+        </script>
+        
+
+        
+        
+    </apex:form>
+</apex:page>

@@ -1,0 +1,365 @@
+<!--Created By: Piyush Jain
+    Description: Cmp to get orders for a customer -->
+<aura:component controller="OrderHubCustomerDetailCancelCntrl"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="issearching" type="Boolean" default="false" />
+    <aura:attribute name="showOrderdetailPage" type="Boolean" default="false" />
+    <aura:attribute name="showForm" type="Boolean" default="false" />
+    <aura:attribute name="showList" type="Boolean" default="false" />
+    <aura:attribute name="showFilter" type="Boolean" default="false" />
+    <aura:attribute name="searchValue" type="String" default="" />
+    <aura:attribute name="orderNum" type="String" default="" />
+    <aura:attribute name="accId" type="String" />
+    <aura:attribute name="statusSelected" type="String" />
+    <aura:attribute Name="server_result" type="object[]" access="private" />
+    <aura:attribute name="limit" type="Integer" access="public" default="5"
+        description="Total number of record to be returned" />
+    <aura:attribute Name="OrdersFetched" type="object[]" access="private"
+        description="Total number of orders returned" />
+    <aura:attribute Name="OrdersFtchdSave" type="object[]" access="private"
+        description="to be user after filter cleared" />
+    <aura:attribute name="Spinner" type="boolean" default="false" />
+    <aura:attribute name="NoOrderFound" type="boolean" default="false" />
+    <aura:attribute Name="selItem" type="object" access="public" />
+    <aura:attribute Name="pageno" type="integer" access="public" default="1" />
+    <aura:attribute Name="pagesize" type="integer" access="public" default="10" />
+    <aura:attribute Name="totalPageSize" type="integer" access="public" default="1" />
+    <aura:attribute Name="recordsPerPage" type="integer" />
+    <aura:attribute Name="recordID" type="String" />
+    <aura:attribute Name="actionToDo" type="String" />
+    <aura:attribute name="btnDisable" type="boolean" default="false" />
+    <aura:attribute name="showPgntbtns" type="boolean" default="true" />
+    <aura:attribute name="showOrdersFetched" type="boolean" default="false" />
+    <aura:attribute Name="btn1Pgn" type="integer" access="public" default="0" />
+    <aura:attribute Name="btn2Pgn" type="String" access="public" default="0" />
+    <aura:attribute Name="btn3Pgn" type="String" access="public" default="0" />
+    <aura:attribute Name="btn4Pgn" type="String" access="public" default="0" />
+    <aura:attribute Name="btn5Pgn" type="String" access="public" default="0" />
+    <aura:attribute Name="recName" type="String" access="public" default="0" />
+    <aura:attribute name="addressType" type="String"
+        description="whether we want to use shipping address or billing address for a given Channel. there is a mapping in setting object" />
+    <aura:attribute name="billingadd" type="String" default="billingAddress" />
+    <aura:attribute name="shippingadd" type="String" default="shippingAddress" />
+    <aura:attribute Name="salesType" type="List" />
+    <aura:attribute Name="selectedValue" type="String" />
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="showOrderInput" type="Boolean" />
+    <aura:attribute name="showAccInput" type="Boolean" />
+    <aura:attribute Name="myAcctId" type="String" />
+    <aura:attribute name="selectedLookUpRecordId" type="String"/>
+    <aura:attribute type="Boolean" name="sortAsc" default="false"/>
+    <aura:attribute type="String"  name="sortField" />
+    <aura:attribute type="Boolean"  name="hasPrev" />
+    <aura:attribute type="boolean"  name="hasNext" />
+    <aura:handler name="change" value="{!v.pageno}"	action="{!c.renderPage}" />
+
+    <!-- {!v.Spinner} sfdx mm pageno pagesize -->
+    <div>
+        <aura:if isTrue="{!v.Spinner}">
+            <div aura:id="spinnerId" class="slds-spinner_container">
+                <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                    <span class="slds-assistive-text">Loading...</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </aura:if>
+        <!--  card  -->
+        <aura:if isTrue="{!v.showForm}">
+            <!-- New Changes for UI-->
+            <lightning:card class="slds-text-heading_small" 
+                title="GET ORDERS FOR CUSTOMERS" iconName="standard:search">
+                 <lightning:layout  multipleRows="true">
+                     <lightning:layoutItem size="12" padding="around-small">
+                     	<lightning:select aura:id="selectedSearch" onchange="{!c.onChange}" name="chooseOption" label="Select to search" required="true">
+                            <option value="">choose one...</option>
+                            <option value="1">Search Using Order Number</option>
+                            <option value="2">Search Using Account</option>
+                        </lightning:select>
+                     </lightning:layoutItem>
+                     
+                     <lightning:layoutItem size="12" padding="around-small">
+                     	<lightning:layout>
+                            <aura:if isTrue="{!v.showOrderInput}">
+                            	<lightning:layoutItem size="8">
+                                    <lightning:input class="slds-m-bottom_small" name="input1" aura:id="SearchedOrderId" label="Enter Order Number" />
+                                </lightning:layoutItem>
+                                 <lightning:layoutItem size="4">
+                                    <lightning:button variant="brand-outline" label="Get Orders" title="Get Orders" onclick="{! c.searchOrderSelected }" />
+                                </lightning:layoutItem>
+                             </aura:if>
+
+                            <aura:if isTrue="{!v.showAccInput}">
+                                <lightning:layoutItem padding="around-small" size="4">
+                                    <lightning:select aura:id="select" name="select" class="slds-m-bottom_small"
+                                                      value="{!v.selectedValue}">
+                                        <aura:iteration items="{!v.salesType}" var="salesType">
+                                            <option text="{!salesType.label}" value="{!salesType.id}" selected="{!v.salesType.selected}" />
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem padding="around-small" size="4">
+                                   
+                                  <!-->
+                                 <c:customLookup objectAPIName="account" IconName="standard:account" selectedRecord="{!v.selectedLookUpRecord}" label="Account Name"/>
+                                    
+                                    <-->
+                                    
+                                    <lightning:recordEditForm objectApiName="Case">
+                                        
+                                        <lightning:inputField fieldName="AccountId" value="{!v.selectedLookUpRecordId}"/>
+                                    </lightning:recordEditForm>
+                                                                
+                                    
+                                    
+                                </lightning:layoutItem>  
+                                
+                                <lightning:layoutItem padding="around-small" size="4">
+                                    <lightning:button variant="brand-outline" label="Reset" title="Reset" onclick="{! c.resetAttr}" />
+                                
+                                	<lightning:button variant="brand-outline" label="Get Orders" title="Get Orders" onclick="{! c.searchButtonSelected}" />
+                             
+                                </lightning:layoutItem>
+                            </aura:if>
+                            
+                     
+                           
+                                                 
+                            
+                           
+                        </lightning:layout>
+                     </lightning:layoutItem>
+                  
+                   
+                </lightning:layout>
+                
+                
+                
+                
+                
+                <footer class="slds-card__footer ">
+                    <aura:if isTrue="{!v.showOrdersFetched}">
+                        <!-- {! !empty(v.OrdersFetched)}  ,showOrdersFetched , true -->
+                        <table
+                            class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table--bordered slds-table--cell-buffer slds-table_fixed-layout"
+                            role="grid">
+                            <thead>
+                                <tr class="slds-text-title--caps">
+                                    <th class="" scope="col">
+                                        <div onclick="{!c.sortByOrderNumber}" class="slds-truncate CustBold" title="Order Number">Order Number
+                                        <aura:if isTrue="{!v.sortField=='orderNumber'}">
+                                            <span>
+                                                <aura:if isTrue="{!v.sortAsc}">
+                                                    &#8593;
+                                                    <aura:set attribute="else">
+                                                        &#8595;
+                                                    </aura:set>
+                                                </aura:if>
+                                            </span>
+                        				</aura:if>
+                                        
+                                        </div>
+                                    	
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div onclick="{!c.sortByAddress}" class="slds-truncate CustBold" title="Order Email Address">Order Email
+                                            Address
+                                        	<aura:if isTrue="{!v.sortField=='billingAddress.addressContactEmail'}">
+                                                <span>
+                                                    <aura:if isTrue="{!v.sortAsc}">
+                                                        &#8593;
+                                                        <aura:set attribute="else">
+                                                            &#8595;
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                        					</aura:if>
+                                        
+                                        </div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div onclick="{!c.sortBySAPNumber}" class="slds-truncate CustBold" title="Order Address SAP BP Number">Order
+                                            Address SAP BP Number
+                                            
+                                            <aura:if isTrue="{!v.sortField=='shippingAddress.businessPartnerNo'}">
+                                                <span>
+                                                    <aura:if isTrue="{!v.sortAsc}">
+                                                        &#8593;
+                                                        <aura:set attribute="else">
+                                                            &#8595;
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                        					</aura:if>
+                                        </div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div onclick="{!c.sortByOrderDate}"  class="slds-truncate CustBold" title="Order Date">
+                                            Order Date
+                                        	<aura:if isTrue="{!v.sortField=='orderDate'}">
+                                                <span>
+                                                    <aura:if isTrue="{!v.sortAsc}">
+                                                        &#8593;
+                                                        <aura:set attribute="else">
+                                                            &#8595;
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                        					</aura:if>
+                                        </div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div onclick="{!c.sortByOrderAmount}" class="slds-truncate CustBold" title="Order Amount">
+                                            Order Amount
+                                        	<aura:if isTrue="{!v.sortField=='orderPrice'}">
+                                                <span>
+                                                    <aura:if isTrue="{!v.sortAsc}">
+                                                        &#8593;
+                                                        <aura:set attribute="else">
+                                                            &#8595;
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                        					</aura:if>
+                                        </div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div onclick="{!c.sortByOrderStatus}" class="slds-truncate CustBold" title="Order Status">
+                                            Order Status
+                                        	<aura:if isTrue="{!v.sortField=='orderStatus'}">
+                                                <span>
+                                                    <aura:if isTrue="{!v.sortAsc}">
+                                                          &#8593;
+                                                        <aura:set attribute="else">
+                                                            &#8595;
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </span>
+                        					</aura:if>
+                                        </div>
+                                    </th>
+                                    <!-- <th class="" scope="col">
+                                        <div class="slds-truncate CustBold" title="Link to Order Detail">Link to Order Detail</div>
+                                    </th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.OrdersFetched}" var="item" indexVar="index">
+                                    <tr class="slds-hint-parent">
+                                        <th scope="row">
+                                            <!-- onclick="{!c.openOrderDetail}" -->
+                                            <div class="slds-truncate" title="{!item.orderNumber}">
+                                                <!-- <lightning:formattedUrl value="{! '/lightning/n/Order_Hub_Details?orderNum=' + item.orderNumber}"
+                                                tooltip="Click to see order details" label="{!item.orderNumber}" target="_blank" />v.recordID   server_result.text-->
+                                          
+                                                <a href="{! '/lightning/n/Order_Cancellation?c__orderNum=' + item.orderNumber + '&amp;c__accId='+v.recordID}"
+                                                    target="_blank"
+                                                    title="Click to see order details">{!item.orderNumber}
+                                                </a>
+                                                <!-- <lightning:formattedUrl value="{! '/cmp/OrderHubCustomerDetails?orderNum=' + item.orderNumber}" tooltip="Click to see order details" label="{!item.orderNumber}" target="_blank" /> -->
+                                            </div>
+                                        </th>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate" title="{!item.addressContactEmail}">
+                                                <aura:if
+                                                    isTrue="{!and(!empty(item.billingAddress.addressContactEmail),equals(v.addressType,v.billingadd))}">
+                                                    {!item.billingAddress.addressContactEmail}
+                                                </aura:if>
+                                                <aura:if
+                                                    isTrue="{!and(!empty(item.shippingAddress.addressContactEmail),equals(v.addressType,v.shippingadd))}">
+                                                    {!item.shippingAddress.addressContactEmail}
+                                                </aura:if>
+
+                                            </div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate">
+
+
+                                                <aura:if
+                                                    isTrue="{!and(!empty(item.billingAddress.addressContactEmail),equals(v.addressType,v.billingadd))}">
+                                                    {!item.billingAddress.businessPartnerNo}
+                                                </aura:if>
+                                                <aura:if
+                                                    isTrue="{!and(!empty(item.shippingAddress.addressContactEmail),equals(v.addressType,v.shippingadd))}">
+                                                    {!item.shippingAddress.businessPartnerNo}
+                                                </aura:if>
+
+                                            </div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate" title="{!item.orderDate}"> {!item.orderDate}
+                                            </div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate" title="{!item.taxAmount}">
+                                                <!-- {! (!empty(item.invoices[0].currencyy)) ? ((item.invoices[0].currencyy ==
+                                            'USD') ?
+                                            '$' : '£') :'' } {!item.orderPrice} -->
+                                                <!-- {! (item.invoice.currencyy == 'USD') ? '$' : '£' }  -->
+                                                <lightning:formattedNumber value="{!item.orderPrice}" style="currency"
+                                                    currencyCode="{!item.invoices[0].currencyy}"
+                                                    maximumFractionDigits="2" />
+                                            </div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate" title="{!item.orderStatus}"> {!item.orderStatus}
+                                            </div>
+                                        </td>
+                                        <!-- <td role="gridcell">
+                                            <div class="slds-truncate" title=""> Link</div>
+                                        </td> -->
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                        
+                        
+                        <!-- New Pagination -->
+                        
+                         <div class="slds-button-group slds-p-top_small slds-p-bottom_large" role="group">
+                            
+                            <lightning:button onclick="{!c.prevPage}" aura:id="previousPgnBtn" class="slds-button slds-button--neutral">
+                                Prev
+                            </lightning:button>
+                            <lightning:button class="slds-button slds-button--neutral">
+                                {!v.pageno} / {!v.totalPageSize}
+                            </lightning:button>
+                            <lightning:button onclick="{!c.nextPage}" aura:id="nextPgnBtn" class="slds-button slds-button--neutral">
+                                Next
+                            </lightning:button>
+                           
+                        </div>
+                          
+                    </aura:if>
+
+                    <!-- {!v.NoOrderFound} true -->
+                    <aura:if isTrue="{!v.NoOrderFound}">
+                        <div
+                            class="slds-text-align_center slds-box slds-box_small  slds-m-left_large slds-m-right_large    ">
+                            <lightning:icon iconName="utility:info" alternativeText="Utility image" size="medium" />
+                            <span class="slds-m-left_small">No orders found</span>
+                        </div>
+                    </aura:if>
+                </footer>
+                
+                
+            </lightning:card>
+            
+    
+    
+    		<!-- End New Changes for UI-->
+      
+        </aura:if>
+        <!--  order detail page - uncomment the code  -->
+        <aura:if isTrue="{!v.showOrderdetailPage}">
+            <c:OrderDetailPageCancel orderNum="{!v.orderNum}" accId="{!v.accId}"
+                showOrderdetailPage="{!v.showOrderdetailPage}" showForm="{!v.showForm}" />
+        </aura:if>
+        <!--  order detail page -->
+    </div>
+    
+    
+   
+</aura:component>

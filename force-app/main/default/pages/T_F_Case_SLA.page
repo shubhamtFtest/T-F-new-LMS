@@ -1,0 +1,3 @@
+<apex:page standardController="Case" extensions="CaseSLAExtensions" action="{!updateTargetDateOnCase}" showHeader="true">
+    <apex:milestoneTracker entityId="{!case.id}"/>
+</apex:page>

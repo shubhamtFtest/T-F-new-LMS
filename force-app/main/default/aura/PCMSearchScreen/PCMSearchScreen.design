@@ -1,0 +1,4 @@
+<design:component label="Product Search">
+    <design:attribute name="consumer" label="Consumer" datasource="Collections,BPC,OPC,OPC_External,All" default="All"/>
+    <design:attribute name="hideCheckboxColumn" label="Hide Result Checkbox"/>
+</design:component>

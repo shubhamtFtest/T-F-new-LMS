@@ -1,0 +1,298 @@
+<!-- IRP_PrintCostCalculator -->
+<aura:component controller="TF_IndiaRePrintCostCalculator" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction">
+    <aura:attribute name="products" type="list"/>
+    <aura:attribute name="selTabId" type="String" default="printCostCalculatorTab" />
+    <aura:attribute name="opportunityLineItemId" type="string"/>
+    <aura:attribute name="wrapProductRecord" type="TF_IndiaRePrintCostCalculator.wrapProduct"/>
+    <aura:attribute name="coversionRate" type="Decimal"/>    
+    <aura:attribute name="popularFormatMap" type="Map"/>
+    
+    <!-- start setting form data -->
+    <aura:attribute name="trimSize" type="String"/>
+    <aura:attribute name="formatHeight" type="String" />
+    <aura:attribute name="formatWidth" type="String" />        
+    <aura:attribute name="extent" type="Integer"/>
+    <aura:attribute name="quantity" type="String"/>
+    <aura:attribute name="versionType" type="String"/>
+    <aura:attribute name="textColour" type="String"/>
+    <aura:attribute name="paperType" type="String"/>
+    <aura:attribute name="requiredVersionType" type="String"/>
+    <!-- end setting form data -->
+    
+    <!-- Start Last Print Run Attributes -->
+    <aura:attribute name="lastPrintTrimSize" type="String"/>
+    <aura:attribute name="lastPrintFormatHeight" type="String" />
+    <aura:attribute name="lastPrintFormatWidth" type="String" />     
+    <aura:attribute name="lastPrintVersionType" type="String"/>
+    <aura:attribute name="lastPrintTextColour" type="String"/>
+    <aura:attribute name="lastPrintPaperType" type="String"/>    
+    <aura:attribute name="lastPrintInsert" type="String"/>
+    <aura:attribute name="lastPrintCoverColor" type="String"/>
+    <aura:attribute name="lastPrintInsertColor" type="String"/>
+    <aura:attribute name="lastPrintInsertPaper" type="String"/>
+    <aura:attribute name="lastPrintCoverPaper" type="String"/>
+    <aura:attribute name="lastPrintExtras" type="String"/>     
+    <aura:attribute name="lastPrintUMC" type="String"/>
+    <aura:attribute name="lastPrintUMCDate" type="String"/>
+    <aura:attribute name="lastPrintQty" type="String"/>
+    <aura:attribute name="lastPrintCustomerQuote" type="String"/>
+    <aura:attribute name="lastPrintRetailPrice" type="String"/>
+    <aura:attribute name="lastPrintPrinter" type="String"/>
+    <aura:attribute name="lastPrintSupplyDate" type="String"/> 
+    <aura:attribute name="lastPrintPages" type="String"/>
+    <!-- End Last Print Run Attributes -->
+    
+    <!-- default values -->    
+    <aura:attribute name="specialHeight" type="String"/>
+    <aura:attribute name="specialWidth" type="String"/>
+    <aura:attribute name="estimatedUnitCostUK" type="Boolean"/>
+    <aura:attribute name="currentUnitCostUK" type="Boolean"/>
+    <aura:attribute name="isSpecialFormatSelected" type="Boolean" default="false"/>
+    
+    <aura:attribute name="isPopularFormatsDisabled" type="Boolean" default="false"/>
+    <aura:attribute name="isformatHeightDisabled" type="Boolean" default=""/>
+    <aura:attribute name="isformatWidthDisabled" type="Boolean" default=""/>
+    <aura:attribute name="isSpecialFormatDisabled" type="Boolean" default="true"/>
+    <aura:attribute name="isSpecialHeightDisabled" type="Boolean" default="true"/>
+    <aura:attribute name="isSpecialWidthDisabled" type="Boolean" default="true"/>
+    <aura:attribute name="isPaperTypeDisabled" type="Boolean" default="false"/>
+    <aura:attribute name="isEstimatedUnitCostUKDisabled" type="Boolean" default="true" />
+    <aura:attribute name="isOpenUMCCalulatorModal" type="boolean" default="false"/>      
+    
+    <!-- Print cost calculator setting values -->
+    <aura:attribute name="hardCasePLCValue" type="Integer"/>
+    <aura:attribute name="colorValue" type="Decimal"/>
+    <aura:attribute name="sewingValue" type="Decimal"/>
+    <aura:attribute name="x70gsmValue" type="Decimal"/>
+    <aura:attribute name="x80gsmValue" type="Decimal"/>    
+    <aura:attribute name="productionhistory" type="list"/>     
+    <aura:attribute name="isSending" type="Boolean" default="true"/>
+    <!-- start handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>      
+    <div class="c-container">
+        <aura:if isTrue="{!v.isOpenUMCCalulatorModal}">        
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div id="printCostCalculatorModal">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close"
+                                                  onclick="{! c.closeUMCCalulatorModal }"
+                                                  alternativeText="close"
+                                                  variant="bare-inverse"
+                                                  class="slds-modal__close"/>
+                            
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <lightning:tabset selectedTabId="printCostCalculator">
+                                <lightning:tab label="Print Cost Calculator" id="printCostCalculator" onactive="{! c.handleActive }">
+                                    <div class="slds">
+                                        <div class="slds-grid slds-wrap">
+                                            <div class="slds-col--padded slds-size--1-of-1 slds-medium-size--1-of-2">
+                                                <div class="slds-form-element slds-is-required">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input name="quantity" aura:id="quantity" value="{!v.quantity}" label="Quantity" required="true" onchange="{!c.onUMCValueChange}"/>
+                                                    </div>
+                                                </div>                                                
+                                                <div class="slds-form-element slds-is-required">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:select name="trimSize" aura:id="trimSize" label="Trim Size" onchange="{!c.onChangeTrimSize}" disabled="{!v.isPopularFormatsDisabled}" required="true">
+                                                            <option value="">--None--</option>
+                                                            <aura:iteration items="{!v.popularFormatMap}" var="ind" indexVar="key">
+                                                                <option text="{!ind.value}" value="{!ind.key}" selected="{!v.trimSize == ind.key}"/>
+                                                            </aura:iteration>                                                           
+                                                        </lightning:select>                            
+                                                    </div>                            
+                                                </div>
+                                                <div class="slds-form-element">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input name="formatHeight" aura:id="formatHeight" value="{!v.formatHeight}" label="Format Height (mm)" disabled="{!v.isformatHeightDisabled}" required="true"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input name="formatWidth" aura:id="formatWidth" value="{!v.formatWidth}" label="Format Width (mm)" disabled="{!v.isformatWidthDisabled}" required="true"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning:input name="extent" aura:id="extent" value="{!v.extent}" label="Extent" required="true"/>
+                                                    </div>
+                                                </div>                      
+                                            </div>
+                                            <div class="slds-col--padded slds-size--1-of-1 slds-medium-size--1-of-2"> 
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input type="checkbox" name="specialFormat" label="Special Format" value="{!v.isSpecialFormatSelected}" aura:id="specialFormat" class="slds-p-vertical_small" Checked="true" onchange="{!c.onSpecialFormatChange}" disabled="{!v.isSpecialFormatDisabled}"/>
+                                                </div>
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input name="specialHeight" aura:id="specialHeight" value="{!v.specialHeight}" label="Special Height (mm)" disabled="{!v.isSpecialHeightDisabled}"/>
+                                                </div>
+                                                <div class="slds-form-element__control">
+                                                    <lightning:input name="specialWidth" aura:id="specialWidth" value="{!v.specialWidth}" label="Special Width (mm)" disabled="{!v.isSpecialWidthDisabled}"/>
+                                                </div>                                              
+                                            </div>
+                                            <div class="slds-size_2-of-6">
+                                                <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small">
+                                                    
+                                                    <lightning:select name="versionType" aura:id="versionType" label="Version Type Options" onchange="{!c.onChangeVersionType}" required="true">
+                                                        <option value="">choose one...</option>
+                                                        <option value="Paperback" selected="{!v.requiredVersionType == 'Paperback'}">Paperback</option>
+                                                        <option value="Hardback" selected="{!v.requiredVersionType == 'Hardback'}">Hardback</option>
+                                                    </lightning:select>                               
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_2-of-6">
+                                                <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small">
+                                                    <lightning:select name="textColour" aura:id="textColour" label="Text Colour Options" onchange="{!c.onChangeTextColour}" required="true">
+                                                        <option value="">choose one...</option>
+                                                        <option value="Mono" selected="{!v.textColour == 'Mono'}">Mono</option>
+                                                        <option value="Colour" selected="{!v.textColour == 'Colour'}">Colour</option>
+                                                    </lightning:select> 
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_2-of-6">
+                                                <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small">
+                                                    <lightning:select name="paperType" aura:id="paperType" label="Paper Type Options" onchange="{!c.onChangePaperType}" disabled="{!v.isPaperTypeDisabled}">
+                                                        <option value="">choose one...</option>
+                                                        <option value="70gsm" selected="{!v.paperType == '70gsm uncoated'}">70gsm uncoated</option>
+                                                        <option value="80gsm" selected="{!v.paperType == '80gsm uncoated'}">80gsm uncoated</option>
+                                                    </lightning:select> 
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_2-of-4">
+                                                <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small">
+                                                    Latest Unit Cost (UK): <lightning:formattedNumber class="greenumc" name="currentUnitCostUK" aura:id="currentUnitCostUK" value="{!v.currentUnitCostUK}" maximumFractionDigits="2" title="Current Unit Cost (UK)"/>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size_2-of-4">
+                                                <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small">
+                                                    <!--Estimated Unit Cost (UK):<lightning:formattedNumber class="greenumc" name="estimatedUnitCostUK" aura:id="estimatedUnitCostUK" value="{!v.estimatedUnitCostUK}" maximumFractionDigits="2" title="Estimated Unit Cost (UK)"/>-->
+                                                    <lightning:input name="estimatedUnitCostUK" aura:id="estimatedUnitCostUK" value="{!v.estimatedUnitCostUK}" label="Current Unit Cost (UK)" required="true" disabled="{!v.isEstimatedUnitCostUKDisabled}"/>
+                                                </div>
+                                            </div>                                            
+                                        </div>
+                                    </div>  
+                                    <div class="slds-form-element">
+                                        <lightning:button variant="brand" label="Generate UMC" title="Generate UMC" onclick="{! c.generatePrices }" />
+                                        <lightning:button variant="brand" label="Submit UMC" title="Submit UMC" onclick="{! c.submitUMC }" />
+                                    </div>
+                                    <div class="slds-form-element">
+                                        <div id="inner1"></div>
+                                        <div id="inner2"></div>
+                                        <div id="inner3"></div>
+                                    </div>
+                                </lightning:tab>
+                                <lightning:tab label="Last Print Run Details" id="lastUMCDetails" onactive="{! c.handleActive }">
+                                    <div class="slds">
+                                        <div class="slds-grid slds-wrap">                                      
+                                            <table class="slds-table slds-table--bordered">
+                                                <tbody>
+                                                    <tr>
+                                                        <td><b>Trim Size</b></td><td>: {!v.lastPrintTrimSize}</td>
+                                                        <td><b>Print Qty</b></td><td>: {!v.lastPrintQty}</td>
+                                                    </tr>                                                    
+                                                    <tr>
+                                                        <td><b>Pages</b></td><td>: {!v.lastPrintPages}</td>
+                                                        <td><b>UMC</b></td><td>: {!v.lastPrintUMC}</td>
+                                                    </tr> 
+                                                    <tr>
+                                                        <td><b>Text Color</b></td><td>: {!v.lastPrintTextColour}</td>
+                                                        <td><b>MRP</b></td><td>: XYZ</td>
+                                                    </tr> 
+                                                    <tr>
+                                                        <td><b>Text Paper</b></td><td>: {!v.lastPrintPaperType}</td>
+                                                        <td><b>Customer Quote</b></td><td>: {!v.lastPrintCustomerQuote}</td>
+                                                    </tr> 
+                                                    <tr>
+                                                        <td><b>Insert</b></td><td>: {!v.lastPrintInsert}</td>
+                                                        <td><b>Printer</b></td><td>: {!v.lastPrintPrinter}</td>
+                                                    </tr> 
+                                                    <tr>
+                                                        <td><b>Extras</b></td><td>: {!v.lastPrintExtras}</td>
+                                                        <td><b>Supply Date</b></td><td>: {!v.lastPrintSupplyDate}</td>
+                                                    </tr>                                                     
+                                                    <tr>
+                                                        <td><b>Binding</b></td><td>: {!v.lastPrintVersionType}</td>
+                                                        <td><b></b></td><td></td>
+                                                    </tr>                                                                                                                                                          
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </lightning:tab>
+                                <lightning:tab label="Production History" id="history" onactive="{! c.handleActive }">
+                                    <div class="slds">
+                                        <div class="slds-grid slds-wrap">
+                                            <table class="slds-table slds-table--bordered slds-table--striped slds-table--cell-buffer slds-table--fixed-layout">
+                                                <thead>
+                                                    <tr class="slds-text-heading--label">
+                                                        <th scope="col" width="5%"><div class="slds-truncate" title="Index">#</div></th>
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="Title">Title</div></th>
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="Indian ISBN">Indian ISBN</div></th>
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="Binding">Binding</div></th> 
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="Quantity">Quantity</div></th>
+                                                        <th scope="col" width="5%"><div class="slds-truncate" title="UMC">UMC</div></th>
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="Gratis">Gratis</div></th>
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="Customer Quote">Customer Quote</div></th>
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="GM">GM</div></th>
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="MRP">MRP</div></th>
+                                                        <th scope="col" width="10%"><div class="slds-truncate" title="Year">Year</div></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <aura:if isTrue="{!not(empty(v.productionhistory))}">
+                                                        <aura:iteration items="{!v.productionhistory}" var ="hist" indexVar="idx">                               
+                                                            <tr>
+                                                                <td><div class="slds-truncate" title="index">{!idx+1}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.title}">{!hist.title}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.IndianISBN}">{!hist.IndianISBN}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.binding}">{!hist.binding}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.binding}">{!hist.Qty}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.umc}">{!hist.umc}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.gratis}">{!hist.gratis}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.customerQuote}">{!hist.customerQuote}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.gm}">{!hist.gm}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.mrp}">{!hist.mrp}</div></td>
+                                                                <td><div class="slds-truncate" title="{!hist.year}">{!hist.year}</div></td>
+                                                            </tr>
+                                                        </aura:iteration>
+                                                        <aura:set attribute="else">
+                                                            <tr><td colspan="10">
+                                                                <center>
+                                                                    <aura:if isTrue="{!v.isSending}">
+                                                                        <div class="slds-spinner_container">
+                                                                            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                                                                                <span class="slds-assistive-text">Loading</span>
+                                                                                <div class="slds-spinner__dot-a"></div>
+                                                                                <div class="slds-spinner__dot-b"></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </aura:if>
+                                                                    <aura:set attribute="else">
+                                                                        <span style="color:red">RECORD NOT FOUND</span>
+                                                                    </aura:set>
+                                                                </center>
+                                                                </td>
+                                                            </tr>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </tbody>
+                                            </table>   
+                                            
+                                        </div>
+                                    </div>
+                                </lightning:tab>                                
+                            </lightning:tabset>                                                                                  				
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral"
+                                              label="Close"
+                                              title="Close"
+                                              onclick="{! c.closeUMCCalulatorModal }"/>
+                        </footer>
+                    </div>
+                </div>
+            </section>       
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>               
+    </div>    
+</aura:component>

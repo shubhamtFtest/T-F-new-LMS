@@ -1,0 +1,235 @@
+<aura:component Controller="PCMoppSyncController">
+    <aura:attribute name="productListPCM" type="List"/>
+    <aura:attribute name="PricebkEntProductList" type="Object"/>
+    <aura:attribute name="LicenceTypeList" type="List"/>
+    <aura:attribute name="poRefNumber" type="Object"/>
+    <aura:attribute name="DeleteSyncProductDataWrapper" type="List" default="[]"/> 
+    <aura:attribute name="RecordId" type="String"/>
+    <aura:attribute name="quoteCurrencyCode" type="String"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:attribute name="quoteOrderType" type="String" />
+    <aura:attribute name="csvUploadedDataList" type="Object" />
+    
+    <aura:attribute name="duplicateProductsMessage" type="String" />
+    <aura:attribute name="duplicateProductsEntitled" type="Boolean" default="false" />
+    <aura:attribute name="DuplicateProductsList" type="List" default="[]"/> 
+    
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:handler event="c:PPDPCMSearchEvent" action="{!c.addProductUI}"/>
+    
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!--SFAL-20 added by shubham Kumar-->
+    <aura:if isTrue="{!v.duplicateProductsEntitled}">
+        <!--Modal Box Start-->
+        <div role="dialog" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container" style="margin-top: 10%;width: 50%;">
+                <!--Modal Box Header Start-->
+                <header class="slds-modal__header">
+                    <h1 class="slds-text-heading--medium">Confirmation</h1>
+                </header>
+                <!--Modal Box Header End-->
+                
+                <!--Modal Box Content Start-->
+                <div class="slds-modal__content slds-p-around--medium">
+                    <center><b>{!v.duplicateProductsMessage}</b></center>
+                </div>
+                <!--Modal Box Content End-->
+                
+                <!--Modal Box Button Start-->
+                <footer class="slds-modal__footer">
+                    <lightning:button name='No' label='No' onclick='{!c.handleConfirmDialogNo}'/>
+                    <lightning:button variant="brand" name='Yes' label='Yes' onclick='{!c.handleConfirmDialogYes}'/>
+                </footer>
+                <!--Modal Box Button End-->
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>            
+    </aura:if>
+    
+    <div class="c-container" style="width:100%;overflow:auto;transform: rotateX(180deg);">
+        
+        <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal" style=" transform: rotateX(180deg);overflow:auto;">
+            <thead>
+                <tr class="slds-text-title_caps">
+                    <th scope="col" data-id="isbn">
+                        <div class="slds-truncate" title="Action" data-id="delaction">
+                            Action
+                        </div>
+                    </th>
+                    <th scope="col" data-id="isbn">
+                        <div class="slds-truncate" title="Action" data-id="delaction">
+                            Existing Entitlement
+                        </div>
+                    </th>
+                    <th scope="col" data-id="isbn">
+                        <div class="slds-truncate" title="ISBN" data-id="isbn">
+                            ISBN
+                        </div>
+                    </th>
+                    <th scope="col" data-id="title">
+                        <div class="slds-truncate titlewidth" title="Title" data-id="title">
+                            Title
+                        </div>
+                    </th>
+                    <th scope="col" data-id="author">
+                        <div class="slds-truncate" title="Author" data-id="author">
+                            Author
+                        </div>
+                    </th>
+                    
+                    <th scope="col" data-id="listPrice">
+                        <div class="slds-truncate" title="List Price" data-id="listPrice">
+                            List Price
+                        </div>
+                    </th>
+                    <th scope="col" data-id="poNum">
+                        <div class="slds-truncate" title="Line Ref No." data-id="poReferense">
+                            Line Ref No.
+                        </div>
+                    </th>
+                    <th scope="col" data-id="ProdSubType">
+                        <div class="slds-truncate" title="Product Sub Type" data-id="poReferense">
+                            Product Sub Type
+                        </div>
+                    </th>
+                    <!--<th scope="col" data-id="LicenceType">
+                        <div class="slds-truncate" title="Licence Type" data-id="poReferense">
+                            Licence Type
+                        </div>
+                    </th>-->
+                    
+                </tr>
+            </thead>
+            <tbody class="tableBody">
+                <aura:iteration items="{!v.productListPCM}" var="priceBk" indexVar="prodIndex">
+                    <aura:if isTrue="{!not(empty(priceBk.PCMProductName))}">
+                        <tr class="slds-hint-parent">
+                            <td data-label="delaction">
+                                <div class="slds-truncate" title="">
+                                    <lightning:button variant="destructive" iconName="utility:close" label="" title="Remove" value="{!prodIndex}" onclick="{!c.removeAddedProduct}" />
+                                </div> 
+                            </td>
+                            <td data-label="Existing Entitlement">
+                                <aura:if isTrue="{!(priceBk.isDuplicate)}">
+                                    <div style="margin-left:35%">
+                                        <lightning:icon iconName="utility:success" alternativeText="Duplicate" title="Duplicate" />
+                                    </div>
+                                </aura:if>
+                            </td>
+                            <td data-label="ISBN">
+                                <div class="slds-truncate" title="{!priceBk.PCMISBN}">{!priceBk.PCMISBN}</div>
+                            </td>
+                            <td data-label="Title">
+                                <div class="slds-truncate" title="{!priceBk.productName}" >
+                                    <div class="slds-truncate titleLeft titlewidth" title="{!priceBk.PCMProductName}">{!priceBk.PCMProductName}</div>
+                                    <!--<u><a onclick="{!c.openProductDetailPage}">{!product.Name}</a></u>-->
+                                </div>
+                            </td>
+                            <td data-label="Author">
+                                <div class="slds-truncate" title="{!priceBk.PCMAuthor}">{!priceBk.PCMAuthor}</div>
+                            </td>
+                            
+                            <td data-label="List Price" style = "width: 10%;">
+                                <div class="slds-truncate" title="{!priceBk.UnitPrice}">
+                                    <lightning:input type="number" name="input4" value="{!priceBk.UnitPrice}"/>
+                                    
+                                    
+                                </div>
+                            </td>
+                            <td data-label="P.O. Ref No.">
+                                <div class="slds-truncate" title="{!priceBk.PONumber}">
+                                    <lightning:input type="text" name="input5" value="{!priceBk.PONumber}"/>
+                                </div>
+                            </td>
+                            <td data-label="ProdSubType">
+                                <div class="slds-truncate" title="">
+                                    <!--<lightning:input type="text" name="input5" value=""/>-->
+                                    <aura:if isTrue="{!priceBk.quoteLineRecId != null}">
+                                        <div class="slds-truncate" title="{!priceBk.SalesforceProductName}">{!priceBk.SalesforceProductName}</div>
+                                        <aura:set attribute="else">
+                                            <lightning:select aura:id="RefNo" name="select" onchange="{!c.onChangeMasterProduct}" title="{!prodIndex}"  value="{!priceBk.SalesforceProductName}" >
+                                                <option value="">--None--</option>
+                                                <aura:iteration items="{!priceBk.SFDCProdList}" var="obj">
+                                                    <option value="{!obj.PricebkEntProduct.Name}">{!obj.PricebkEntProduct.Name}</option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </aura:set>
+                                    </aura:if> 
+                                    
+                                    
+                                    
+                                </div>
+                            </td>
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            <!--<td data-label="LicenceType">
+                                <div class="slds-truncate" title="">
+                                    <aura:if isTrue="{!priceBk.quoteLineRecId != null}">
+                                        <div class="slds-truncate" title="{!priceBk.LicenceType}">{!priceBk.LicenceType}</div>
+                                        <aura:set attribute="else">
+                                            <lightning:select aura:id="RefNo" name="select" onchange="{!c.onChangeLicenceType}" title="{!prodIndex}"  value="{!priceBk.LicenceType}" >
+                                                <option value="">None</option>
+                                                <aura:iteration items="{!priceBk.SFDCLicenceData}" var="obj">
+                                                    <option value="{!obj}">{!obj}</option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </aura:set>
+                                    </aura:if> 
+                                    
+                                    
+                                    
+                                </div>
+                            </td>-->
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                        </tr>
+                    </aura:if>
+                    
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>
+    
+    <lightning:layout>
+        <lightning:layoutItem>
+            <lightning:input name="file1" aura:id="file" type="file" accept=".csv" onchange="{! c.handleUploadFinished }"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem>
+            <div style="padding-top:5%">
+                <lightning:button variant="destructive" 
+                                  label="Remove all products"
+                                  title="Remove all products"
+                                  onclick="{! c.deleteDataToQuote }"/>
+                <lightning:button variant="success" 
+                                  label="Sync to Opportunity"
+                                  title="Sync to Opportunity"
+                                  onclick="{!c.syncToQuote}"/>
+                <lightning:button variant="success" 
+                                  label="Sync and Cancel"
+                                  title="Sync and Cancel"
+                                  onclick="{!c.checkForEntitlements}"/>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+</aura:component>

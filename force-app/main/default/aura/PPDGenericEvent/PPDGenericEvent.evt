@@ -1,0 +1,12 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="disableButton" type="String"/>
+    <aura:attribute name="buttonValue" type="boolean"/>
+    <aura:attribute name="porcessBundelItems" type="boolean"/>
+    <aura:attribute name="getAllItems" type="boolean"/>
+    <aura:attribute name="validateAllItems" type="boolean"/>
+    <aura:attribute name="addAllItems" type="boolean"/>
+    <aura:attribute name="validationFor" type="String" default=""/>
+    <aura:attribute name="showValidationResult" type="boolean"/>
+    <aura:attribute name="fileUpload" type="boolean"/>
+    
+</aura:event>

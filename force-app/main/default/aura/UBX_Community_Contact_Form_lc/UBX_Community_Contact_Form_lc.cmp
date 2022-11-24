@@ -1,0 +1,278 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" controller="UBX_Community_Contact_Form_ctr" access="global" >
+  
+    <aura:attribute name="showSpiner" type="Boolean" default="false" /> 
+    <aura:attribute name="queryType" type="String" default="" />
+    <aura:attribute name="vendorId" type="String" default="" />
+    <aura:attribute name="customerType" type="String[]" default="" />
+    <aura:attribute name="topics" type="Setting_Item__c[]" default="[]" />
+    <aura:attribute name="priority" type="String[]" default="" />
+    <aura:attribute name="Topic" type="String[]" default="[]" />
+    <aura:attribute name="contactReason" type="String[]" default="[]" />
+    <aura:attribute name="emailAddress" type="String" default="" />
+    <aura:attribute name="agentName" type="String" default="" />
+    <aura:attribute name="institutionName" type="String" default="" />
+    <aura:attribute name="agentEmailAddress" type="String" default="" />
+    <aura:attribute name="title" type="String" default="" />
+    <aura:attribute name="isbn" type="String" default="" />
+    <aura:attribute name="name" type="String" default="" />
+    <aura:attribute name="prioritySelected" type="String" default="Low" />
+    <aura:attribute name="additionalComments" type="String" default="" />
+    <aura:attribute name="selectedTopic" type="String" default="" />
+    <aura:attribute name="customerTypePicked" type="String" default="" />
+    <aura:attribute name="contactReasonSelected" type="String" default="" />
+    <aura:attribute name="getListValue" type="String" default="" />
+    <aura:attribute name="getListValueToSearch" type="String" default="" />
+    <aura:attribute name="data" type= "Object[]" default="[]" />  
+    <aura:attribute name="AllowCaseSubmit" type="Boolean" default="false" />
+    <aura:attribute name="firstSelect" type="Boolean" default="true" /> 
+    <aura:attribute name="toggleCaseSubmit" type="Boolean" default="false" /> 
+    <aura:attribute name="showThankYou" type="Boolean" default="false" />
+    <aura:attribute name="displayScreen" type="String" default="" />  
+    <aura:attribute name="caseId" type="id" default="" /> 
+    <aura:attribute name="showLoadingSpinner" type="boolean" default="false" />
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="itemsToShow" type= "String[]" default="[]" /> 
+    <aura:attribute name="itemsToHide" type= "String[]" default="[]" /> 
+    <aura:attribute name="selectedArticleId" type="String" default="" /> 
+    <aura:attribute name="fileTooLarge" type="boolean" default="false"/> 
+    <aura:attribute name="maxFileSize" type="integer" default="0"/>
+    <aura:attribute name="recaptchaConfirmed" type="boolean" default="false"/>  
+    <aura:attribute name="removeButtonLabel" type="string" default=""/> 
+    <aura:attribute name="showHelpArticle" type="boolean" default="false"/>
+    <aura:attribute name="showFullPage" type="boolean" default="true"/>
+    <aura:attribute name="selectedHelpArticleDetails" type="sObject"/>
+    <aura:attribute name="isViewingArticle" type="boolean" default="false"/>
+    <aura:attribute name="showBackButton" type="boolean" default="false"/>
+    <aura:attribute name="previousArticleId" type="String"/>
+    <aura:attribute name="CommunityName" type="String" default=""/>
+    <aura:attribute name="NoCase" type="boolean" default="false"/>
+    <aura:attribute name="showRemoveBut" type="boolean" default="false"/>
+    <!--added by sidd-->
+    <aura:attribute name="CommunityCheck" type="String" default="Success"/>
+    <!-- added by sidd-->
+    <aura:handler name='init' value='{!this}' action='{!c.init}'/> 
+    <aura:if isTrue="{!v.showBackButton}">
+        <div>
+            &nbsp; &nbsp; <lightning:button disabled="false" variant= "brand" label="Back" title="backButton" onclick="{!c.goBack}" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'ContinuewithReq' : ''}"/>
+        </div>
+    </aura:if>
+    <br/>
+    <aura:if isTrue="{!v.showHelpArticle}">
+        <div class="slds-text-longform" style="line-height: 1.4em; font-size:1.4em; font-family: lato;">
+            <b><aura:unescapedHtml value="{!v.selectedHelpArticleDetails.Title}" /></b>
+        </div>
+        <br/>
+        <div class="slds-text-longform" style="line-height: 1.4em; font-size:1.4em; font-family: lato;">
+            <aura:unescapedHtml value="{!v.selectedHelpArticleDetails.Summary}" />
+        </div>
+        <br/>
+        <br/>
+        <div class="slds-text-longform" style="line-height: 1.4em; font-size:1.4em; font-family: lato;">
+            <aura:unescapedHtml value="{!v.selectedHelpArticleDetails.Description__c}" />
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showSpiner}"> 
+        <div class="exampleHolder">
+            <lightning:spinner alternativeText="Loading" size="medium" />
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showFullPage}"> 
+        <aura:if isTrue="{!v.CommunityName == 'book_authors'}">
+            <div class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'slds-p-left_small selectwid' : 'slds-p-left_small showCmp'}" aura:id="showTopLevelFields">  
+                <ui:inputSelect label="Content Category" change="{!c.onTopicSelect}" required="true" value="{!v.selectedTopic}" >
+                    <aura:iteration items="{!v.topics}" var="item">
+                        <ui:inputSelectOption text="{!item}"/>
+                    </aura:iteration>
+                </ui:inputSelect>  
+                <aura:if isTrue="{!v.CommunityName != 'book_authors'}">
+                    &nbsp;      
+                </aura:if>
+            </div>   
+            <aura:set attribute="else"> 
+                <div class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'slds-p-left_small selectwid' : 'slds-p-left_small showCmp'}" aura:id="showTopLevelFields">  
+                    
+                    <ui:inputSelect value="{!v.customerTypePicked}" label="Customer Type" required="true" change="{!c.onCustomerTypeSelect}"  >
+                        <aura:iteration items="{!v.customerType}" var="item">
+                            <ui:inputSelectOption text="{!item}" />
+                        </aura:iteration>
+                    </ui:inputSelect> 
+                    &nbsp;    
+                    <ui:inputSelect label="Request Priority" required="true" value="{!v.prioritySelected}" >
+                        <aura:iteration items="{!v.priority}" var="item">
+                            <ui:inputSelectOption text="{!item}"/>
+                        </aura:iteration>
+                    </ui:inputSelect>   
+                    &nbsp;     
+                    <ui:inputSelect label="Contact Category" change="{!c.onTopicSelect}" required="true" value="{!v.selectedTopic}" >
+                        <aura:iteration items="{!v.topics}" var="item">
+                            <ui:inputSelectOption text="{!item}"/>
+                        </aura:iteration>
+                    </ui:inputSelect>    
+                    &nbsp;      
+                </div>   
+            </aura:set>
+        </aura:if> 
+        
+    </aura:if>
+    <div class="slds-p-left_small hideCmp" aura:id="ArticlesSection">
+        <br/>
+        Could these support documents help? &nbsp;       
+        <div >
+            <table  class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX' ? 'HelparticleTable' : 'articleTable' }">
+                <tr >
+                </tr > 
+                <aura:iteration items="{!v.data}" var="data" >
+                    <tr >
+                        <!-- <a href="{!data.dataLink}" onclick="{!c.caseDeflection}" id="{!data.dataArticleId}"> <td >{!data.dataName} </td > </a>!-->
+                        <td >
+                            <div>
+                                <aura:if isTrue="{!v.CommunityName == 'book_authors'}">
+                                    <aura:if isTrue="{!data.dataName == 'No Documents Available'}">
+                                        <div  style="padding-bottom: 34px;">  <p style="text-decoration:none;color: black;position: absolute;">No Documents Available</p></div>
+                                        <aura:set attribute="else">
+                                            <br/>
+                                            <lightning:button variant="base" name="{!data.dataArticleId}" label="{!data.dataName}" onclick="{!c.caseDeflection}"  class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX' ? 'HelparticleTable' : ''}"/>
+                                            <br/>
+                                        </aura:set>
+                                    </aura:if>
+                                    <aura:set attribute="else">
+                                        <br/>
+                                        <lightning:button variant="base" name="{!data.dataArticleId}" label="{!data.dataName}" onclick="{!c.caseDeflection}"  class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'HelparticleTable' : ''}"/>
+                                        <br/>
+                                    </aura:set>  
+                                </aura:if>
+                                
+                            </div>
+                        </td > 
+                        
+                    </tr >     
+                </aura:iteration >
+            </table >
+            <br/>
+            <lightning:button   aura:id="disablebuttonid" disabled="false" variant= "brand" label="Continue with request" title="CreateCase" onclick="{!c.onButtonClick}" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'inputSel' : ''}"/> 
+        </div >
+    </div>
+    <div class="slds-p-left_small hideCmp" aura:id="showContactReason" >            
+        <ui:inputSelect aura:id="contactReason" change="{!c.onReasonSelect}" label="Contact Reason" required="true" value="{!v.contactReasonSelected}" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'inputSel' : ''}">
+            <aura:iteration items="{!v.contactReason}" var="item">
+                <ui:inputSelectOption text="{!item}"/>
+            </aura:iteration>
+        </ui:inputSelect>   
+    </div>  
+    &nbsp;    
+    <div class="slds-p-left_small hideCmp" aura:id="showName" >
+        <ui:inputText label="Full Name" value="{!v.name}" required="true" />      
+    </div>  
+    &nbsp;
+    <div class="helpMessageClass hideCmp" aura:id="helpMessage" >
+        &nbsp; &nbsp; If not applicable insert: N/A
+    </div> 
+    <div class="slds-p-left_small hideCmp" aura:id="showInstitutionName">
+        <ui:inputText label="Institution Name" value="{!v.institutionName}" required="true" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'inputSel' : ''}"/> 
+    </div>   
+    &nbsp;     
+    <div class="slds-p-left_small hideCmp" aura:id="showEmailAddress" >
+        <ui:inputText label="Email Address" value="{!v.emailAddress}" required="true" />
+    </div>     
+    &nbsp;
+    <div class="slds-p-left_small hideCmp" aura:id="showAgentName" >
+        <ui:inputText label="Agent Name" value="{!v.agentName}" required="true" />      
+    </div>    
+    &nbsp;     
+    <div class="slds-p-left_small hideCmp" aura:id="showAgentEmailAddress" >
+        <ui:inputText label="Agent Email Address" value="{!v.agentEmailAddress}" required="true" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'inputSel' : ''}"/>        
+    </div>   
+    &nbsp;    
+    <div class="slds-p-left_small hideCmp" aura:id="showTitle" >
+        <ui:inputText aura:id="lblTitle" label="Journal Title" value="{!v.title}" required="true" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'inputSel' : ''}"/>        
+    </div>   
+    &nbsp;    
+    <div class="slds-p-left_small hideCmp" aura:id="showISBN" >
+        <ui:inputText aura:id="lblISBN" label="ISSN" value="{!v.isbn}" required="true" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'inputSel' : ''}"/>       
+    </div>   
+    &nbsp;   
+    <div class="slds-p-left_small hideCmp" aura:id="showAdditionalComments" >
+        <lightning:textarea name="additionalComments" label="Additional Comments" value="{!v.additionalComments}" required="true" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX' ? 'inputSel' : ''}"/>        
+    </div> 
+     <div class="slds-p-left_small hideCmp" aura:id="ShowNameField" >            
+	   <ui:inputText label="Name" value="{!v.agentName}" required="true" />      
+
+</div>  
+    &nbsp; 
+	 <div class="slds-p-left_small hideCmp" aura:id="showRoyalityIdField" >            
+       <span style="color: var(--lwc-colorTextLabel,#696969);font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif !important; font-size: 1rem;line-height: 1.5em;font-weight: 300;" >*Royalty ID/Account Number</span> 
+        <lightning:helptext class="slds-p-left_small hideCmp" content="If you are unsure where to locate this information please see “How to locate your account number”" />
+        <ui:inputText   value="{!v.vendorId}" required="true" />    
+        <a target="_blank" href="https://help.taylorfrancis.com/book_authors/s/article/How-to-locate-my-Account-Number-or-Royalty-ID">How to locate your account number</a>
+    </div>  
+    &nbsp; 
+    
+    
+    <div class="slds-p-left_small hideCmp" aura:id="showEmailField" >
+        <ui:inputText label="Email" value="{!v.emailAddress}" required="true" />
+    </div> 
+    
+    &nbsp;
+    <div class="slds-p-left_small hideCmp" aura:id="showSubjectExpField" >            
+        <ui:inputText label="Subject Explanation" value="{!v.queryType}" required="true" />       
+    </div>  
+    &nbsp; 
+    <div class="slds-p-left_small hideCmp" aura:id="showDescriptionField" >
+        <lightning:textarea name="additionalComments" label="Description" value="{!v.additionalComments}" required="true" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX' ? 'inputSel' : ''}"/>        
+    </div>
+     &nbsp; 
+    <div class="slds-p-left_small hideCmp" aura:id="showBankMsg" >
+        <ui:outputText  value="Please complete this form to set up or request a change to your banking details.
+This will initiate a secure process to collect your details. We will respond to you within 5 working days." />
+    </div>
+     &nbsp; 
+    <div class="slds-p-left_small hideCmp" aura:id="showAddressMsg" >
+        <ui:outputText value="Please provide details regarding your address change in the Description box." />
+    </div>
+    <br/>    
+    &nbsp;
+        <div class="slds-p-left_small hideCmp" aura:id="showFileUpload" >
+            <lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}" type="file" name="file" label="Attach a File" multiple="false"/>
+            <div aura:id="fileName" class="fileNameOk"> 
+                {!v.fileName} 
+                &nbsp;
+                <aura:if isTrue="{!v.showRemoveBut}">
+                    <lightning:button variant="base" aura:id="removeButton" class="removeButton" label="{!v.removeButtonLabel}" onclick="{! c.removeFile }" />
+                </aura:if>
+            </div>
+        </div>
+    
+    <!--use aura:if for show-hide the loading spinner image--> 
+    <div class="slds-p-left_small hideCmp" aura:id="showSpinner">
+        <aura:if isTrue="{!v.showLoadingSpinner}">
+            <div class="slds-text-body_small slds-text-color_error"><aura:if isTrue="{!v.CommunityName != 'book_authors'}">Uploading... </aura:if>
+                <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="Loading"/>'
+            </div>
+        </aura:if>
+    </div>
+    <br/>  
+    <div class="slds-p-left_small showCmp" aura:id="showFirstButton" style="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'opacity:0.6' : ''}">         
+        <lightning:button disabled="true" variant= "brand" label="Submit Request" class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'ContinuewithReq' : ''}"/>
+    </div>
+    <div class="slds-p-left_small hideCmp" aura:id="showSecondButton">
+        <lightning:button aura:id = "submit button" disabled="false" variant= "brand" label="Submit Request" onclick="{!c.onButtonClick}"   class="{!v.CommunityName == 'book_authors' || !v.CommunityName == 'UBX'  ? 'ContinuewithReq' : ''}"/>
+    </div>
+    
+    <aura:if isTrue="{!v.showThankYou}">
+        <aura:if isTrue="{!v.CommunityName == 'book_authors'}">
+            <div style="font-family: Lato;font-size: 1.3rem;font-weight: 700;text-align: center; border-style: solid; border-width: thin; border-color: lightgray; padding: 50px;background-color: rgb(248,248,248);">
+                Thank you for contacting Taylor &amp; Francis Royalty Department who will respond within 5 working days.
+            </div>
+            <aura:set attribute="else">
+                
+                <div style="font-family: Lato;font-size: 1.3rem;font-weight: 700;text-align: center; border-style: solid; border-width: thin; border-color: lightgray; padding: 50px;background-color: rgb(248,248,248);">
+                    Thank you for contacting Taylor &amp; Francis.
+                </div>
+            </aura:set>
+        </aura:if>
+    </aura:if> 
+    
+    
+</aura:component>

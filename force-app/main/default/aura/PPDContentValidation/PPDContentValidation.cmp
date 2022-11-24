@@ -1,0 +1,103 @@
+<aura:component access="global" controller="TF_PPDProcessController">
+  <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+  <aura:attribute name="products" type="Product2[]"/>
+  <div class="ppdContentValidationBody">
+   <div class="demo-only slds-grid" style="width:70%; background: rgb(244, 246, 249); padding: 1rem;">
+         <!--Products List Table-->
+         <table class="slds-table slds-table--bordered slds-table--cell-buffer" role="grid">      
+                <thead>  
+                    <tr class="slds-text-title--caps">
+                        <th>           
+                            <label class="slds-checkbox">
+                                <ui:inputCheckbox value="{!v.isSelectAll}" change="{!c.handleSelectAllProducts}" aura:id="selectAll"/>
+                                <span class="slds-checkbox--faux" />
+                                <span class="slds-form-element__label"></span>
+                            </label>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" title="Name">Name</div>
+                        </th>
+                        <!--
+                        <th scope="col">
+                            <div class="slds-truncate" title="Account">Code</div>
+                        </th>
+                         
+                        <th scope="col">
+                            <div class="slds-truncate" title="Phone">Family</div>
+                        </th>
+                         
+                        <th scope="col">
+                            <div class="slds-truncate" title="Email">Version Type</div>
+                        </th> -->
+                    </tr>
+                </thead>
+                <tbody>        
+                    <aura:iteration items="{!v.products}" var="product">
+                        <tr>
+                            <th>
+                                <label class="slds-checkbox">
+                                    <ui:inputCheckbox aura:id="checkProduct" value="" text="{!product.Id}"/>
+                                    <span class="slds-checkbox--faux" />
+                                    <span class="slds-form-element__label"></span>
+                                </label>
+                            </th>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!product.Name}">{!product.Name}</div>
+                            </th>
+                            <!--
+                            <td>
+                                <div class="slds-truncate" title="{!product.ProductCode}">{!product.ProductCode}</div>
+                            </td>
+                            <th scope="row">
+                                <div class="slds-truncate" title="{!product.Family}">{!product.Family}</div>
+                            </th>
+                            <td>
+                                <div class="slds-truncate" title="{!product.Version_Type__c}">{!product.Version_Type__c}</div>
+                            </td>
+							-->
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+      </div>    
+   <div class="demo-only slds-grid" style="width:30%; background: rgb(244, 246, 249); padding: 1rem;">
+     <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap">
+       <div class="demo-only slds-size_1-of-2">
+        <div class="slds-form-element">
+          <label class="slds-checkbox_toggle slds-grid">
+          <span class="slds-form-element__label slds-m-bottom_none">Country Validation</span>
+          <input type="checkbox" name="checkbox-toggle-2" value="checkbox-toggle-2" aria-describedby="checkbox-toggle-2" />
+          <span id="checkbox-toggle-2" class="slds-checkbox_faux_container" aria-live="assertive">
+            <span class="slds-checkbox_faux"></span>
+            <span class="slds-checkbox_on">Enabled</span>
+            <span class="slds-checkbox_off">Disabled</span>
+          </span>
+        </label>
+          <label class="slds-checkbox_toggle slds-grid">
+          <span class="slds-form-element__label slds-m-bottom_none">Rule 1 Validation</span>
+          <input type="checkbox" name="checkbox-toggle-2" value="checkbox-toggle-2" aria-describedby="checkbox-toggle-2" />
+          <span id="checkbox-toggle-2" class="slds-checkbox_faux_container" aria-live="assertive">
+            <span class="slds-checkbox_faux"></span>
+            <span class="slds-checkbox_on">Enabled</span>
+            <span class="slds-checkbox_off">Disabled</span>
+          </span>
+        </label> 
+          <label class="slds-checkbox_toggle slds-grid">
+          <span class="slds-form-element__label slds-m-bottom_none">Rule 2 Validation</span>
+          <input type="checkbox" name="checkbox-toggle-2" value="checkbox-toggle-2" aria-describedby="checkbox-toggle-2" />
+          <span id="checkbox-toggle-2" class="slds-checkbox_faux_container" aria-live="assertive">
+            <span class="slds-checkbox_faux"></span>
+            <span class="slds-checkbox_on">Enabled</span>
+            <span class="slds-checkbox_off">Disabled</span>
+          </span>
+        </label>  
+          <div>
+             <br/>
+                <lightning:button label="Validate" class="slds-button_brand" onclick="{!c.handleSelectedPrducts}"  />
+            </div>      
+        </div>
+       </div>
+    </div>
+   </div>
+  </div>
+</aura:component>

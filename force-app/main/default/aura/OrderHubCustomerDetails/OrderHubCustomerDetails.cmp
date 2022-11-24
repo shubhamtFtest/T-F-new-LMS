@@ -1,0 +1,421 @@
+<!-- cmp to get orders for a customer -->
+<aura:component controller="TF_OrderHubCustomerDetailCntrl"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="issearching" type="Boolean" default="false" />
+    <aura:attribute name="showOrderdetailPage" type="Boolean" default="false" />
+    <aura:attribute name="showForm" type="Boolean" default="false" />
+    <aura:attribute name="showList" type="Boolean" default="false" />
+    <aura:attribute name="showFilter" type="Boolean" default="false" />
+    <aura:attribute name="searchValue" type="String" default="" />
+    <aura:attribute name="orderNum" type="String" default="" />
+    <aura:attribute name="accId" type="String" />
+    <aura:attribute name="statusSelected" type="String" />
+    <aura:attribute Name="server_result" type="object[]" access="private" />
+    <aura:attribute name="limit" type="Integer" access="public" default="5"
+        description="Total number of record to be returned" />
+    <aura:attribute Name="OrdersFetched" type="object[]" access="private"
+        description="Total number of orders returned" />
+    <aura:attribute Name="OrdersFtchdSave" type="object[]" access="private"
+        description="to be user after filter cleared" />
+    <aura:attribute name="Spinner" type="boolean" default="false" />
+    <aura:attribute name="NoOrderFound" type="boolean" default="false" />
+    <aura:attribute Name="selItem" type="object" access="public" />
+    <aura:attribute Name="pageno" type="integer" access="public" default="1" />
+    <aura:attribute Name="pagesize" type="integer" access="public" default="10" />
+    <aura:attribute Name="totalPageSize" type="integer" access="public" default="1" />
+    <aura:attribute Name="recordsPerPage" type="integer" />
+    <aura:attribute Name="recordID" type="String" />
+    <aura:attribute Name="actionToDo" type="String" />
+    <aura:attribute name="btnDisable" type="boolean" default="false" />
+    <aura:attribute name="showPgntbtns" type="boolean" default="true" />
+    <aura:attribute name="showOrdersFetched" type="boolean" default="false" />
+    <aura:attribute Name="btn1Pgn" type="integer" access="public" default="0" />
+    <aura:attribute Name="btn2Pgn" type="String" access="public" default="0" />
+    <aura:attribute Name="btn3Pgn" type="String" access="public" default="0" />
+    <aura:attribute Name="btn4Pgn" type="String" access="public" default="0" />
+    <aura:attribute Name="btn5Pgn" type="String" access="public" default="0" />
+    <aura:attribute Name="recName" type="String" access="public" default="0" />
+    <aura:attribute name="addressType" type="String"
+        description="whether we want to use shipping address or billing address for a given Channel. there is a mapping in setting object" />
+    <aura:attribute name="billingadd" type="String" default="billingAddress" />
+    <aura:attribute name="shippingadd" type="String" default="shippingAddress" />
+
+    <!-- {!v.Spinner} sfdx mm pageno pagesize -->
+    <div>
+        <aura:if isTrue="{!v.Spinner}">
+            <div aura:id="spinnerId" class="slds-spinner_container">
+                <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                    <span class="slds-assistive-text">Loading...</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </aura:if>
+        <!--  card  -->
+        <aura:if isTrue="{!v.showForm}">
+            <article class="slds-card">
+                <div class="slds-card__header slds-grid">
+                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                        <div class="slds-media__body">
+                            <h1 class="slds-card__header-title">
+                                <div class="oneline slds-m-bottom_small">
+                                    <lightning:icon iconName="standard:search" alternativeText="Approved"
+                                        class="slds-m-right_x-small" />
+                                    <b>GET ORDERS FOR CUSTOMERS</b>
+                                </div>
+                                <div>
+                                    <div>
+
+                                        <!-- search bar  height: 15rem; -->
+                                        <div>
+                                            <div class="slds-form-element">
+                                                <label class="slds-form-element__label" for="combobox-id-1"> </label>
+                                                <div class="slds-form-element__control">
+                                                    <table>
+                                                        <tr>
+
+                                                            <div class="slds-grid slds-col slds-size_1-of-1">
+                                                                <div class="slds-col slds-size_1-of-3">
+                                                                    <!-- <lightning:input name="input2" label="Channel" aura:id="channel" /> -->
+                                                                    <lightning:select aura:id="channel" name="input2"
+                                                                        label="Channel">
+                                                                        <option value="choose">choose one...</option>
+                                                                        <option value="UBX">UBX</option>
+                                                                        <option value="GOBI">GOBI</option>
+                                                                        <option value="OASIS">OASIS</option>
+                                                                    </lightning:select>
+                                                                </div>
+                                                                <div
+                                                                    class="slds-p-left_small slds-p-left_small slds-col slds-size_1-of-3">
+                                                                    <div class="slds-combobox_container">
+                                                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
+                                                                            aria-expanded="true" aria-haspopup="listbox"
+                                                                            role="combobox  ">
+                                                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                                                                                role="none"
+                                                                                onkeyup="{! c.handleKeyUp }">
+                                                                                <lightning:input aura:id="enter-search"
+                                                                                    name="enter-search"
+                                                                                    label="Hit Enter To Serach Customers"
+                                                                                    placeholder="Search when user hits the 'enter' key"
+                                                                                    isLoading="{! v.issearching }"
+                                                                                    type="search"
+                                                                                    value="{!v.searchValue}"
+                                                                                    autocomplete="off" />
+                                                                                <span
+                                                                                    class="slds-icon_container  slds-input__icon slds-input__icon_right">
+
+                                                                                    <lightning:buttonIcon
+                                                                                        class="slds-p-top_xx-small  slds-p-top_xx-small slds-p-right_x-small"
+                                                                                        iconName="utility:close"
+                                                                                        variant="bare" size="small"
+                                                                                        onclick="{! c.closeAccountList }"
+                                                                                        alternativeText="Remove text" />
+
+                                                                                </span>
+                                                                            </div>
+
+
+                                                                            <aura:if isTrue="{!v.showList}">
+                                                                                <div class="custBorder">
+                                                                                    <aura:iteration
+                                                                                        items="{!v.server_result}"
+                                                                                        var="item" indexvar="ind">
+
+                                                                                        <div id="listbox-id-1"
+                                                                                            class="accList"
+                                                                                            role="listbox">
+                                                                                            <ul class="slds-listbox slds-listbox_vertical"
+                                                                                                role="presentation">
+                                                                                                <li role="presentation"
+                                                                                                    class="slds-listbox__item">
+                                                                                                    <div onclick="{!c.searchItemSelected}"
+                                                                                                        data-text="{!item.text}"
+                                                                                                        data-recordId="{!item.val}">
+                                                                                                        <div id="option1"
+                                                                                                            data-recordId="{!item.val}"
+                                                                                                            data-text="{!item.text}"
+                                                                                                            class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
+                                                                                                            role="option">
+                                                                                                            <span
+                                                                                                                class="slds-media__body"
+                                                                                                                data-recordId="{!item.val}"
+                                                                                                                data-text="{!item.text}">
+                                                                                                                <span
+                                                                                                                    class="slds-listbox__option-text slds-listbox__option-text_entity "
+                                                                                                                    data-text="{!item.text}"
+                                                                                                                    data-recordId="{!item.val}">
+                                                                                                                    {!item.text}</span>
+                                                                                                            </span>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </li>
+                                                                                            </ul>
+                                                                                        </div>
+
+                                                                                    </aura:iteration>
+                                                                                </div>
+                                                                            </aura:if>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div onclick="{!c.searchButtonSelected}">
+                                                                    <ui:button
+                                                                        class="slds-button slds-button_outline-brand"
+                                                                        aura:id="{!c.searchButtonSelected}">Get Orders
+                                                                    </ui:button>
+                                                                </div>
+                                                                <div class="slds-col slds-size_1-of-3">
+                                                                    <!-- <aura:if isTrue="showList">
+                                                                    <div class=" slds-float_right slds-m-top_small slds-m-right_small">
+                                                                        <lightning:icon iconName="utility:filterList"
+                                                                            class="slds-box" title="click to filter the order list"
+                                                                            size="small" alternativeText="Utility image"
+                                                                            onclick="{!c.FilterClicked}" />
+                                                                    </div>
+                                                                </aura:if> -->
+                                                                </div>
+                                                            </div>
+                                                        </tr>
+                                                        <aura:if isTrue="{!v.showFilter}">
+
+                                                            <tr class=" slds-m-top_medium slds-m-bottom_small ">
+                                                                <div
+                                                                    class="slds-grid slds-gutters slds-grid_vertical-align-end  ">
+
+                                                                    <td class=" slds-col ">
+
+                                                                    </td>
+                                                                    <td class=" slds-col  slds-p-left_small">
+
+                                                                    </td>
+                                                                    <td class=" slds-col slds-p-left_small">
+                                                                        <lightning:select aura:id="statusId"
+                                                                            name="select" label="Filter by order status"
+                                                                            onchange="{!c.onChngStatus}">
+                                                                            <option value="choose">choose one...
+                                                                            </option>
+                                                                            <!-- PLACED, INVOICED, PAID, COMPLETE, INVALID, DISPATCHED -->
+                                                                            <option value="PLACED">PLACED</option>
+                                                                            <option value="INVOICED">INVOICED</option>
+                                                                            <option value="PAID">PAID</option>
+                                                                            <option value="COMPLETE">COMPLETE</option>
+                                                                            <option value="INVALID">INVALID</option>
+                                                                            <option value="DISPATCHED">DISPATCHED
+                                                                            </option>
+
+                                                                        </lightning:select>
+                                                                    </td>
+                                                                    <td class=" slds-col slds-p-left_small">
+                                                                        <lightning:button variant="brand"
+                                                                            label="Apply filter"
+                                                                            onclick="{!c.applyFilter}"
+                                                                            title="Apply filter"
+                                                                            class="slds-align_absolute-center" />
+                                                                    </td>
+                                                                    <td class=" slds-col slds-p-left_small">
+                                                                        <lightning:button variant="brand"
+                                                                            label="Clear filter"
+                                                                            onclick="{!c.clearFilter}"
+                                                                            title="Clear filter"
+                                                                            class="slds-align_absolute-center" />
+                                                                    </td>
+                                                                </div>
+                                                            </tr>
+                                                        </aura:if>
+                                                    </table>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- search bar  -->
+
+                                    </div>
+
+                                </div>
+
+
+                            </h1>
+
+                        </div>
+
+                    </header>
+                </div>
+                <div class="slds-m-top_medium slds-card__body ">
+
+
+                </div>
+                <footer class="slds-card__footer ">
+                    <aura:if isTrue="{!v.showOrdersFetched}">
+                        <!-- {! !empty(v.OrdersFetched)}  ,showOrdersFetched , true -->
+                        <table
+                            class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered slds-table_fixed-layout"
+                            role="grid">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate CustBold" title="Order Number">Order Number</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate CustBold" title="Order Email Address">Order Email
+                                            Address
+                                        </div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate CustBold" title="Order Address SAP BP Number">Order
+                                            Address SAP BP Number
+                                        </div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate CustBold" title="Order Date">Order Date</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate CustBold" title="Order Amount">Order Amount</div>
+                                    </th>
+                                    <th class="" scope="col">
+                                        <div class="slds-truncate CustBold" title="Order Status">Order Status</div>
+                                    </th>
+                                    <!-- <th class="" scope="col">
+                                        <div class="slds-truncate CustBold" title="Link to Order Detail">Link to Order Detail</div>
+                                    </th> -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.OrdersFetched}" var="item" indexVar="index">
+                                    <tr class="slds-hint-parent">
+                                        <th scope="row">
+                                            <!-- onclick="{!c.openOrderDetail}" -->
+                                            <div class="slds-truncate" title="{!item.orderNumber}">
+                                                <!-- <lightning:formattedUrl value="{! '/lightning/n/Order_Hub_Details?orderNum=' + item.orderNumber}"
+                                                tooltip="Click to see order details" label="{!item.orderNumber}" target="_blank" />v.recordID   server_result.text -->
+                                                <a href="{! '/lightning/n/UBX_Self_Service_Orders?c__orderNum=' + item.orderNumber + '&amp;c__accId='+v.recordID}"
+                                                    target="_blank"
+                                                    title="Click to see order details">{!item.orderNumber}
+                                                </a>
+                                                <!-- <lightning:formattedUrl value="{! '/cmp/OrderHubCustomerDetails?orderNum=' + item.orderNumber}" tooltip="Click to see order details" label="{!item.orderNumber}" target="_blank" /> -->
+                                            </div>
+                                        </th>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate" title="{!item.addressContactEmail}">
+                                                <aura:if
+                                                    isTrue="{!and(!empty(item.billingAddress.addressContactEmail),equals(v.addressType,v.billingadd))}">
+                                                    {!item.billingAddress.addressContactEmail}
+                                                </aura:if>
+                                                <aura:if
+                                                    isTrue="{!and(!empty(item.shippingAddress.addressContactEmail),equals(v.addressType,v.shippingadd))}">
+                                                    {!item.shippingAddress.addressContactEmail}
+                                                </aura:if>
+
+                                            </div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate">
+
+
+                                                <!--  -->
+                                                <aura:if
+                                                    isTrue="{!and(!empty(item.billingAddress.addressContactEmail),equals(v.addressType,v.billingadd))}">
+                                                    {!item.billingAddress.businessPartnerNo}
+                                                </aura:if>
+                                                <aura:if
+                                                    isTrue="{!and(!empty(item.shippingAddress.addressContactEmail),equals(v.addressType,v.shippingadd))}">
+                                                    {!item.shippingAddress.businessPartnerNo}
+                                                </aura:if>
+                                                <!--  -->
+
+                                            </div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate" title="{!item.orderDate}"> {!item.orderDate}
+                                            </div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate" title="{!item.taxAmount}">
+                                                <!-- {! (!empty(item.invoices[0].currencyy)) ? ((item.invoices[0].currencyy ==
+                                            'USD') ?
+                                            '$' : '£') :'' } {!item.orderPrice} -->
+                                                <!-- {! (item.invoice.currencyy == 'USD') ? '$' : '£' }  -->
+                                                <lightning:formattedNumber value="{!item.orderPrice}" style="currency"
+                                                    currencyCode="{!item.invoices[0].currencyy}"
+                                                    maximumFractionDigits="2" />
+                                            </div>
+                                        </td>
+                                        <td role="gridcell">
+                                            <div class="slds-truncate" title="{!item.orderStatus}"> {!item.orderStatus}
+                                            </div>
+                                        </td>
+                                        <!-- <td role="gridcell">
+                                            <div class="slds-truncate" title=""> Link</div>
+                                        </td> -->
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                        <!-- pagination comp div -->
+                        <div class="slds-align_absolute-center slds-grid slds-grid_vertical">
+                            <div
+                                class=" slds-p-right_small slds-p-left_small  slds-p-top_small slds-p-bottom_xx-small slds-col">
+                                <div class="slds-grid slds-gutters slds-p-left_x-large slds-p-right_x-large"
+                                    id="paginationCompDiv">
+                                    <lightning:button label="Previous" onclick="{!c.previousPg}"
+                                        iconName="utility:chevronleft" iconPosition="left" variant="Neutral"
+                                        class="slds-p-around_small " aura:id="previousPgnBtn" />
+                                    <!-- pagination buttons involved  -->
+                                    <!-- <aura:if isTrue="{!v.showPgntbtns}"> -->
+                                    <div aura:id="pgn1Btn" id="pgn1Btn" class="slds-col slds-box slds-p-around_small"
+                                        onclick="{!c.pgNumClicked}" data-btnvalue="{!v.btn1Pgn + 1 }">{!v.btn1Pgn + 1 }
+                                    </div>
+                                    <div aura:id="pgn2Btn" id="pgn2Btn" class="slds-col slds-box slds-p-around_small"
+                                        onclick="{!c.pgNumClicked}" data-btnvalue="{!v.btn1Pgn + 2 }">{!v.btn1Pgn + 2 }
+                                    </div>
+                                    <div aura:id="pgn3Btn" id="pgn3Btn" class="slds-col slds-box slds-p-around_small"
+                                        onclick="{!c.pgNumClicked}" data-btnvalue="{!v.btn1Pgn + 3 }">{!v.btn1Pgn + 3 }
+                                    </div>
+                                    <div aura:id="pgn4Btn" id="pgn4Btn" class="slds-col slds-box slds-p-around_small"
+                                        onclick="{!c.pgNumClicked}" data-btnvalue="{!v.btn1Pgn + 4 }">{!v.btn1Pgn + 4 }
+                                    </div>
+                                    <div aura:id="pgn5Btn" id="pgn5Btn" class="slds-col slds-box slds-p-around_small"
+                                        onclick="{!c.pgNumClicked}" data-btnvalue="{!v.btn1Pgn + 5 }">{!v.btn1Pgn + 5 }
+                                    </div>
+                                    <!-- </aura:if> -->
+
+
+                                    <!-- pagination buttons involved   -->
+                                    <lightning:button label="Next" onclick="{!c.nextPg}" iconName="utility:chevronright"
+                                        iconPosition="right" variant="Neutral" aura:id="nextPgnBtn"
+                                        class="slds-p-around_small" />
+                                    <!--  "{! equals(v.btnDisable,false) }"    -->
+                                </div>
+                            </div>
+                            <div
+                                class="slds-border_bottom slds-m-left_large slds-m-right_large slds-p-bottom_xx-small slds-align_absolute-center slds-col">
+                                Page
+                                {!v.pageno} of {!v.totalPageSize}| Showing records from {! (v.pageno-1)*v.pagesize} to
+                                {!((v.pageno-1)*(v.pagesize))+v.recordsPerPage }
+                            </div>
+                        </div>
+                        <!-- pagination comp div -->
+                    </aura:if>
+
+                    <!-- {!v.NoOrderFound} true -->
+                    <aura:if isTrue="{!v.NoOrderFound}">
+                        <div
+                            class="slds-text-align_center slds-box slds-box_small  slds-m-left_large slds-m-right_large    ">
+                            <lightning:icon iconName="utility:info" alternativeText="Utility image" size="medium" />
+                            <span class="slds-m-left_small">No orders found</span>
+                        </div>
+                    </aura:if>
+                </footer>
+            </article>
+        </aura:if>
+        <!--  order detail page - uncomment the code  -->
+        <aura:if isTrue="{!v.showOrderdetailPage}">
+            <c:OrderDetailPage orderNum="{!v.orderNum}" accId="{!v.accId}"
+                showOrderdetailPage="{!v.showOrderdetailPage}" showForm="{!v.showForm}" />
+        </aura:if>
+        <!--  order detail page -->
+
+    </div>
+</aura:component>

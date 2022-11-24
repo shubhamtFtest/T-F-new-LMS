@@ -1,0 +1,33 @@
+.THIS.c-container {
+    border: 1px solid #d8dde6;
+    margin: 10px 0 10px 0;
+    background-color: #dbdde0;
+    border-radius: 10px;
+}
+
+.THIS.c-container-light {
+    border: 1px solid #d8dde6;
+    margin: 10px 0 20px 0;
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+.THIS .red { 
+    color: #FFFFFF;
+    background-color: #C12A34;
+    border-radius: 20px;
+}
+
+.THIS .blue { 
+    color: #FFFFFF;
+    background-color: #044B8E;
+     border-radius: 15px;
+    
+}
+
+.THIS.showRed{
+    border: 1px solid #C23934;
+    margin: 10px 0 10px 0;
+    background-color: #dbdde0;
+    border-radius: 10px;
+}

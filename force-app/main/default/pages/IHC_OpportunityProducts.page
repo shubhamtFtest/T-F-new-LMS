@@ -1,0 +1,1191 @@
+<!-- 
+Created by Jeff Lup - 2015.07.29 - IHC Separation Project
+Modified by Jeff Lup - 2016.03.28 - CHG0072245 - Errors on New Opportunity in Lightning
+Modified by Tom Reed - 2017.09.12 - CHG0037576 - Addition of Issue__c field on Advertizing Sales
+Modified by Sheena John -2022.08.19 -GRQ0326681 - Added 6 aditional fields in Commercial Permissions Sales type
+-->
+
+<apex:page standardController="Opportunity" extensions="IHC_OpportunityProductsController" showHeader="false" action="{!init}">
+    
+    <apex:messages style="color:red"/>
+
+    <style>
+        .search {
+            font-family: Arial,Helvetica,sans-serif;
+            font-size:1.2em;
+            font-weight:bold;
+            margin-right: 20px;
+        }
+        .error {
+            color:red;
+            font-style:italic;
+            border-style:none;
+        }
+        .label {
+            margin-right:10px;
+            font-weight:bold;
+        }
+        div.bPageBlock.brandSecondaryBrd.apexDefaultPageBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }
+        div.bPageBlock.brandSecondaryBrd.bEditBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }       
+        .dataCol, .labelCol, .data2Col {
+            background-color: #f8f8f8 !important;
+        }
+        .datePicker {
+            top: 100px !important;
+            left:350px !important;
+        }
+    </style>
+
+    <apex:form id="frm" >
+        <apex:pageBlock title="Hidden Fields" rendered="false">
+            <apex:outputField value="{!Opportunity.Pricebook2Id}" />
+            <apex:outputField value="{!Opportunity.CurrencyIsoCode}" />
+            <apex:outputField value="{!Opportunity.CloseDate}" />
+        </apex:pageBlock>
+        
+        <apex:outputText value="You may add products after first saving the opportunity." rendered="{!Opportunity.Id == null}" /> <!-- CHG0072245 -->
+        
+        <apex:pageBlock Title="" mode="view" rendered="{!AND(NOT(isEditMode),NOT(Opportunity.Id == null))}"> <!-- CHG0072245 -->
+            <apex:pageBlockButtons location="Top">
+                <apex:messages />
+                <apex:commandButton value="Add/Edit Products" action="{!addEditProducts}" rerender="frm"/>
+            </apex:pageBlockButtons>
+
+            <apex:outputpanel style="overflow:auto;height:375px;" layout="block">
+                <apex:pageBlockTable value="{!productWrapperList}" var="w">
+                    <apex:column headervalue="">
+                        <apex:pageBlock mode="edit" id="pbProducts">
+                            <apex:pageBlockSection columns="2">
+                                <apex:outputField value="{!w.oli.IHC_Sales_Type__c}"/>
+                                <apex:outputField value="{!w.oli.IHC_Product_Family__c}" rendered="{!AND(w.oli.IHC_Sales_Type__c == 'Advertising Sales',isProductFamilyRequired)}" />
+                            </apex:pageBlockSection>
+
+                            <!-- ********* Sales Type is blank ********* -->
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == ''}" columns="2">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Product Code</apex:outputLabel>
+                                    <!-- <apex:outputLink target="_blank" value="/{!w.oli.PricebookEntry.Product2Id}" >{!w.oli.ProductCode}</apex:outputLink> -->
+                                    <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />    
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem />
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Product Name</apex:outputLabel>
+                                    <!-- <apex:outputLink target="_blank" value="/{!w.oli.PricebookEntry.Product2Id}" >{!w.oli.ProductName__c}</apex:outputLink> -->
+                                    <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                            
+                            <!-- ********* Commercial Reprints ********* -->
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Reprints'}" columns="1">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Full Citation</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Authorized_User_Notes__c}"/>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Reprints'}" columns="2">
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                <apex:outputField value="{!w.oli.Qty__c}"/>
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualUnitPrice}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!w.oli.Deliver_By__c}"/>
+                                <apex:outputText value="{!w.oli.Delivery_Cost__c}"/>
+                                <apex:outputField value="{!w.oli.Split_Delivery__c}"/>
+                                <apex:outputText value="{!w.oli.Gross_Cost__c}"/>
+                                <apex:outputField value="{!w.oli.Colour__c}"/>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Other Costs Description</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Other_Notes__c}"/>
+                                </apex:pageBlockSectionItem>                                
+                                <apex:outputField value="{!w.oli.Shrink_Wrap__c}"/>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualTotalCost}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!w.oli.Delivery_Instructions__c}"/>
+                                <apex:outputField value="{!w.oli.Split_Billing__c}"/>
+                                <apex:outputField value="{!w.oli.Digital_Object_Identifier__c}"/>
+                                <apex:outputField value="{!w.oli.Billing_Notes__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Billing_Month__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Invoiced__c}"/>
+                                </apex:pageBlockSection>
+
+                            <!-- ********* Commercial ePrints ********* -->
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial ePrints'}" columns="1">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Full Citation</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Authorized_User_Notes__c}"/>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial ePrints'}" columns="2">
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                <apex:outputField value="{!w.oli.Qty__c}"/>
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualUnitPrice}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!w.oli.Deliver_By__c}"/>
+                                <apex:outputText value="{!w.oli.Delivery_Cost__c}"/>
+                                <apex:outputField value="{!w.oli.Digital_Object_Identifier__c}"/>
+                                <apex:outputText value="{!w.oli.Gross_Cost__c}"/>
+                                <apex:pageBlockSectionItem />
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Other Costs Description</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Other_Notes__c}"/>
+                                </apex:pageBlockSectionItem>                                
+                                <apex:pageBlockSectionItem />
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualTotalCost}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Billing_Month__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Invoiced__c}"/>
+                            </apex:pageBlockSection>
+
+                            <!-- ********* Commercial Permissions ********* -->
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Permissions'}" columns="1">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Full Citation</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Authorized_User_Notes__c}"/>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Permissions'}" columns="2">
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                <apex:outputField value="{!w.oli.Qty__c}"/>
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualTotalCost}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!w.oli.Digital_Object_Identifier__c}"/>
+                                <apex:outputField value="{!w.oli.Split_Billing__c}"/>
+                                
+                                
+                                <apex:outputField value="{!w.oli.Article_type__c}" />
+                                <apex:outputText value="{!w.oli.Billing_Notes__c}"/>
+                                
+                                <apex:outputField value="{!w.oli.Dove_details__c}"/>
+                                <apex:outputField value="{!w.oli.Billing_Month__c}"/>
+                                
+                                <apex:outputField value="{!w.oli.Drug_Compound__c}"/>
+                                <apex:outputField value="{!w.oli.Invoiced__c}"/>
+                                
+                                <apex:outputField value="{!w.oli.Therapy_Area__c}"/>
+                                
+                                
+                                
+                                
+                           <apex:pageBlockSectionItem />
+                                 <apex:outputField value="{!w.oli.Therapeutic_Indication__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Language__c}"/>
+                              <!--  <apex:outputField value="{!w.oli.Billing_Notes__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Billing_Month__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Invoiced__c}"/> -->
+                            </apex:pageBlockSection>
+
+                            <!-- ********* Sponsored Focus ********* -->
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Sponsored Focus'}" columns="1">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Full Citation</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Authorized_User_Notes__c}"/>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Sponsored Focus'}" columns="2">
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualTotalCost}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                <apex:outputField value="{!w.oli.Start_Date__c}"/>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Duration</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Duration_IHC__c}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!w.oli.End_Date__c}"/>
+                                <apex:outputField value="{!w.oli.Digital_Object_Identifier__c}"/>
+                                <apex:outputField value="{!w.oli.Split_Billing__c}"/>
+                                <apex:pageBlockSectionItem />
+                                <apex:outputField value="{!w.oli.Billing_Notes__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Billing_Month__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Invoiced__c}"/>
+                            </apex:pageBlockSection>
+                            
+                            <!-- ********* Advertizing Sales ********* -->
+                       <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Advertising Sales'}" columns="2">
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                <apex:outputField value="{!w.oli.Number_of_Issues__c}"/>
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                           <apex:outputField value="{!w.oli.Issue__c}"/> <!--CHG0037576-->
+
+                                <apex:outputField value="{!w.oli.Volume__c}"/>
+                           
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Gross Rate</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualRateCard}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualTotalCost}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Series Discount</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualSeriesDiscount}"/>
+                                </apex:pageBlockSectionItem>
+                           
+                                <apex:outputField value="{!w.oli.Split_Billing__c}"/>
+                                <apex:outputField value="{!w.oli.Size__c}"/>
+                                <apex:outputField value="{!w.oli.Billing_Notes__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Billing_Month__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Invoiced__c}"/>
+                                <apex:outputField value="{!w.oli.Position__c}"/>
+                                <apex:outputField value="{!w.oli.Planning_Buying_Agency__c}"/>
+                                <apex:outputField value="{!w.oli.Ad_Orientation__c}"/>
+                                <apex:outputField value="{!w.oli.Publication_Date__c}"/>
+                                <apex:outputField value="{!w.oli.Creative_Art_Agency__c}"/>
+                                <apex:outputField value="{!w.oli.Art_Received__c}"/>
+                                <apex:outputField value="{!w.oli.Art_Required_Date__c}"/>
+                                <apex:outputField value="{!w.oli.Colour__c}"/>
+                                <apex:pageBlockSectionItem />
+                                
+                                <!--
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Revenue Scheduler</apex:outputLabel>
+                                    <apex:outputLink target="_parent" value="/apex/IHC_Revenue_Schedule?Id={!w.oli.Id}" >Click to view</apex:outputLink>    
+                                </apex:pageBlockSectionItem>
+                                -->
+                            </apex:pageBlockSection>
+
+                            <!-- ********* Commercial Supplements ********* -->
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Supplements'}" columns="1">
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Full Citation</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Authorized_User_Notes__c}"/>
+                                </apex:pageBlockSectionItem>
+                            </apex:pageBlockSection>
+                            <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Supplements'}" columns="2">
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                <apex:outputField value="{!w.oli.Qty__c}"/>
+                                <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualUnitPrice}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!w.oli.Deliver_By__c}"/>
+                                <apex:outputText value="{!w.oli.Delivery_Cost__c}"/>
+                                <apex:outputField value="{!w.oli.Split_Delivery__c}"/>
+                                <apex:outputText value="{!w.oli.Gross_Cost__c}"/>
+                                <apex:outputField value="{!w.oli.Colour__c}"/>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Other Costs Description</apex:outputLabel>
+                                    <apex:outputField value="{!w.oli.Other_Notes__c}"/>
+                                </apex:pageBlockSectionItem>                                
+                                <apex:outputField value="{!w.oli.Shrink_Wrap__c}"/>
+                                <apex:outputText value="{!w.oli.Total_Cost_IHC__c}"/>
+                                <apex:pageBlockSectionItem >
+                                    <apex:outputLabel >Net Cost</apex:outputLabel>
+                                    <apex:outputText escape="false" value="{!w.dualTotalCost}"/>
+                                </apex:pageBlockSectionItem>
+                                <apex:outputField value="{!w.oli.Delivery_Instructions__c}"/>                                
+                                <apex:outputField value="{!w.oli.Split_Billing__c}"/>
+                                <apex:outputField value="{!w.oli.Fulfilled__c}"/>
+                                <apex:outputField value="{!w.oli.Billing_Notes__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Billing_Month__c}"/>
+                                <apex:outputLabel >&nbsp;</apex:outputLabel>
+                                <apex:outputField value="{!w.oli.Invoiced__c}"/>
+                            </apex:pageBlockSection>
+                            
+                        </apex:pageBlock>
+                    </apex:column>
+                </apex:pageBlockTable>
+            </apex:outputpanel>
+        </apex:pageBlock>
+
+        <apex:actionFunction name="salesTypeChanged" rerender="pbtProductEdit" />
+        
+        <!--
+        <apex:actionFunction name="sizeChanged" rerender="positionList,orientationList,colourList" />
+        <apex:actionFunction name="positionChanged" rerender="orientationList,colourList" />
+        <apex:actionFunction name="orientationChanged" rerender="colourList" />
+        -->
+        
+        <apex:tabPanel switchType="client" value="{!selectedTab}" id="tabProducts" rendered="{!isEditMode}">
+            <apex:tab label="Edit Products" name="tabSelectedProducts" id="tabSelectedProducts">
+                <apex:pageBlock id="selectedProducts" title="Selected Products" mode="view" rendered="{!isEditMode}">
+                    <apex:pageMessages />        
+                    
+                    <apex:pageBlockButtons location="Top">
+                        <apex:messages />
+                        <apex:commandButton value="Cancel" action="{!cancel}"/>
+                        <apex:commandButton value="Save" action="{!save}" oncomplete="conditionalRefresh()" status="saveStatus" rerender="selectedProducts" />
+                        <apex:actionStatus startText=" saving..." stopText="{!errorMessage}" stopStyle="color: red; font-weight: bold;" id="saveStatus"/>
+                        <script type='text/javascript'>
+                            function conditionalRefresh(){
+                                if ('{!denyClose}' == 'false') {
+                                    parent.window.location.replace('/{!Opportunity.id}');
+                                }
+                            }
+                        </script>
+                    </apex:pageBlockButtons>
+                    
+                    <apex:outputpanel style="overflow:auto;height:360px;" layout="block">
+                        <apex:pageblockTable id="pbtProductEdit" value="{!productWrapperList}" var="w">
+            
+                            <apex:column width="50">
+                                <apex:commandLink value="Remove" action="{!removeFromSelectedProducts}" reRender="selectedProducts" immediate="true">
+                                    <apex:param value="{!w.tempOliId}" assignTo="{!selectedTempOliId}" name="selectedTempOliId"/>
+                                </apex:commandLink>
+                            </apex:column>
+
+                            <apex:column >
+                                <apex:pageBlock mode="edit" id="pbProductEdit">
+
+                                    <apex:pageBlockSection id="pbsSalesType">
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Sales Type" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.IHC_Sales_Type__c}" id="inputSalesType"  onChange="salesTypeChanged(this.value)" />
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_SalesType}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_SalesType}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+    
+                                        <apex:pageBlockSectionItem rendered="{!AND(w.oli.IHC_Sales_Type__c == 'Advertising Sales',isProductFamilyRequired)}" >
+                                            <apex:outputLabel value="Product Family" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.IHC_Product_Family__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_ProductFamily}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_ProductFamily}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+
+                                    <!-- ********* Sales Type is blank ********* -->
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == ''}" columns="2">
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                        <apex:pageBlockSectionItem />
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                    </apex:pageBlockSection>        
+                                    
+                                    <!-- ********* Commercial Reprints ********* -->
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Reprints'}" columns="1">
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Full Citation" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Authorized_User_Notes__c}" style="width:90%;"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_FullCitation}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_FullCitation}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Reprints'}" columns="2">
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Qty" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.Qty__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Quantity}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Quantity}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Net Cost" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.UnitPrice}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!w.oli.Deliver_By__c}"/>
+                                        <apex:inputField value="{!w.oli.Delivery_Cost__c}"/>
+                                        <apex:inputField value="{!w.oli.Split_Delivery__c}"/>
+                                        <apex:inputText value="{!w.oli.Gross_Cost__c}"/>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Delivery Instructions" />
+                                            <apex:outputPanel >
+                                                <apex:inputField value="{!w.oli.Delivery_Instructions__c}"/>
+                                                <div>
+                                                    <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Delivery}" />
+                                                </div>
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Delivery}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel >Other Costs Description</apex:outputLabel>
+                                            <apex:inputField value="{!w.oli.Other_Notes__c}"/>
+                                        </apex:pageBlockSectionItem>                                
+                                        <apex:inputField value="{!w.oli.Shrink_Wrap__c}"/>
+                                        <apex:inputField value="{!w.oli.Split_Billing__c}"/>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Colour" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Colour__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Color}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Color}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Billing Notes" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Billing_Notes__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Digital Object Identifier" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Digital_Object_Identifier__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_DOI}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_DOI}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>   
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Billing Month" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Billing_Month__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Invoiced" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Invoiced__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+
+                                    <!-- ********* Commercial EPrints ********* -->
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial ePrints'}" columns="1">
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Full Citation" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Authorized_User_Notes__c}" style="width:90%;"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_FullCitation}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_FullCitation}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial ePrints'}" columns="2">
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Qty" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.Qty__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Quantity}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Quantity}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Net Cost" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.UnitPrice}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!w.oli.Deliver_By__c}"/>
+                                        <apex:inputField value="{!w.oli.Delivery_Cost__c}"/>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Digital Object Identifier" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Digital_Object_Identifier__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_DOI}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_DOI}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputText value="{!w.oli.Gross_Cost__c}"/>
+                                        <apex:pageBlockSectionItem />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel >Other Costs Description</apex:outputLabel>
+                                            <apex:inputField value="{!w.oli.Other_Notes__c}"/>
+                                        </apex:pageBlockSectionItem>  
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel >Billing Month</apex:outputLabel>
+                                            <apex:inputField value="{!w.oli.Billing_Month__c}"/>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel >Invoiced</apex:outputLabel>
+                                            <apex:inputField value="{!w.oli.Invoiced__c}"/>
+                                        </apex:pageBlockSectionItem>                              
+                                    </apex:pageBlockSection>
+
+                                    <!-- ********* Commercial Permissions ********* -->
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Permissions'}" columns="1">
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Full Citation" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="re0quiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Authorized_User_Notes__c}" style="width:90%;"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_FullCitation}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_FullCitation}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Permissions'}" columns="2">
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Qty" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.Qty__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Quantity}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Quantity}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Net Cost" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.UnitPrice}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Digital Object Identifier" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Digital_Object_Identifier__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_DOI}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_DOI}" />
+                                            </apex:outputPanel>
+                                            </apex:pageBlockSectionItem>
+                                        
+                                        <!-- added below fields as per the GRQ0326681--- Modified by Sheena John -->    	
+                                        <apex:inputField value="{!w.oli.Split_Billing__c}"/>
+                                        <apex:pageBlockSectionItem />
+                                        
+                                    
+                                        <apex:pageBlockSectionItem > </apex:pageBlockSectionItem>
+                                         <apex:pageBlockSectionItem >
+                                             <apex:outputLabel value="Article type" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                 <apex:inputField value="{!w.oli.Article_type__c}"/>
+                                                </div>
+                                            </apex:outputPanel>  
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!w.oli.Billing_Notes__c}"/>
+                                        <apex:pageBlockSectionItem />
+                                        
+                                         <apex:pageBlockSectionItem > </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                             <apex:outputLabel value="Dove Details" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Dove_details__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_DoveDetails}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_DoveDetails}" />
+                                            </apex:outputPanel>  
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!w.oli.Billing_Month__c}"/>
+                                        <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                        <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                        <apex:pageBlockSectionItem />
+                                        
+										<apex:pageBlockSectionItem > </apex:pageBlockSectionItem>
+												<apex:pageBlockSectionItem >
+                                             <apex:outputLabel value="Drug Compound" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Drug_Compound__c}"/>
+                                                </div>
+                                            </apex:outputPanel>  
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!w.oli.Invoiced__c}"/>
+                                        <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                        <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                        <apex:pageBlockSectionItem />
+                                        
+										<apex:pageBlockSectionItem > </apex:pageBlockSectionItem>
+												<apex:pageBlockSectionItem >
+                                             <apex:outputLabel value="Therapy Area" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Therapy_Area__c	}"/>
+                                                </div>
+                                            </apex:outputPanel>  
+                                        </apex:pageBlockSectionItem>
+                                        
+                                        <apex:pageBlockSectionItem > </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Therapeutic Indication" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Therapeutic_Indication__c}"/>
+                                                </div>
+                                                
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        
+                                        <apex:pageBlockSectionItem > </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Language" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Language__c}"/>
+                                                </div>
+                                                
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        
+                                    </apex:pageBlockSection>
+
+                                    <!-- ********* Sponsored Focus ********* -->
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Sponsored Focus'}" columns="1">
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Full Citation" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Authorized_User_Notes__c}" style="width:90%;"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_FullCitation}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_FullCitation}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Sponsored Focus'}" columns="2">
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Net Cost" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.UnitPrice}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Start Date" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Start_Date__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_StartDate}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_StartDate}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Duration" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Duration_IHC__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Duration}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Duration}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="End Date" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.End_Date__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_EndDate}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_EndDate}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Digital Object Identifier" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Digital_Object_Identifier__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_DOI}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_DOI}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!w.oli.Split_Billing__c}"/>
+                                        <apex:pageBlockSectionItem />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Billing Notes" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Billing_Notes__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Billing Month" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Billing_Month__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Invoiced" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Invoiced__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                    
+                                    <!-- ********* Advertising Sales ********* -->
+                                   <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Advertising Sales'}" columns="2">
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Number of Issues" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.Number_of_Issues__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Quantity}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Quantity}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                       
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                       <!--CHG0037576-->
+                                              <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Issue" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.Issue__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Quantity}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Quantity}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <!--CHG0037576-->
+                                        
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Volume" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.Volume__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Volume}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Volume}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+
+                                            <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Gross Rate" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.Rate_Card_Price__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_RateCard}" />
+                                                <apex:outputText value="Value must not be less than the Sales Price" style="color:red" rendered="{!w.showError_RateCard}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+
+                                        
+                                      <!--   <apex:pageBlockSectionItem /> <!-- Discount on view screen only -->
+                                        
+                                     <!--   <apex:inputText value="{!w.oli.Issue__c}"/> -->
+                                        
+                                         <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Net Cost" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.UnitPrice}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                         <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Planning/Buying Agency" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                   <apex:inputField value="{!w.oli.Planning_Buying_Agency__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                             </apex:pageBlockSectionItem>
+                                             <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Publication Date" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                   <apex:inputField value="{!w.oli.Publication_Date__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                            <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Creative/Art Agency" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                   <apex:inputField value="{!w.oli.Creative_Art_Agency__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        
+                                         
+                                        
+                                         <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Art Required Date" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                   <apex:inputField value="{!w.oli.Art_Required_Date__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                       
+                                       <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Art Received" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>                                         
+                                       <apex:inputField value="{!w.oli.Art_Received__c}"/>
+                                       </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                                                                                                             
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Size" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Size__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Size}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Size}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!w.oli.Split_Billing__c}"/>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Position" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Position__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Position}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Position}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Billing Notes" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Billing_Notes__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Orientation" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Ad_Orientation__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Orientation}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Orientation}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Colour" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Colour__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Color}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Color}" />
+                                            </apex:outputPanel>                                            
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Billing Month" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Billing_Month__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Invoiced" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Invoiced__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <!--
+                                        <apex:selectList id="sizeList" value="{!w.oli.Size__c}" size="1" onChange="sizeChanged(this.value)">
+                                            <apex:selectOptions value="{!w.SizeList}"/>
+                                        </apex:selectList>
+                                        <apex:pageBlockSectionItem />
+                                        <apex:selectList id="positionList" value="{!w.oli.Position__c}" size="1" onChange="positionChanged(this.value)">
+                                            <apex:selectOptions value="{!w.PositionList}"/>
+                                        </apex:selectList>
+                                        <apex:pageBlockSectionItem />
+                                        <apex:selectList id="orientationList" value="{!w.oli.Ad_Orientation__c}" size="1" onChange="orientationChanged(this.value)">
+                                            <apex:selectOptions value="{!w.OrientationList}"/>
+                                        </apex:selectList>
+                                        <apex:pageBlockSectionItem />                                                                    
+                                        <apex:selectList id="colourList" value="{!w.oli.Colour__c}" size="1" >
+                                            <apex:selectOptions value="{!w.ColourList}"/>
+                                        </apex:selectList>
+                                        -->
+                                    </apex:pageBlockSection>
+
+                                    <!-- ********* Commercial Supplements ********* -->
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Supplements'}" columns="1">
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Full Citation" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Authorized_User_Notes__c}" style="width:90%;"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_FullCitation}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_FullCitation}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                    </apex:pageBlockSection>
+                                    <apex:pageBlockSection rendered="{!w.oli.IHC_Sales_Type__c == 'Commercial Supplements'}" columns="2">
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.ProductCode}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Qty" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.Qty__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Quantity}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Quantity}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:outputField value="{!w.oli.PricebookEntry.Product2.Name}" />
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Net Cost" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputText value="{!w.oli.UnitPrice}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Price}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Price}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:inputField value="{!w.oli.Deliver_By__c}"/>
+                                        <apex:inputText value="{!w.oli.Delivery_Cost__c}"/>
+                                        <apex:inputField value="{!w.oli.Split_Delivery__c}"/>
+                                        <apex:inputText value="{!w.oli.Gross_Cost__c}"/>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Colour" />
+                                            <apex:outputPanel >
+                                                <div class="requiredInput"><div class="requiredBlock"></div>
+                                                    <apex:inputField value="{!w.oli.Colour__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Color}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Color}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel >Other Costs Description</apex:outputLabel>
+                                            <apex:inputField value="{!w.oli.Other_Notes__c}"/>
+                                        </apex:pageBlockSectionItem>                                
+                                        <apex:inputField value="{!w.oli.Shrink_Wrap__c}"/>
+                                        <apex:inputField value="{!w.oli.Split_Billing__c}"/>
+                                        <apex:inputField value="{!w.oli.Delivery_Instructions__c}"/>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Billing Notes" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Billing_Notes__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem> 
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Billing Month" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Billing_Month__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                                        <apex:pageBlockSectionItem >
+                                            <apex:outputLabel value="Invoiced" />
+                                            <apex:outputPanel >
+                                                <div>
+                                                    <apex:inputField value="{!w.oli.Invoiced__c}"/>
+                                                </div>
+                                                <apex:outputText value="Error: " style="color:red; font-weight:bold" rendered="{!w.showError_Billing}" />
+                                                <apex:outputText value="You must enter a value" style="color:red" rendered="{!w.showError_Billing}" />
+                                            </apex:outputPanel>
+                                        </apex:pageBlockSectionItem>                                       
+                                        <apex:inputField value="{!w.oli.Fulfilled__c}"/>
+                                    </apex:pageBlockSection>
+
+                                </apex:pageBlock>
+                            </apex:column>
+                        </apex:pageblockTable>
+                    </apex:outputpanel>
+                </apex:pageBlock>
+
+            </apex:tab>
+            <apex:tab label="Add Products" name="tabProductSearch" id="tabProductSearch">
+
+                <apex:pageBlock rendered="{!isEditMode}" >
+                
+                    <apex:outputPanel styleClass="search">
+                        Search for Products:
+                    </apex:outputPanel>
+        
+                    <apex:actionRegion renderRegionOnly="false" immediate="true">
+                    
+                        <apex:actionFunction name="fetchResults" action="{!updateAvailableList}" reRender="searchResults,errormsg" status="searchStatus"/>
+                        
+                        <!-- here we invoke the scripting to get out fancy 'no button' search bar to work -->
+                        <apex:inputText value="{!searchString}" html-autocomplete="off" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:300px"/>
+                        &nbsp;&nbsp;
+                        <i>
+                            <!-- actionStatus component makes it easy to let the user know when a search is underway -->
+                            <apex:actionStatus id="searchStatus" startText="searching..." stopText=" "/>
+                        </i>
+                        
+                    </apex:actionRegion>
+                
+                    <br/>
+                    <br/>
+                    
+                    <apex:outputpanel style="overflow:auto;height:320px;" layout="block">
+                        <apex:pageBlockTable id="searchResults" value="{!availableProducts}" var="a">
+            
+                            <apex:column headervalue="Product Code" value="{!a.Product2.ProductCode}"/>
+                            <apex:column headervalue="Product Name" value="{!a.Product2.Name}"/>
+                            <apex:column headervalue="Description" value="{!a.Product2.Description}"/>
+
+                            <apex:column width="50" >
+                                <span style="font-size: 10pt; color: green; font-weight: bold; font-style: italics" >
+                                    <apex:actionStatus id="selectStatus" startText="adding..." stopText=" "/>
+                                </span>
+                                <apex:commandButton value="Select" action="{!addToSelectedProducts}" reRender="selectedProducts" immediate="false" status="selectStatus">
+                                    <apex:param value="{!a.Id}" assignTo="{!selectedPbeId}" name="selectedPbeId"/>
+                                </apex:commandButton>
+                            </apex:column>
+                            
+                        </apex:pageBlockTable>
+                    </apex:outputpanel>
+                        
+                </apex:pageBlock>        
+
+            </apex:tab>
+        </apex:tabPanel>
+    </apex:form>
+    
+    <script type='text/javascript'>
+        // This script assists the search bar functionality
+        // It will execute a search only after the user has stopped typing for more than 1 second
+        // To raise the time between when the user stops typing and the search, edit the following variable:
+        
+        var waitTime = 1;
+        var countDown = waitTime+1;
+        var started = false;
+        
+        function resetTimer() {        
+            countDown=waitTime+1;
+            if(started==false){
+                started=true;
+                runCountDown();
+            }
+        } 
+                
+        function runCountDown(){
+            countDown--;
+            if(countDown<=0){
+                fetchResults();
+                started=false;
+            } else {
+                window.setTimeout(runCountDown,1000);
+            }
+        }
+    </script>
+
+</apex:page>

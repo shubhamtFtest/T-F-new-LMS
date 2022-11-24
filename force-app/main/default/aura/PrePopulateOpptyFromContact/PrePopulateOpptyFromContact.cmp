@@ -1,0 +1,37 @@
+<aura:component controller="TF_PrePopulateRecords" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.fetchListOfRecordTypes}"/>
+    
+    <aura:attribute name="lstOfRecordType" type="String[]" />
+    <aura:attribute name="isOpen" type="boolean" default="true" />
+    <aura:attribute name="recTypeID" type="String[]" />
+    <aura:attribute name="selectedValue" type="String" default="--None--"/>
+
+   <!--Model Box Start -->    
+    <aura:if isTrue="{!v.isOpen}">
+                <div class="slds-modal__header">
+                    <h2 id="header1" class="slds-text-heading--medium">Create New Opportunity</h2>
+                </div>
+                
+                <div class="slds-modal__content slds-p-around--medium">
+                    <div class="slds-grid slds-wrap">
+
+                        <div class="slds-size--1-of-1 slds-large-size--1-of-1">
+                            <lightning:select name="mySelect" label="Select a Record Type" aura:id="selectid" value="{!v.selectedValue}">
+                                <aura:iteration items="{!v.lstOfRecordType}" var="item">
+                                    <option text="{!item}" value="{!item}" selected="{!item.selected}"/>
+                                 </aura:iteration>
+                            </lightning:select>
+
+                        </div>&nbsp; &nbsp;
+                    </div>                   
+                </div>
+                
+                <div class="slds-modal__footer">
+                    <lightning:button class="slds-button slds-button--neutral" onclick="{!c.closeModal}">Cancel</lightning:button>
+                    <lightning:button class="slds-button slds-button--brand" onclick="{!c.createRecord}">Next</lightning:button>
+                </div>
+        
+    </aura:if>
+
+</aura:component>

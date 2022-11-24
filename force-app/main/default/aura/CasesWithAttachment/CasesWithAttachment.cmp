@@ -1,0 +1,73 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                access="global" controller="CasesWithAttachment">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="attachmentDetails" type="List" default="[]"/>
+    <aura:attribute name="finalListToAdd" type="list" />
+    <div style="background-color:#FFFFFF;padding:0.5rem">
+        <div style="overflow:auto">
+            <lightning:button variant="brand" label="Export All" title="Export All" iconName="utility:download" iconPosition="right" class="slds-float_right" onclick="{!c.downloadCases}" />
+        </div>
+    </div>
+    
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+            <tr class="slds-text-title_caps">
+                <th scope="col">
+                    <div class="slds-truncate" title="Case Owner">Case Owner</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="Case Number">Case Number</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="Case Id">Case Id</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="Case Subject">Case Subject</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="Status">Status</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="Priority">Priority</div>
+                </th>
+                <th scope="col">
+                    <div class="slds-truncate" title="Attachment Name">Attachment Name</div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <aura:iteration items="{!v.attachmentDetails}" var="at">
+                <tr>
+                    <td data-label="Case Owner">
+                        <div class="slds-truncate" title="">{!at.Case[0].Owner.Name}</div>
+                    </td>
+                    <td data-label="Case Number">
+                        <div>
+                            <a data-caseid="{!at.Case[0].Id}" onclick="{!c.handleClick}" >{!at.Case[0].CaseNumber}</a>
+                        </div>
+                        <!--<div class="slds-truncate" title="">{!at.Case[0].CaseNumber}</div>-->
+                    </td>
+                    <td data-label="Case Id">
+                        <div class="slds-truncate" title="">{!at.Case[0].Id}</div>
+                    </td>
+                    <td data-label="Case Subject">
+                        <div class="slds-truncate" title="">{!at.Case[0].Subject}</div>
+                    </td>
+                    <td data-label="Status">
+                        <div class="slds-truncate" title="">{!at.Case[0].Status}</div>
+                    </td>
+                    <td data-label="Priority">
+                        <div class="slds-truncate" title="">{!at.Case[0].Priority}</div>
+                    </td>
+                    <td data-label="Attachment Name">
+                        <div>
+                            <a data-attachid="{!at.Case[0].Id}" onclick="{!c.handleClickAttachment}" >{!at.Name}</a>
+                        </div>
+                        <!--<div class="slds-truncate" title="">{!at.Name}</div>-->
+                    </td>
+                </tr>
+            </aura:iteration>
+        </tbody>
+    </table>
+</aura:component>

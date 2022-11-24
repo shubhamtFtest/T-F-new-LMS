@@ -1,0 +1,19 @@
+.customHeader {
+    background-color: rgb(243, 242, 242);
+    margin-bottom: unset;
+}
+
+.custFontSize {
+    font-size: unset;
+    font-family: sans-serif;
+    font-variant: traditional;
+    color: rgb(81, 70, 70);
+}
+
+.slds-align_absolute-center, .slds-align--absolute-center {
+    display: block !important;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    margin: auto;
+}

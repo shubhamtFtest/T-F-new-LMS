@@ -1,0 +1,151 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                controller="ContactSearchController"
+                access="global" >
+      <aura:handler name='init' value="{!this}" action="{!c.doInit}" />
+
+    
+  <!--  <aura:attribute name="GetIdFromUrl" type="String" default="hi" /> -->
+    <aura:attribute name="columsToDisplay" type="List"/>
+    <aura:attribute name="contactData" type="ContactDataWrapper"/>
+     <!-- { Page No # FirstPage # LastPage # Previous # Next  }  -->
+    <!--  <aura:handler name="render" value="{!this}" action="{!c.onRender}"/> -->
+    <aura:attribute name="totalPages" type="Integer" default="0" /> 
+    <aura:attribute name="pageNo" type="Integer" default="1" /> 
+    <aura:attribute name="recordPerPage" type="Integer" default="150" /> 
+    <aura:attribute name="defaultSearch" type="boolean" default="true" /> 
+    <!-- <aura:attribute name="totalRecords" type="Integer" default="0" />  -->
+    
+   
+    <aura:attribute name="isSending" type="boolean" />
+    <aura:attribute name="showDateFilters" type='boolean' />
+    <aura:attribute name="sortedBy" type="string" default="Name" />
+    <aura:attribute name="sortedDirection" type="string" default="asc"/>
+    <aura:attribute name='showFromDateError' type='boolean' />
+    <aura:attribute name='showToDateError' type='boolean' /> 
+    <aura:attribute name='showRecordTypeError' type='boolean' />
+    <aura:attribute name="accID" type="String" default='' />
+    <aura:attribute name="campusID" type="String" default='' />
+    <aura:attribute name="deptID" type="String" default='' />
+    <!-- Attribute Declration For Pagination Start -->
+    <aura:attribute name="PaginationList" type="ContactDataWrapper"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="15"/> 
+   <!-- <aura:attribute name="pageSize" type="Integer" default="10"/> -->
+    <!-- Attribute Declration For Pagination End-->
+    
+  
+    
+    <!-- Show Spinner -->
+    <c:SpinnerCmp isSending='{!v.isSending}'/>
+    <!-- Show Spinner End -->
+    
+    <div class="slds-m-around_medium slds-m-left_none slds-m-right_none">
+        <lightning:card iconName='standard:contact'>
+            <aura:set attribute="title">
+                Search in Contacts 
+            </aura:set>
+            <aura:set attribute="actions">
+                <lightning:button variant="brand" label="Search" class='btn' onclick="{!c.doPerformSearch}" iconName='utility:search'/>
+                <lightning:button variant="destructive" label="Clear All" class='btn' onclick="{!c.doHandleClear}" iconName='utility:clear'/>
+            </aura:set>
+        </lightning:card>
+        <br/>
+        <!-- build a search form -->
+        <div class="slds-grid slds-wrap slds-m-left_x-large">
+             <div class="slds-size_1-of-10 slds-p-right_small">
+                <lightning:input type="text" label="Contact Name" name="Contact Name" aura:id="ContactName" />
+            </div>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <lightning:input type="text" label="Account Name" name="AccountName" aura:id="AccountName" />
+            </div>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <lightning:select name="datePick" label="Select Date Range" aura:id="datePickList" onchange="{!c.handleonChange}" >
+                    <option value="">--Select One --</option>
+                    <option value="CreatedDate">Created Date</option>
+                    <option value="LastModifiedDate">Last Modified Date</option>
+                    
+                </lightning:select>
+                
+            </div>
+            <aura:if isTrue="{!v.showDateFilters}">
+                <div class="slds-size_1-of-10 slds-p-right_small">
+                    <lightning:input type="date" label="From" name="fromdate" aura:id="fromdate" required='true'
+                                     messageWhenBadInput="You must Select From Date" />
+                    <aura:if isTrue="{!v.showFromDateError}">
+                        <ui:message title="Error" severity="error" closable="false">
+                            You must Select From Date!
+                        </ui:message>
+                    </aura:if>
+                </div>
+                <div class="slds-size_1-of-10 slds-p-right_small">
+                    <lightning:input type="date" label="To" name="toDate" aura:id="toDate" required='true' 
+                                     messageWhenBadInput="You must Select To Date" />
+                    <aura:if isTrue="{!v.showToDateError}">
+                        <ui:message title="Error" severity="error" closable="false">
+                            You must Select To Date!
+                        </ui:message>
+                    </aura:if>
+                </div>
+            </aura:if>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <lightning:input type="text" label="Department Name" name="Department Name" aura:id="DepartmentName" />
+            </div>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <lightning:input type="text" label="Campus Name" name="Campus Name" aura:id="CampusName" />
+            </div>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <lightning:input type="text" label="Mailing City" name="Mailing City" aura:id="MailingCity" />
+            </div>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <lightning:input type="text" label="Business" name="Business" aura:id="Business" />
+            </div>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <lightning:input type="text" label="Contact Type" name="Contact Type" aura:id="ContactType" />
+            </div>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <ui:inputSelect class="slds-select" label="Status"
+                                        aura:id="Status"/>
+            </div>
+            <div class="slds-size_1-of-10 slds-p-right_small">
+                <!--<lightning:input type="text" label="Contact Record Type " name="ContactRecordType " aura:id="ContactRecordType" />-->
+                <ui:inputSelect class="slds-select" label="ContactRecordType"
+                                        aura:id="ContactRecordType"/>
+                <aura:if isTrue="{!v.showRecordTypeError}">
+                    <ui:message title="Error" severity="error" closable="false">
+                        Record Type must be of T&amp;F!
+                    </ui:message>
+                </aura:if>
+            </div>
+        </div>   
+        <br/>
+        <!-- build Form Search End -->
+        
+        <!-- Build Page Size Picklist -->
+       
+        <!-- Build Page Size Picklist End -->
+        
+        <!-- Search Result -->
+        <lightning:datatable aura:id="contactDataDetails"
+                             data="{! v.PaginationList }" 
+                             columns="{! v.columsToDisplay }" 
+                             keyField="Id"
+                             hideCheckboxColumn="true"
+                             onsort="{!c.updateColumnSorting}"
+                             onrowselection="{!c.doHandleRowSelection}"
+                             minColumnWidth="50px"
+                             maxColumnWidth="50px"
+                             />
+        <!-- Search Result End -->
+        
+        <lightning:buttonGroup class="slds-m-around_medium" >
+            <lightning:button label="Previous" disabled="{!v.pageNo == 1}"  onclick="{!c.previous}" class="slds-button slds-button_brand"
+                              iconName='utility:back' />
+            &nbsp; &nbsp; &nbsp;
+            <lightning:button label="Next" disabled="{!v.pageNo >= v.totalPages}" onclick="{!c.next}" class="slds-button slds-button_brand"
+                              iconName='utility:forward' iconPosition="right" />
+        </lightning:buttonGroup>
+        
+    </div>
+</aura:component>

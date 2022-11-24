@@ -1,0 +1,11 @@
+<apex:page showHeader="false" id="ICSiteTemplate" standardStylesheets="true">
+  <apex:insert name="header"> 
+    <c:IC_Site_Header />
+  </apex:insert>
+  <apex:panelGrid width="100%" border="0">
+    <apex:insert name="body"/>
+  </apex:panelGrid>
+  <apex:insert name="footer">
+    <c:IC_Site_Footer />
+  </apex:insert>
+</apex:page>

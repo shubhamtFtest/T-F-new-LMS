@@ -1,0 +1,14 @@
+<!-- 
+ Created by Jeff Lup - 2015.01.20 - CHG0063461
+-->
+<apex:page showHeader="false" sidebar="false">
+    <apex:outputpanel >
+        <script type="text/javascript">
+            var url = window.top.location.href.toLowerCase();
+            var newOpp = '/006/e';
+            var rtSelect = 'recordtypeselect.jsp?ent=opportunity';
+            if (url.indexOf(rtSelect) > 0 || (url.indexOf(newOpp) > 0 && url.indexOf('?cid=') == -1 && url.indexOf('?conid=') == -1 && url.indexOf('&cid=') == -1 && url.indexOf('&conid=') == -1 && url.indexOf('/006/e', url.length - newOpp.length) == -1))
+                window.top.location.replace('/apex/OppRestrictedCreate_Error');
+        </script>
+    </apex:outputpanel>
+</apex:page>

@@ -1,0 +1,107 @@
+<aura:component access="global" controller="TF_ProcessUnsiloresponse">
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="rowdata" type="Object"/>
+    <aura:attribute type="Integer" name="rowIndx"/>
+    <aura:attribute name="fullData" type="List"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="sortedBy" type="String"/>
+    <aura:attribute name="sortedDirection" type="String"/>
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute type="String" name="name"/>
+    <aura:attribute type="String" name="givenname" />
+    <aura:attribute type="String" name="familyname" />
+    <aura:attribute type="String" name="role" />
+    <aura:attribute type="Integer" name="position"/>
+    <aura:attribute type="Boolean" name="sortAsc" />
+    <aura:attribute name="IsRecordLocked" type="String"/>
+    
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <div class="c-container" >
+       <!--<lightning:badge label="Contributors" class="align"/>-->
+        <lightning:formattedText value="Contributors" class="align"/>
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem  size="12">
+                   <aura:if isTrue="{!v.IsRecordLocked=='true'}"> 
+                <lightning:layout>
+                    <lightning:layoutItem padding="around-small" size="4">
+                        <div >
+                            <lightning:input aura:id="field" label="Given name" required="true" name="givenname" value="{!v.givenname}"/>
+                            <lightning:input aura:id="namefield" label="Name" name="name" disabled="true" value="{!v.givenname +' '+ v.familyname}"/>
+                        </div>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" size="4">
+                        <div >
+                            <lightning:input aura:id="field" label="Family name" name="familyname" value="{!v.familyname}"/>
+                            <lightning:select aura:id="field" label="Role" name="role" required="true" value="{!v.role}">
+                                <option value="Editor">Editor</option>
+                                <option value="Author">Author</option>
+                            </lightning:select>
+                            <div class="page-button">
+                                <lightning:button variant="brand" aura:id="submit" type="brand" label="Add" onclick="{! c.addContributors }" />
+                            </div>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                        </aura:if>
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="8">
+                <div aura:id="datatable" >
+                    <lightning:datatable
+                                         columns="{! v.columns }"
+                                         data="{! v.data }"
+                                         keyField="id"
+                                         hideCheckboxColumn="true"
+                                         sortedDirection="{!v.sortedDirection}"
+                                         onrowaction="{! c.handleRowAction }"
+                                         />   
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div class="slds-m-around_xx-large">
+        <aura:if isTrue="{!v.isOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Contributor</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:layoutItem padding="around-small" size="12">
+                            <lightning:layout>
+                                <lightning:layoutItem padding="around-small" size="6">
+                                    <div >
+                                        <lightning:input aura:id="field" label="Given name" required="true" name="givenname" value="{!v.givenname}"/>
+                                        <lightning:input aura:id="field" label="Name" name="name" disabled="true" value="{!v.givenname +' '+ v.familyname}"/>
+                                    </div>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem padding="around-small" size="6">
+                                    <div >
+                                        <lightning:input aura:id="field" label="Family name" name="familyname" value="{!v.familyname}"/>
+                                        <lightning:select aura:id="field" label="Role" name="role" required="true" value="{!v.role}">
+                                            <option value="editor">Editor</option>
+                                            <option value="author">Author</option>
+                                        </lightning:select>
+                                        <div class="page-button">
+                                            <lightning:button variant="brand" aura:id="submit" type="brand" label="Update" onclick="{! c.updateRow }" />
+                                        </div>
+                                    </div>
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                        </lightning:layoutItem>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>            
+        </aura:if>
+    </div>
+</aura:component>

@@ -1,0 +1,34 @@
+<apex:component controller="TFConsortiumMembershipComController" allowDML="true" > 
+    <apex:form id="form">
+            <apex:pageBlock title="Add to Consortia" id="addToConsortia">
+                <apex:outputLabel value="Consortia: "/>
+                <apex:selectList value="{!newConsortiaValue}" size="1">
+                    <apex:selectOptions value="{!consortiaList}"/>
+                    <apex:actionSupport event="onchange" action="{!consortiaListSelectionChanged}" reRender="addToConsortia,listMembership"/>
+                </apex:selectList>
+                <apex:commandButton value="Add" action="{!AddMember}" reRender="parmMsgs,memberList"/>
+
+                <apex:pageBlockTable value="{!MemberList}" var="mem" id="memberList">
+                    <apex:column headerValue="Action">
+                        <apex:outputPanel rendered="{!mem.Id != editRowMemberId}">
+                            <apex:commandLink action="{!DeleteMember}" onclick="if (!window.confirm('Are you sure?')) return false;" rerender="memberList,parmMsgs">Del
+                                <apex:param name="editrowparmid" value="{!mem.Id}" assignTo="{!EditRowMemberId}"/>
+                            </apex:commandLink>
+                        </apex:outputPanel>
+                    </apex:column>
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:outputLabel value="Consortia"/>
+                        </apex:facet>
+                        <apex:outputLink value="/{!URLFOR(mem.ConsortiumParent__c)}" rendered="{!mem.Id != EditRowMemberId}" target="_top">{!mem.ConsortiumParent__r.name} </apex:outputLink>
+
+                    </apex:column>
+                </apex:pageBlockTable>
+                <apex:outputText value="No records to display" rendered="{!membersDoNotExist}"/>
+
+            </apex:pageBlock>
+            <apex:outputPanel id="parmMsgs" rendered="{!ErrorMessagesIsRendered}">
+                <apex:pageMessages />
+            </apex:outputPanel>
+    </apex:form>
+</apex:component>

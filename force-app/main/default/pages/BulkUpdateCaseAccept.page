@@ -1,0 +1,15 @@
+<apex:page standardController="Case" action="{!updateCurrentOwner}" extensions="BulkUpdateCase" lightningStylesheets="true" standardStylesheets="true" recordSetVar="cases"> 
+
+<apex:form id="updateOwner">
+    <script type="text/javascript">
+        function backWin(updated){ 
+            if (updated == 'true'){
+                window.history.back();
+            }
+        }    
+    </script>
+    
+    <apex:pageMessages id="message" ></apex:pageMessages>
+    <apex:commandButton action="{!cancel}" value="Go Back" immediate="true"/>
+</apex:form>
+</apex:page>

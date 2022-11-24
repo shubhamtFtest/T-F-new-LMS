@@ -1,0 +1,5 @@
+<apex:component >
+    <script src="{!URLFOR($Resource.jQuery_Complete_Redmond, 'js/jquery-1.4.4.min.js')}"/>
+    <script src="{!URLFOR($Resource.jQuery_Complete_Redmond, 'js/jquery-ui-1.8.10.custom.min.js')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.jQuery_Complete_Redmond, 'css/redmond/jquery-ui-1.8.10.custom.css')}"/>
+</apex:component>

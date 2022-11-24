@@ -1,0 +1,60 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+<head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+
+<!-- Latest compiled JavaScript for bootstrap -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+<style>
+  .jumbotron{
+
+        background-color: rgb(0, 109, 180);
+        Padding-left:5em;
+    }
+    .Footer{
+        background-color: rgb(0, 109, 180);
+        font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-weight: 300;
+        Padding-left:5em;
+        padding-top:2em;
+        padding-bottom:2em;
+    }
+    .container{
+        background-color:#e6e6e6;
+        border-radius:2em;
+        margin-bottom:3em;
+    }
+    .ImagePlaceHolder{
+        padding-top:2em;
+        padding-bottom:2em; 
+    }
+</style>
+
+</head>
+<body>
+ <div class="jumbotron">
+         <apex:image url="{!$Resource.TFo_Logo_Maintenance_Page}" />            
+        </div>      
+        <div class="container">
+                <div class="Row">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-7">
+                            <div class="Row">
+                                <div class="col-sm-9">                                    
+                                    <div class="Row"><div class="col-sm-12"><h2>This site is down for maintenance</h2></div></div>
+                                    <div class="Row"><div class="col-sm-12"><h4>We will be back shortly. Sorry for the inconvinience..</h4></div></div>                                   
+                                </div>
+                                <div class="col-sm-3"><apex:image url="{!$Resource.Maintenance_Icon}" />     </div>     
+                            </div>
+                        </div>
+                        <div class="col-sm-3"></div>
+                        
+                    </div>
+        </div>
+        <div class="Footer">
+                <p>Registered in England &amp; Wales No. 3099067 5 Howick Place | London | SW1P 1WG <span>© 2019 Informa UK Limited</span></p>
+        </div>
+</body>
+<site:previewAsAdmin />
+</apex:page>

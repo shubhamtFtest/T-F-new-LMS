@@ -1,0 +1,12 @@
+.THIS .right {
+    text-align: right;
+}
+.THIS .hideCmp {
+    display: none;
+}
+.THIS .showCmp {
+    display: block;
+}
+.THIS .border { 
+    border-style: outset;
+}

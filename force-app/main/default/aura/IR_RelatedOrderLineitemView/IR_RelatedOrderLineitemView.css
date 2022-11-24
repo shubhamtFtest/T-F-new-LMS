@@ -1,0 +1,62 @@
+.THIS .leftPaddingClass {
+    padding-left: 2rem;
+}
+ 
+.THIS .pillSize{
+ width:100%;
+}
+.THIS #datatbl div.slds-scrollable_y { 
+     min-height: 200px;
+}
+.THIS.slds-spinner_container {
+    background-color:initial;
+}
+.THIS .orangecolor svg{
+    fill : orange;
+}
+.THIS .orangecolor, .THIS .orangecolor a{
+    color: red ;
+}
+.THIS .orangecolor svg{
+    fill: red !important;
+}
+
+
+.THIS .bluecolor svg{
+    fill : blue;
+}
+.THIS .bluecolor, .THIS .bluecolor a{
+    color: blue ;
+}
+.THIS .bluecolor svg{
+    fill: nlue !important;
+}
+
+
+.THIS .greencolor svg{
+    fill : green;
+}
+.THIS .greencolor, .THIS .greencolor a{
+    color: green ;
+}
+.THIS .greencolor svg{
+    fill: green !important;
+}
+
+.THIS .blackcolor svg{
+    fill : black; 
+}
+.THIS .blackcolor{
+    color : black ;
+}
+.THIS .slds-button__icon.slds-button_icon-inverse{
+    color : black ;
+    margin-top: 75px;
+
+}
+.THIS .blackcolor a{
+    color : black ;
+}
+.THIS .blackcolor svg{
+    color : black !important;
+}

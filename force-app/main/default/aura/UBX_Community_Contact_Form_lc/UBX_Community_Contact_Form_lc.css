@@ -1,0 +1,145 @@
+.THIS {
+    font: Helvetica,Arial,sans-serif;
+    font-size: 1rem;
+    line-height: 1.5em;
+    font-weight: 300;
+}
+
+.THIS .removeButton {
+    color: #CF1E0A;
+    
+}
+
+.THIS.uiInput--default .form-element__label {
+    font-family: Lato;
+    font-size: 1rem;
+    line-height: 1.5em;
+    font-weight: 300;
+    
+}
+
+.THIS.hideCmp {
+    display: none;
+    font-family: Lato;
+    font-size: 1rem;
+    line-height: 1.5em;
+    font-weight: 300;
+    width: 500px!important; 
+    
+    
+}
+.THIS.ShowUbx{
+    display: block;
+    font-family: Lato;
+    font-size: 1rem;
+    line-height: 1.5em;
+    font-weight: 300;
+    width: 500px!important; 
+    
+    
+}
+.THIS.showCmp {
+    display: block;
+    font-family: Lato;
+    font-size: 1rem;
+    line-height: 1.5em;
+    font-weight: 300;
+    width: 100%!important; 
+
+}
+@media (max-width: 768px) {
+    .THIS.showCmp{
+        width: 100%!important; 
+        padding: 0px 0px 0px 12px;
+    }
+}
+
+
+.THIS.showCmpDisable {
+    display: block;
+    font-family: Lato;
+    font-size: 1rem;
+    line-height: 1.5em;
+    font-weight: 300;
+    opacity:0.6;
+}
+.THIS .articleTable {
+    display: block;
+    font-family: Lato;
+    font-size: 1rem;
+    line-height: 1em;
+    font-weight: 300;
+    line-height: 20pt;
+    padding: 4px 4px 4px 4px;
+    
+}
+
+.THIS .fileNameOk{
+    color: black;
+}
+
+.THIS .fileNameError{
+    color: #CF1E0A;
+}
+
+.THIS.helpMessageClass{
+    color: #CF1E0A;
+    font-size: .75rem;
+
+}
+
+.THIS .ContinuewithReq{
+    height: 38px;
+    background-color: #007a96;
+    border: 1px solid #007a96;
+    border-radius: 0px;
+    font-size: 14px;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: normal;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color :white !important;
+}
+
+
+.THIS.selectwid{
+    
+    display: block;
+    font-family: Lato;
+    font-size: 1rem;
+    line-height: 1.5em;
+    font-weight: 300;
+    width: 100%!important;   
+}
+@media (max-width: 768px) {
+    .THIS.selectwid{
+        width: 100%!important; 
+        
+    }
+}
+
+
+.THIS .HelparticleTable {
+    display: block;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    font-size: 1rem;
+    line-height: 1em;
+    font-weight: 300;
+    line-height: 20pt;
+    text-decoration:underline;
+    color: #007a96!important;
+    text-align: left;
+    
+    
+}
+.THIS.textcolor{
+    display: block;
+    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    font-size: 1rem;
+    line-height: 1em;
+    font-weight: 300;
+    text-decoration:underline;
+    color: #007a96!important;
+}

@@ -1,0 +1,70 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="steps" type="List"/>
+    <aura:attribute name="selectedStep" type="string" default="step1"/>
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="typeOfCollection" type="String" default="Manual Curation"/>
+   
+    
+        <lightning:layout>
+        <lightning:layoutItem size="6" class="align">
+            <!-- <div style="pointer-events:none;">-->
+            <lightning:progressIndicator currentStep="{!v.selectedStep}" type="base" variant="shaded">
+                <aura:iteration items="{! v.steps }" var="step">
+                    <lightning:progressStep label="{! step.label }" value="{! step.value }" onclick="{!c.selectStep}"  />
+                </aura:iteration>
+            </lightning:progressIndicator>
+            <!--  </div>-->
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+       
+    <lightning:layout>
+        <lightning:layoutItem  size="12">
+            <aura:if isTrue="{!v.selectedStep == 'step1'}">
+                <c:PPDKeywords recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>
+            </aura:if>
+            
+            <aura:if isTrue="{!v.selectedStep == 'step2'}">
+                <c:PPDContributors recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>
+            </aura:if>              
+          <!--  <aura:if isTrue="{!v.selectedStep == 'step3'}">
+                <c:PPDSaveNetBaseCollection recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>
+            </aura:if>-->
+            
+            <!--<aura:if isTrue="{!v.selectedStep == 'step3'}" >
+                <c:PPDSaveClassification recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>
+            </aura:if>-->
+            
+            <aura:if isTrue="{!v.selectedStep == 'step3'}">
+                <c:PPDProductValidity recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}" typeOfCollection="{!v.typeOfCollection}"/>
+            </aura:if>
+            <aura:if isTrue="{!v.selectedStep == 'step4'}">
+                <c:PPDCollectionImageUpload recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}" typeOfCollection = "{#v.typeOfCollection}" />
+            </aura:if>
+             <aura:if isTrue="{!v.selectedStep == 'step5'}">
+                <c:PPDPriceSummary recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}" typeOfCollection = "{#v.typeOfCollection}" />
+            </aura:if>
+            
+            
+            
+            
+            
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <div align="center">
+        <br></br>
+        <!--  <lightning:layout>
+        <lightning:layoutItem  size="12" alignmentBump="right" >-->
+        <button disabled="{!v.selectedStep != 'step1' ? '' : 'disabled'}" class="slds-button slds-button--neutral" onclick="{!c.handlePrev}">Back</button>  
+      
+            <aura:if isTrue="{!v.selectedStep != 'step5'}">
+                <button class="slds-button slds-button--brand" onclick="{!c.handleNext}">Next</button>
+            </aura:if>
+            <aura:if isTrue="{!v.selectedStep == 'step5'}">   
+                <button class="slds-button slds-button--brand" onclick="{!c.handleFinish}">Finish</button>  
+            </aura:if>
+    </div>
+</aura:component>

@@ -1,0 +1,4 @@
+<apex:page standardController="Billing__c" tabStyle="Opportunity">
+	<apex:sectionHeader title="Billings" subTitle="No Access"/>
+	<h1>To edit or delete Billings, please use the 'Edit Billings' button.</h1>
+</apex:page>

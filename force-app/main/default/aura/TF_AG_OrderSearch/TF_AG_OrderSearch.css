@@ -1,0 +1,7 @@
+.THIS .left_paging,.THIS .right_paging {display: inline-block; *display: inline; zoom: 1; font-size: 12px;}
+.THIS .left_paging {width: 90%; }
+.THIS .right_paging {width: 10%;}
+.THIS .srchBtn{
+    text-align: right;
+}
+.THIS .slds-modal__container{width:0px}

@@ -1,0 +1,365 @@
+<template>
+  <article if:true={showCard} class="slds-card">
+    <div class="slds-card__header slds-grid customHeader slds-p-around_medium">
+      <header class="slds-media slds-media_center slds-has-flexi-truncate ">
+        <div class="slds-media__figure">
+          <span class="slds-icon_container ">
+            <!-- <lightning:icon iconName="action:priority" size="x-small"
+                            class="slds-icon_container slds-icon-standard-opportunity" /> -->
+
+            <lightning-icon icon-name="action:priority" alternative-text="SAP BP" size="x-small"
+              class="slds-icon_container slds-icon-standard-opportunity"></lightning-icon>
+
+            <span class="slds-assistive-text"></span>
+          </span>
+        </div>
+        <div class="slds-media__body">
+          <h3 class="slds-card__header-title">
+            <span class="slds-card__header-link slds-truncate">
+              <span>SAP Business Partners </span>
+            </span>
+          </h3>
+        </div>
+        <div class="slds-no-flex"></div>
+      </header>
+    </div>
+    <div class="slds-border_top "></div>
+    <div class="slds-card__body slds-card__body_inner ">
+      <!-- 1st row -->
+      <div class="slds-grid slds-gutters slds-p-bottom_small ">
+        <div class="slds-col slds-size_11-of-12">
+          <span>
+            <div class="slds-grid slds-wrap">
+              <div class="slds-col slds-size_8-of-12 slds-p-bottom_xx-small">
+                <span>
+                  <p class="test-id__field-label-container slds-form-element__label">
+                    Bill to
+                  </p>
+                </span>
+              </div>
+
+              <div class="slds-col slds-size_12-of-12">
+                <span>
+                  BP :&nbsp;
+                  <template if:true={fetchedData.Bill_to_BP_name}>
+                    <lightning-formatted-url value={billToBpUrl} label={fetchedData.Bill_to_BP_name} target="_blank">
+                    </lightning-formatted-url>
+                  </template>
+                </span>
+              </div>
+              <div class="slds-col slds-size_12-of-12  slds-form-element__static slds-grow custFontSize"
+                if:true={fetchedData.bill_to_BP_Email}>
+                <span>
+                  <lightning-formatted-text value={fetchedData.bill_to_BP_Email}>
+                  </lightning-formatted-text>
+                </span>
+              </div>
+              <div class="slds-col slds-size_12-of-12  slds-form-element__static slds-grow custFontSize"
+                if:true={fetchedData.bill_to_BP_Address}>
+                <span>
+                  <lightning-formatted-text value={fetchedData.bill_to_BP_Address}>
+                  </lightning-formatted-text>
+                </span>
+              </div>
+            </div>
+          </span>
+        </div>
+        <div class="slds-col slds-size_1-of-12  slds-align_absolute-center">
+          <lightning-button-icon name="Bill to BP" icon-name="utility:edit" size="medium" variant="bare"
+            alternative-text="Edits" onclick={handleClick}></lightning-button-icon>
+        </div>
+      </div>
+      <!-- 1st row -->
+      <!-- line -->
+      <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_5-of-12 slds-border_bottom"></div>
+        <div class="slds-col slds-size_1-of-12 slds-border_bottom"></div>
+        <div class="slds-col slds-size_5-of-12 slds-border_bottom"></div>
+        <div class="slds-col slds-size_1-of-12 slds-border_bottom"></div>
+      </div>
+      <!-- line -->
+
+      <!-- 2nd row -->
+      <div class="slds-grid slds-gutters  slds-p-top_small">
+        <div class="slds-col slds-size_10-of-12 ">
+          <span>
+            <div class="slds-grid slds-wrap">
+              <div class="slds-col slds-size_8-of-12  slds-p-bottom_xx-small">
+                <span>
+                  <p class="test-id__field-label-container slds-form-element__label">
+                    Ship to
+                  </p>
+                </span>
+              </div>
+              <div class="slds-col slds-size_12-of-12">
+                <span>BP :&nbsp;
+                  <template if:true={fetchedData.Ship_to_BP_name}>
+                    <lightning-formatted-url value={shipToBpUrl} label={fetchedData.Ship_to_BP_name} target="_blank">
+                    </lightning-formatted-url>
+                  </template>
+                </span>
+              </div>
+              <div class="slds-col slds-size_12-of-12  slds-form-element__static slds-grow custFontSize"
+                if:true={fetchedData.ship_to_BP_Email}>
+                <span>
+                  <lightning-formatted-text value={fetchedData.ship_to_BP_Email}>
+                  </lightning-formatted-text>
+                </span>
+              </div>
+              <div class="slds-col slds-size_12-of-12  slds-form-element__static slds-grow custFontSize"
+                if:true={fetchedData.ship_to_BP_Address}>
+                <span>
+                  <lightning-formatted-text value={fetchedData.ship_to_BP_Address}>
+                  </lightning-formatted-text>
+                </span>
+              </div>
+            </div>
+          </span>
+        </div>
+        <div class="slds-col slds-size_1-of-12 slds-p-top_medium slds-p-left_large slds-align_absolute-center">
+          <lightning-button-icon name="Ship to BP" icon-name="utility:copy" size="medium" variant="bare"
+            alternative-text="Copy bill to SAP BP" onclick={copybilltoShip}></lightning-button-icon>
+        </div>
+        <div class="slds-col slds-size_1-of-12 slds-p-top_medium slds-p-left_large slds-align_absolute-center">
+          <lightning-button-icon name="Ship to BP" icon-name="utility:edit" size="medium" variant="bare"
+            alternative-text="Edits" onclick={handleClick}></lightning-button-icon>
+        </div>
+
+      </div>
+      <!-- 2nd row  -->
+    </div>
+  </article>
+
+  <!-- pop up -->
+  <!-- pop up -->
+  <template if:true={isModalOpen}>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium"
+      aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+            <span class="slds-assistive-text">Close</span>
+          </button>
+          <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+            <lightning-formatted-text value={modalHeader}></lightning-formatted-text>
+          </h2>
+        </header>
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+          <lightning-layout multiple-rows>
+            <!-- spiiner -->
+            <template if:true={showSpintrue}>
+              <div class="demo-only demo--inverse" style="height:6rem">
+                <div class="slds-spinner_container" style="background-color:initial;">
+                  <div role="status" class="slds-spinner slds-spinner_medium">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                  </div>
+                </div>
+              </div>
+            </template>
+            <!-- spiiner -->
+
+            <lightning-layout-item size="12" padding="around-medium">
+              <lightning-combobox name="progress" label="Address type" value="" placeholder="Select Address type"
+                options={options} onchange={comboBoxChange}>
+              </lightning-combobox>
+            </lightning-layout-item>
+
+            <template if:true={isAccountComboBoxSelected}>
+              <lightning-layout-item size="12" padding="around-medium">
+                <!-- <p class="slds-form-element__label"> Select account </p> -->
+                <c-lwc-custom-lookup object-name="Account" field-name="Name" icon-name="action:new_account"
+                  onselected={selectedRecords} onclearselected={lookUpCleared} selected-label="Select account">
+                </c-lwc-custom-lookup>
+              </lightning-layout-item>
+            </template>
+
+            <template if:true={isAccountForCampusDepartComboBox}>
+              <lightning-layout-item size="12" padding="around-medium">
+                <!-- <p class="slds-form-element__label"> Select account </p> -->
+                <!-- <lightning-helptext
+                                    content="Select account to be used for campus or department search.">
+                                </lightning-helptext> -->
+                <c-lwc-custom-lookup object-name="Account" field-name="Name" icon-name="action:new_account"
+                  onselected={selectedRecords} onclearselected={lookUpCleared} account-for-campus-depart="true"
+                  selected-label="Select account to be used for campus or department search.">
+                </c-lwc-custom-lookup>
+              </lightning-layout-item>
+            </template>
+
+            <template if:true={isCampusComboBoxSelected}>
+              <lightning-layout-item size="12" padding="around-medium">
+                <!-- <p class="slds-form-element__label"> Select campus </p> -->
+                <c-lwc-custom-lookup object-name="Campus__c" field-name="Name" icon-name="action:new_account"
+                  onselected={selectedRecords} onclearselected={lookUpCleared} search-under-account="true"
+                  account-for-campus-depart-id={accountForCampusDepartId} selected-label="Select campus">
+                </c-lwc-custom-lookup>
+              </lightning-layout-item>
+            </template>
+
+            <template if:true={isDepartmentComboBoxSelected}>
+              <lightning-layout-item size="12" padding="around-medium">
+                <!-- <p class="slds-form-element__label"> Select department </p> -->
+                <c-lwc-custom-lookup object-name="Department__c" field-name="Name" icon-name="action:new_account"
+                  onselected={selectedRecords} onclearselected={lookUpCleared} search-under-account="true"
+                  account-for-campus-depart-id={accountForCampusDepartId} selected-label="Select department">
+                </c-lwc-custom-lookup>
+              </lightning-layout-item>
+            </template>
+
+            <lightning-layout-item size="12" padding="around-medium">
+              <!-- <p class="slds-form-element__label"> Select contact </p> -->
+              <c-lwc-custom-lookup object-name="Contact" field-name="Name" icon-name="action:new_contact"
+                onselected={selectedRecords} onclearselected={lookUpCleared} selected-label="Select contact" con-accnt-id={conAccntId}>
+              </c-lwc-custom-lookup>
+            </lightning-layout-item>
+
+            <!-- if:true={showAddress} -->
+            <div class="slds-box slds-align_absolute-center slds-m-bottom_small slds-m-top_small">
+              <p class="slds-m-left_small ">
+                <lightning-formatted-text value="Selected Address : "></lightning-formatted-text>
+                <lightning-badge label={selectedAddress}></lightning-badge>
+              </p><br/>
+              <p class="slds-m-left_small ">
+                <lightning-formatted-text value="Selected Email : "></lightning-formatted-text>
+                <lightning-badge label={selectedContactInfo}></lightning-badge>
+              </p>
+            </div >
+                
+
+            <!-- <lightning-layout-item size="12" padding="around-medium">
+
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" padding="around-medium">
+                            <div class="dummy height"></div>
+                        </lightning-layout-item> -->
+          </lightning-layout>
+        </div>
+        <footer class="slds-modal__footer">
+          <button class="slds-button slds-button_neutral" onclick={closePopUP}>
+            Cancel
+          </button>
+          <button class="slds-button slds-button_brand" onclick={savePopUPBtn}>
+            Save
+          </button>
+        </footer>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+  <!-- pop up -->
+  <!-- pop up -->
+</template>
+
+<!-- <template if:true={isModalOpen}>
+
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header slds-p-around_large">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close">
+                       
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                        <lightning-formatted-text value={modalHeader}></lightning-formatted-text>
+                    </h2>
+
+                </header>
+                <div class="slds-modal__content slds-p-around_large" id="modal-content-id-1">
+                    <lightning-layout multiple-rows>
+                        spiiner
+                        <template if:true={showSpintrue}>
+                            <div class="demo-only demo--inverse" style="height:6rem">
+                                <div class="slds-spinner_container" style="background-color:initial;">
+                                    <div role="status" class="slds-spinner slds-spinner_medium">
+                                        <span class="slds-assistive-text">Loading</span>
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        spiiner 
+
+                        <div if:true={showAddress} class="slds-box">
+                            <p class="slds-m-left_small ">
+                                <lightning-formatted-text value="Selected Address  "></lightning-formatted-text>
+                                <lightning-badge label={selectedAddress}></lightning-badge>
+                            </p>
+                        </div>
+
+                        <lightning-layout-item size="12" padding="around-medium">
+                            <lightning-combobox name="progress" label="Address type" value=""
+                                placeholder="Select Address type" options={options} onchange={comboBoxChange}>
+                            </lightning-combobox>
+                        </lightning-layout-item>
+
+                        <template if:true={isAccountComboBoxSelected}>
+                            <lightning-layout-item size="12" padding="around-medium">
+                                <p class="slds-form-element__label"> Select account </p>
+                                <c-lwc-custom-lookup object-name="Account" field-name="Name"
+                                    icon-name="action:new_account" onselected={selectedRecords}
+                                    onclearselected={lookUpCleared}>
+                                </c-lwc-custom-lookup>
+                            </lightning-layout-item>
+                        </template>
+
+                        <template if:true={isAccountForCampusDepartComboBox}>
+                            <lightning-layout-item size="12" padding="around-medium">
+                                <p class="slds-form-element__label"> Select account </p>
+                                <lightning-helptext
+                                    content="Select account to be used for campus or department search.">
+                                </lightning-helptext>
+                                <c-lwc-custom-lookup object-name="Account" field-name="Name"
+                                    icon-name="action:new_account" onselected={selectedRecords}
+                                    onclearselected={lookUpCleared} account-for-campus-depart=true>
+                                </c-lwc-custom-lookup>
+                            </lightning-layout-item>
+                        </template>
+
+                        <template if:true={isCampusComboBoxSelected}>
+                            <lightning-layout-item size="12" padding="around-medium">
+                                <p class="slds-form-element__label"> Select campus </p>
+                                <c-lwc-custom-lookup object-name="Campus__c" field-name="Name"
+                                    icon-name="action:new_account" onselected={selectedRecords}
+                                    onclearselected={lookUpCleared} search-under-account=true
+                                    account-for-campus-depart-id={accountForCampusDepartId}>
+                                </c-lwc-custom-lookup>
+                            </lightning-layout-item>
+                        </template>
+
+                        <template if:true={isDepartmentComboBoxSelected}>
+                            <lightning-layout-item size="12" padding="around-medium">
+                                <p class="slds-form-element__label"> Select department </p>
+                                <c-lwc-custom-lookup object-name="Department__c" field-name="Name"
+                                    icon-name="action:new_account" onselected={selectedRecords}
+                                    onclearselected={lookUpCleared} search-under-account=true
+                                    account-for-campus-depart-id={accountForCampusDepartId}>
+                                </c-lwc-custom-lookup>
+                            </lightning-layout-item>
+                        </template>
+
+                        <lightning-layout-item size="12" padding="around-medium">
+                            <p class="slds-form-element__label"> Select contact </p>
+                            <c-lwc-custom-lookup object-name="Contact" field-name="lastname"
+                                icon-name="action:new_contact" onselected={selectedRecords}
+                                onclearselected={lookUpCleared}>
+                            </c-lwc-custom-lookup>
+                        </lightning-layout-item>
+
+
+
+                    </lightning-layout>
+
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closePopUP}>Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick={savePopUPBtn}>Save</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template> -->

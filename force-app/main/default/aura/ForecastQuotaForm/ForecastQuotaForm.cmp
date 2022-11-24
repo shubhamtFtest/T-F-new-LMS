@@ -1,0 +1,149 @@
+<aura:component controller="CreateForecastQuotaRecords" >
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="showFormQuota" type="boolean" default="false"/>
+    <aura:attribute name="showTable" type="boolean" default="false"/>
+    <aura:attribute name="showMenu" type="boolean" default="false"/>
+    <aura:attribute name="objForecastingQuota" type="ForecastingQuota"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="InsertQuotaType" type="String" default="Revenue"/>           
+    <aura:attribute name="recordId" type="String" default="0J91X0000004CY2SAM"/>           
+    <!--  InsertQuotaType == territory , producttype , Revenue  var == showTerritory showProducttype showRevenue -->
+    <aura:attribute name="showTerritory" type="boolean" default="false"/>    
+    <aura:attribute name="showProducttype" type="boolean" default="false"/>    
+    <aura:attribute name="showRevenue" type="boolean" default="false"/>    
+    <aura:attribute name="editMode" type="boolean" default="false"/>  
+    <!-- user  -->
+    <aura:attribute Name="selItem2" type="object"  access="public" /> 
+    <!-- forecastype -->
+    <aura:attribute Name="selItem3" type="object"  access="public" /> 
+    <!-- territory selItem.val = Id -->
+    <aura:attribute Name="selItem" type="object"  access="public" />
+    
+    
+    <div aura:id="formQuota"   >
+        <fieldset class="slds-box slds-theme--default slds-container--fluid slds-container--center  ">
+            <legend id="newQuotaform" class="slds-text-heading--medium 
+                                             slds-p-vertical--medium">
+                
+            </legend>
+            <h3 class="slds-section-title--divider slds-text-title_bold slds-m-bottom_medium">Add Forecasting Quota</h3>
+            <!-- <c:LookupDemo
+                          />  -->
+            <!-- CREATE NEW EXPENSE FORM  required="true" -->
+            <form class="slds-form--stacked "> 
+                <div class="slds-gutters slds-grid">
+                    <div class="slds-col slds-size_1-of-2"> 
+                        <div class=" slds-hide" aura:id="divProductFamily">
+                            <lightning:input aura:id="ProductFamily" label="Product Family"
+                                             name="ProductFamily" required="true"                                                 
+                                             /> 
+                        </div>                                            
+                        
+                        <label  class="slds-form-element__label" >
+                                <abbr title="required" class="slds-required" >*</abbr>
+                                Quota Amount <lightning:helptext iconName="utility:info" class="slds-m-bottom_xx-small" content="Enter amount for each month " />
+                            </label>
+                        <lightning:input type="number" aura:id="QuotaAmount" label="Quota Amount"
+                                         name="QuotaAmount"                                                                                                 
+                                         step="0.01"
+                                         variant="label-hidden" 
+                                         />
+                        
+                        <lightning:input type="number" aura:id="QuotaQuantity" label="Quota Quantity"
+                                         name="QuotaQuantity"                                                                                                
+                                         
+                                         />
+                        <lightning:input aura:id="CurrencyIsoCode" label="Currency ISO Code" required="true" name="CurrencyIsoCode"                                                   
+                                         /> 
+                        
+                    </div>
+                    <div class="slds-col slds-size_1-of-2">
+                        
+                        <lightning:input type="date" aura:id="StartDate" label="Start Quota Month"
+                                         name="QuotaMonth"                                                 
+                                         required="true" 
+                                         />     
+                        <lightning:input type="date" aura:id="endDate" label=" End Quota Month"
+                                         name="endDate"    required="true"                                               
+                                         />     
+                        <!-- <lightning:input aura:id="QuotaOwner" label="Quota Owner"
+                                            name="QuotaOwner"                                                 
+                                            /> -->               
+                        
+                        <label  class="slds-form-element__label" >
+                            <abbr title="required" class="slds-required" >*</abbr>
+                            Quota Owner 
+                        </label>
+                        <div class="slds-m-bottom_xxx-small">
+                        <c:Lookup objectName="User"
+                                  field_API_text="Name"
+                                  field_API_val="Id"
+                                  limit="4"
+                                  field_API_search="Name"
+                                  lookupIcon="standard:user" 
+                                  selItem="{!v.selItem2}" 
+                                  placeholder="Enter space after text to search User"
+                                  />  
+                        </div>
+                        <!-- <aura:if isTrue="{!v.showTerritory}">                                         -->
+                        <div class="slds-hide " aura:id="divTerritory">
+                            <!-- <lightning:input aura:id="Territory" label="Territory"
+                                        name="Territory"    required="true"                                             
+                                        /> -->
+                           
+                            <label  class="slds-form-element__label" >
+                                <abbr title="required" class="slds-required" >*</abbr>
+                                Territory
+                            </label>
+                            <c:Lookup objectName="Territory2"
+                                      field_API_text="Name"
+                                      field_API_val="Id"
+                                      limit="4"
+                                      field_API_search="Name"
+                                      lookupIcon="standard:opportunity" 
+                                      selItem="{!v.selItem}" 
+                                      placeholder="Enter space after text to search Territory"
+                                      />  
+                        </div>
+                        <!-- </aura:if> -->
+                        
+                        <!-- <lightning:input aura:id="ForecastingType" label="Forecasting Type"
+                                            name="ForecastingType"     required="true"                                                
+                                            />-->                        
+                        <label  class="slds-form-element__label" >
+                            <abbr title="required" class="slds-required" >*</abbr>
+                            Forecasting Type
+                        </label>
+                        <c:Lookup objectName="ForecastingType"
+                                  field_API_text="MasterLabel"
+                                  field_API_val="Id"
+                                  limit="4" 
+                                  field_API_search="MasterLabel"
+                                  lookupIcon="standard:contact" 
+                                  selItem="{!v.selItem3}"
+                                  placeholder="Enter space after text to search ForecastingType"
+                                  />  
+                        
+                        
+                    </div>
+                </div>
+                
+                <lightning:button label="Create Quota"  aura:id="createQuota"  
+                                  class="slds-m-top--medium"
+                                  variant="brand"
+                                  onclick="{!c.clickCreate}"/>
+                
+                <lightning:button label="Back "  class="slds-m-top--medium slds-m-left_medium" iconName="utility:back"
+                                  iconPosition="left" onclick="{!c.showList}" />
+                
+                
+            </form>
+            <!-- / CREATE NEW EXPENSE FORM -->
+            
+        </fieldset>
+        
+        <!-- insert form -->
+        <!-- card body -->
+    </div>
+    
+</aura:component>

@@ -1,0 +1,44 @@
+<aura:component Controller="TF_GetBundleData" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global">  
+    <aura:attribute name="recordId" type="String" default="01t7R000008WoxuQAC"/>
+    <aura:attribute name="selectedTab" type="String" default="items"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:attribute name="truthy" type="Boolean" default="true" />
+    <aura:attribute name="productBundle" type="Product2" />
+    <aura:attribute name="uuId" type="String"/>
+    <aura:attribute name="isBespokeQLI" type="Boolean" default="true"/>
+    <aura:attribute name="inSalesforce" type="Boolean" />
+    <aura:attribute name="isCollection" type="Boolean" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler name="showBundleData" event="c:ShowBundleItemsEvent" action="{!c.handleComponentEvent}"/>
+    
+    
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div> 
+            </div>
+        </div>
+    </aura:if>
+    
+    <lightning:tabset variant="horizontal" selectedTabId="{!v.selectedTab}" >
+        <lightning:tab label="Bundle Details" id="details" >
+            <c:DisplayBundleDetails collectionType ="{v.isCollection}" uuId="{!v.uuId}" productBundle="{!v.productBundle}"/>
+        </lightning:tab>
+        <lightning:tab label="Bundle Items" id="items" >
+            <aura:if isTrue="{!v.isCollection}">
+                  <c:PPDPartsList recordId="{!v.uuId}"/>
+                
+            <aura:set attribute="else">
+           <aura:if isTrue="{!v.isBespokeQLI}">
+                <c:DisplayBundleItems  uuId="{!v.uuID}" recordId="{!v.uuId}"  inSalesforce="{!v.inSalesforce}"/>
+                <aura:set attribute="else">
+                 <c:PPDContentSelectionResult  consumer='Collections' recordId="{!v.uuId}" typeOfCollection = 'Rule based' calledFrom ='Titles' />
+                </aura:set>
+            </aura:if> 
+             </aura:set>
+             </aura:if> 
+        </lightning:tab>
+    </lightning:tabset>
+</aura:component>

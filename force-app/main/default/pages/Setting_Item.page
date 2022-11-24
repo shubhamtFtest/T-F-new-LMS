@@ -1,0 +1,26 @@
+<apex:page standardController="Setting_Item__c" extensions="SettingItemExtension" >
+    <apex:form >
+        
+        <apex:sectionHeader title="{!setting.Name}" subtitle="Setting Item"/>
+        
+        <apex:pageBlock >
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton action="{!save}" value="Save" rendered="{!OR(mode=='e',mode='a')}" />
+                <apex:commandButton action="{!edit}" value="Edit" rendered="{!NOT(OR(mode=='e',mode='a'))}" />
+                <apex:commandButton action="{!deleteItem}" value="Delete" rendered="{!NOT(OR(mode=='e',mode='a'))}" onclick="if (!window.confirm('Are you sure?')) return false;" />
+                <apex:commandButton action="{!cancel}" value="Cancel" />
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockSection title="pageBlockSection" showHeader="false" columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Setting"/>
+                    <apex:outputLink value="/{!setting.id}">{!setting.Name}</apex:outputLink>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            
+            <apex:dynamicComponent componentValue="{!SettingItemPageLayout}"/>
+
+        </apex:pageBlock>
+
+    </apex:form>
+</apex:page>

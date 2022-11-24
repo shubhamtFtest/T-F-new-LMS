@@ -1,0 +1,56 @@
+<aura:component  controller="TF_IndiaRePrintCtr" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction">
+    <aura:attribute name="opportunityId" type="string"/>
+    <aura:attribute name="isBulkUpdateModalOpen" type="boolean" default="boolean"/>
+    <aura:attribute name="isdisabled" type="boolean" default="true" />
+
+    <aura:attribute name="defaultHeaderOld" type="String[]" default="['Id','GlobalISBN','IndiaISBN','Qty','UMC','MRP','CustomerQuote','GrossMargin','TitleName','ReprintEligibility','BindingType','Size','Pages','Inserts','TextColor','TextPaper','CoverColor','CoverPaper','UkPrice','ReprintBind','ReprintBind','Extras','Cancelled','Status']"/>
+    <aura:attribute name="defaultHeader" type="String[]" default="['Id','GlobalISBN','IndiaISBN','Qty','UMC','MRP','CustomerQuote','GrossMargin','ReprintEligibility','BindingType','Size','Pages','Inserts','TextColor','TextPaper','CoverColor','CoverPaper','UkPrice','ReprintBind','ReprintBind','Extras','Gratis','Cancelled','Status']"/>
+    <aura:attribute name="header" type="String[]" default="[]"/>
+    
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="fileTooLarge" type="boolean" default="false"/> 
+    <aura:attribute name="maxFileSize" type="integer" default="0"/>
+    <aura:attribute name="ShowUploadSec" type="boolean" default="false"/> 
+    <aura:attribute name="spinner" type="boolean" default="false"/>     
+    <aura:if isTrue="{!v.isBulkUpdateModalOpen}">        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div id="InvoiceUploadModal">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{!c.closeBulkUpdateModel}"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h1 class="slds-text-heading--medium">Bulk Update</h1>    
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:input aura:id="file" 
+                                         onchange="{!c.handleFilesChange}" 
+                                         type="file" name="file" 
+                                         label="Attach a File" accept=".csv" multiple="false" />
+                        <div aura:id="fileName" class="fileNameOk"> 
+                            {!v.fileName} 
+                            &nbsp;
+                            <lightning:button variant="base" aura:id="removeButton" class="removeButton" label="{!v.removeButtonLabel}" onclick="{! c.removeFile }"/>
+                            <button disabled="{!v.isdisabled}" class="slds-button slds-button_brand" onclick="{!c.doUpdate}">Update</button>
+                        </div>
+                        <!--use aura:if for show-hide the loading spinner image--> 
+                        <aura:if isTrue="{!v.spinner}">
+                            <div class="slds-text-body_small slds-text-color_error">Updating... 
+                                <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="Loading"/>
+                            </div>
+                        </aura:if>                         
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Close"
+                                          title="Close"
+                                          onclick="{!c.closeBulkUpdateModel}"/>
+                    </footer>
+                </div>
+            </div>
+        </section>       
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>   
+</aura:component>

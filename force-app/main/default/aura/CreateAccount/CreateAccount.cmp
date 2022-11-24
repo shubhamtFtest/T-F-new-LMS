@@ -1,0 +1,717 @@
+<aura:component controller="TF_CreateAccountController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <!--Define Attributes-->
+    <aura:attribute name="Account" type="Account" default="{'sobjectType': 'Account','Name': '','Phone': '','Website': '','BillingStreet': '','BillingCity': '','BillingPostalCode': '','Mailing_Country_List__c': '','Billing_State_List__c': '','Mailing_State_List__c': '','Shipping_State_List__c': '','ShippingStreet': '','ShippingCity': '','ShippingPostalCode': '','Shipping_Country_List__c': '','ShippingState': '','Billing_Street__c': '','Billing_City__c': '','Billing_ZIP__c': '','Billing_Country_List__c': '','Billing_State__c': '','Ringgold_Account_ID__c': ''}"/>
+    <aura:attribute name="EndUserRemoteAccess" type="End_User_Access__c[]" description="use to insert remote access in profile data tab"/>
+    <aura:attribute name="RequestNotes" type="String" description="use to insert notes for the specific request"/>
+	<aura:attribute name="BillingAddLine1" type="String" description="use to insert billing address line 1"/>
+    <aura:attribute name="BillingAddLine2" type="String" description="use to insert billing address line 2"/>
+    <aura:attribute name="MailingAddLine1" type="String" description="use to insert mailing address line 1"/>
+    <aura:attribute name="MailingAddLine2" type="String" description="use to insert mailing address line 2"/>
+    <aura:attribute name="ShippingAddLine1" type="String" description="use to insert shipping address line 1"/>
+    <aura:attribute name="ShippingAddLine2" type="String" description="use to insert shipping address line 2"/>
+    <aura:attribute name="searchNameKeyword" type="String" description="use for account name search input"/>
+    <aura:attribute name="searchedAccountList" type="List" description="use to show searched account list in approved customer tab"/>
+    <aura:attribute name="searchedAccountColumn" type="List" description="setting header values in searched account table"/>
+    <aura:attribute name="pandingReqAcctList" type="Account[]" description="use to show account list in pending request tab with status draft and submit for appoval"/>
+    <aura:attribute name="pendingRequestTabColumn" type="List" description="setting header values in pending request table"/>
+    <aura:attribute name="showSearchTable" type="Boolean" default="false" description="use for show and hide search table"/>
+    <aura:attribute name="showPendingRequestTable" type="Boolean" default="false" description="use for show and hide pending request tab's table"/>
+    <aura:attribute name="ContactRoleMap" type="Map" description="use for role picklist"/>
+    <aura:attribute name="TypeMap" type="Map" description="use for type picklist"/>
+    <aura:attribute name="Message" type="boolean" default="false" description="use for display no record found message"/>
+    <aura:attribute name="selTabId" type="string" default="1" description="use to store tab id of inner tabset"/>
+    <aura:attribute name="userInfo" type="user" default="{'sobjectType' : 'User'}" description="use to show current user details"/>  
+    <aura:attribute name="startDate" type="date" description="use for start date input"/>  
+    <aura:attribute name="endDate" type="date" description="use for end date input"/>  
+    <aura:attribute name="ListForIP" type="End_User_Access__c[]" description="use to insert list of IP ranges in profile data tab"/>
+    <aura:attribute name="AccountRequestPage" type="Boolean" default="true" description="use to show Account request page after login"/>
+    <aura:attribute name="ThankYouPage" type="Boolean" default="false" description="use to show Thank You page"/>
+    <aura:attribute name="Spinner" type="boolean" default="false" description="use to show spinner after submit any request"/>
+    <aura:attribute name="sortBy" type="String" description="use to sort pending request tab"/>
+    <aura:attribute name="sortDirection" type="String" description="use to show direction in pending request tab"/>
+    <aura:attribute name="sortApprovedCustomerTab" type="String" description="use to sort approved customer tab"/>
+    <aura:attribute name="sortDirectionApprovedTab" type="String" description="use to show direction in approved customer tab"/>
+    <aura:attribute name="TotalNumberOfRecordPendingAll" type="integer" default="0" description="use for display all Number of records in pending request tab"/>
+    <aura:attribute name="RecordStart" type="integer" default="0" description="use to show record start(from 1 or from 11..) in pending request tab"/>
+    <aura:attribute name="RecordEnd" type="integer" default="0" description="use to show record end(10 or 20..) in pending request tab"/>
+    <aura:attribute name="showTotalRecordsPending" type="Boolean" default="true" description="use to show total number of record's badge in pending request tab"/>
+    <aura:attribute name="showTotalRecordsApproved" type="Boolean" default="false" description="use to show total number of record's badge in approved customer tab"/>
+    <aura:attribute name="offset" type="integer" description="use to set offset value in pagination in pending request tab"/>
+    <aura:attribute name="next" type="boolean" description="use for next button in pending request tab"/>
+    <aura:attribute name="prev" type="boolean" description="use for prvious button in pending request tab"/>
+    <aura:attribute name="PageNumber" type="integer" default="1"/>
+    <aura:attribute name="TotalPages" type="integer" default="0"/>
+    <aura:attribute name="selTabIdOuterTab" type="string" default="one" description="use to store outer tabset id"/>
+    <aura:attribute name="ListForContact" type="Contact[]" description="use to insert list of contact in authorised user information tab"/>
+    <aura:attribute name="updateOrInsert" type="string" default="NewCustomer" description="use to insert or update the new customer request"/>
+    <aura:attribute name="NewListForContact" type="Contact[]" description="use to update list of contact in authorised user information tab"/>
+    <aura:attribute name="NewEndUserRemoteAccessSet" type="String[]" description="use to update remote access in profile data tab"/>
+    <aura:attribute name="NewListForIPSet" type="String[]" description="use to update IP ranges in profile data tab"/>
+    <aura:attribute name="ThankYouUpdatePage" type="Boolean" default="false" description="use to show Thank You page during account update"/>
+    <aura:attribute name="cancelButtonOnEdit" type="Boolean" default="false" description="use to show Account request page again"/>
+    
+    <aura:attribute name="mailingListControllingValues" type="list" default="[]" description="to store mailing country list values(controlling)"/>
+    <aura:attribute name="mailingListDependingValues" type="list" default="['--- None ---']" description="to store mailing state list values(dependent)"/>
+    <aura:attribute name="mailingDepnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="mailingDisabledDependentFld" type="boolean" default="true"/> 
+    <aura:attribute name="mailingControllingFieldAPI" type="string" default="Mailing_Country_List__c" description="store field API name of Controller field(mailing country)"/>
+    <aura:attribute name="mailingDependingFieldAPI" type="string" default="Mailing_State_List__c" description="store field API name of dependent field(mailing state)"/>
+    
+    <aura:attribute name="shippingListControllingValues" type="list" default="[]" description="to store shipping country list values(controlling)"/>
+    <aura:attribute name="shippingListDependingValues" type="list" default="['--- None ---']" description="to store shipping state list values(dependent)"/>
+    <aura:attribute name="shippingDepnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="shippingDisabledDependentFld" type="boolean" default="true"/> 
+    <aura:attribute name="shippingControllingFieldAPI" type="string" default="Shipping_Country_List__c" description="store field API name of Controller field(shipping country)"/>
+    <aura:attribute name="shippingDependingFieldAPI" type="string" default="Shipping_State_List__c" description="store field API name of dependent field(shipping state)"/>
+    
+    <aura:attribute name="billingListControllingValues" type="list" default="[]" description="to store billing country list values(controlling)"/>
+    <aura:attribute name="billingListDependingValues" type="list" default="['--- None ---']" description="to store billing state list values(dependent)"/>
+    <aura:attribute name="billingDepnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="billingDisabledDependentFld" type="boolean" default="true"/> 
+    <aura:attribute name="billingControllingFieldAPI" type="string" default="Billing_Country_List__c" description="store field API name of Controller field(billing country)"/>
+    <aura:attribute name="billingDependingFieldAPI" type="string" default="Billing_State_List__c" description="store field API name of dependent field(billing state)"/>
+    
+    <aura:attribute name="mailingStateNoneUpdate" type="String[]" description="use to update mailing state"/>
+    <aura:attribute name="mailingCountryNotUpdate" type="boolean" default="false"/>
+    <aura:attribute name="shippingStateNoneUpdate" type="String[]" description="use to update shipping state"/>
+    <aura:attribute name="shippingCountryNotUpdate" type="boolean" default="false"/>
+    <aura:attribute name="billingStateNoneUpdate" type="String[]" description="use to update billing state"/>
+    <aura:attribute name="billingCountryNotUpdate" type="boolean" default="false"/>
+    <aura:attribute name="verifyAddresses" type="String" default="notVerify" description="use to verify account addresses on submit for approval button"/>
+    <aura:attribute name="addressInvalidMessage" type="boolean" default="false" description="use for display address invalid message on submit for approval"/>
+    <aura:attribute name="mailingAddressError" type="String" description="use for display address error message on submit for approval"/>
+    <aura:attribute name="shippingAddressError" type="String" description="use for display address error message on submit for approval"/>
+    <aura:attribute name="billingAddressError" type="String" description="use for display address error message on submit for approval"/>
+    <aura:attribute name="showMailingAddressError" type="boolean" default="false" description="use for show address invalid message on submit for approval"/>
+    <aura:attribute name="showShippingAddressError" type="boolean" default="false" description="use for show address invalid message on submit for approval"/>
+    <aura:attribute name="showBillingAddressError" type="boolean" default="false" description="use for show address invalid message on submit for approval"/>
+    <aura:attribute name="showAccUpdatedMessage" type="boolean" default="false" description="use for show account update message"/>
+    <aura:attribute name="showAccCreatedMessage" type="boolean" default="false" description="use for show account created message"/>
+    
+    <aura:attribute name="TotalNumberOfRecordPendingAllSearch" type="integer" default="0" description="use for display all Number of records in approved customer tab"/>
+    <aura:attribute name="RecordStartSearch" type="integer" default="0" description="use to show record start(from 1 or from 11..) in approved customer tab"/>
+    <aura:attribute name="RecordEndSearch" type="integer" default="0" description="use to show record end(10 or 20..) in approved customer tab"/>
+    <aura:attribute name="offSetSearch" type="integer" description="use to set offset value for pagination in approved customer tab"/>
+    <aura:attribute name="nextSearch" type="boolean" description="use for next button in approved customer tab"/>
+    <aura:attribute name="prevSearch" type="boolean" description="use for prvious button in approved customer tab"/>
+    <aura:attribute name="PageNumberSearch" type="integer" default="1"/>
+    <aura:attribute name="TotalPagesSearch" type="integer" default="0"/>
+    <aura:attribute name="deleteSpinner" type="boolean" default="false" description="use to show spinner after delete any account request"/>
+    <aura:attribute name="showApprovedCustomerList" type="Boolean" default="false" description="use for show and hide approved customer table"/>
+    <aura:attribute name="ApprovedCustomerList" type="List" description="use to show approved customer request list in approved customer tab"/>
+    <aura:attribute name="showTotalApprovedCustomerList" type="Boolean" default="false" description="use to show total number of record's badge in approved customer tab on page load"/>
+    <aura:attribute name="messageNoRecordsApproved" type="boolean" default="false" description="use for display no record found message in approved customer tab"/>
+    <aura:attribute name="onLoadSpinner" type="boolean" default="false" description="use to show spinner on load"/>
+    <aura:attribute name="noRecordsInApproedTab" type="Boolean" default="false" description="use to check if no record fount in approved customer tab with search details then get all approved customer list in pending request tab"/>
+    <aura:attribute name="onPendingLoadSpinner" type="boolean" default="false" description="use to show spinner on load of account list in pending request tab"/>
+    <aura:attribute name="onApprovedLoadSpinner" type="boolean" default="false" description="use to show spinner on load of account list in approved customer tab"/>
+    <aura:attribute name="onSearchLoadSpinner" type="boolean" default="false" description="use to show spinner on search of account list in approved customer tab"/>
+    <aura:attribute name="showPendingLoadSpinner" type="boolean" default="true" description="use to show spinner on load of account list in pending request tab"/>
+	<aura:attribute name="showApprovedLoadSpinner" type="boolean" default="true" description="use to show spinner on load of account list in approved customer tab"/>
+	<aura:attribute name="showSearchLoadSpinner" type="boolean" default="true" description="use to show spinner on search of account list in approved customer tab"/>
+    <aura:attribute name="reqPostalCode" type="boolean" default="true"/>
+
+    <!--Define Handler-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!--LOGO and Current User Information-->      
+    <lightning:layout>
+        <lightning:layoutItem  >
+            <img src="{!$Resource.Account_request}" height="250" width="250"/>    
+        </lightning:layoutItem>  
+        <lightning:layoutItem alignmentBump="left">
+            <div class="slds-float--right userName">{!v.userInfo.Name}</div>
+        </lightning:layoutItem>
+        <lightning:layoutItem >
+            <lightning:button class="slds-float--right logoutButton" variant="base" label="| Logout" title="Logout" onclick="{! c.LogOutUser }"/><br/>
+        </lightning:layoutItem>
+    </lightning:layout><br/><br/><br/>
+    
+    <!--Define Spinner-->
+    <aura:if isTrue="{!v.Spinner}">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!--Define Spinner on page load-->
+    <aura:if isTrue="{!v.onLoadSpinner}">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!--Define Spinner in pending request tab-->
+    <aura:if isTrue="{!v.onPendingLoadSpinner}">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!--Define Spinner in approved customer tab-->
+    <aura:if isTrue="{!v.onApprovedLoadSpinner}">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!--Define Spinner in approved customer tab on search-->
+    <aura:if isTrue="{!v.onSearchLoadSpinner}">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!--Account Request Page-->
+    <aura:if isTrue="{!v.AccountRequestPage}">        
+        <lightning:tabset selectedTabId="{!v.selTabIdOuterTab}" variant="scoped">            
+            <lightning:tab label="New Customer Request" id="one">
+                <!--Create Account in Salesforce-->
+                <lightning:tabset variant="scoped" selectedTabId="{!v.selTabId}">
+                    <lightning:tab label="Organization Details" id="1">
+                        
+                        <lightning:button class="slds-float_left" disabled="{!v.selTabId == '1'}" variant="Brand" label="Previous" onclick="{!c.back}" />
+                        <lightning:button class="slds-float_right" disabled="{!v.selTabId == '4'}" variant="brand" label="Next" onclick="{!c.next}" /><br/><br/>                                         
+                        
+                        <lightning:layout multipleRows="true">
+                            <lightning:layoutItem  size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input aura:id="Name" required="true" messageWhenValueMissing="Account Name is required" value="{!v.Account.Name}" label="Account Name" /> 
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input aura:id="websiteValidate" messageWhenValueMissing="Website is invalid" value="{!v.Account.Website}" label="Website" />
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input aura:id="MailingAddLine1" required="true" messageWhenValueMissing="Address line 1 is required" value="{!v.MailingAddLine1}" label="Address Line 1" />
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input aura:id="MailingAddLine2" messageWhenValueMissing="Address line 2 is required" value="{!v.MailingAddLine2}" label="Address Line 2" />
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input aura:id="BillingCity" required="true" messageWhenValueMissing="City is required" value="{!v.Account.BillingCity}" label="City"/>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">        
+                                <lightning:select name="mailingControllerFld"
+                                                  required="true" 
+                                                  aura:id="mailingCountry"
+                                                  messageWhenValueMissing="Country is required"
+                                                  value="{!v.Account.Mailing_Country_List__c}"
+                                                  label="Country"
+                                                  onchange="{!c.mailingControllerFieldChange}" >
+                                    <aura:iteration items="{!v.mailingListControllingValues}" var="val">
+                                        <option value="{!val}">{!val}</option>
+                                    </aura:iteration>
+                                </lightning:select>         
+                            </lightning:layoutItem> 
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <div class="label" style="padding-top: 6px;font-family: Lato;overflow-wrap: break-word;                                           
+                                                          color: rgb(105, 105, 105);
+                                                          font-size: 0.75rem;">
+                                    <ui:inputSelect disabled="{!v.mailingDisabledDependentFld}" aura:id="levels" label="State" value="{!v.Account.Mailing_State_List__c}">
+                                        <aura:iteration items="{!v.mailingListDependingValues}" var="level">
+                                            <ui:inputSelectOption text="{!level}" label="{!level}"/>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input aura:id="BillingPostalCode" required="{!v.reqPostalCode}" messageWhenValueMissing="Zip is required" value="{!v.Account.BillingPostalCode}" label="Postal Code" />
+                            </lightning:layoutItem>                                           
+                            
+                            <!--<lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                                <lightning:input aura:id="phone" value="{!v.Account.Phone}" type="integer" label="Phone" maxlength="10" minlength="10"/>
+                            </lightning:layoutItem>-->
+                            
+                            <!--<lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                                <lightning:input aura:id="fieldToValidate" messageWhenPatternMismatch="Please enter the number in this pattern - (XXX) XXX-XXXX" type="tel" value="{!v.Account.Phone}" pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"/>
+                            </lightning:layoutItem>--> 
+                            
+                            <!--<lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small" >
+                                <lightning:input label="RingGold Number" value="{!v.Account.Ringgold_Account_ID__c}"/>
+                            </lightning:layoutItem>-->                        
+                        </lightning:layout><br/>
+                        
+                        <aura:if isTrue="{!v.cancelButtonOnEdit}">
+                            <center><lightning:button variant="brand" label="Cancel Request" title="Cancel Request" onclick="{! c.confirmCancelOrNot }"/></center>
+                        </aura:if>
+                        
+                    </lightning:tab>
+                    
+                    <lightning:tab label="Additional Address Information" id="2">
+                        <lightning:button class="slds-float_left" disabled="{!v.selTabId == '1'}" variant="Brand" label="Previous" onclick="{!c.back}" />
+                        <lightning:button class="slds-float_right" disabled="{!v.selTabId == '4'}" variant="brand" label="Next" onclick="{!c.next}" /><br/><br/> 
+                        
+                        <div class= "heading">Shipping Address</div>
+                        <lightning:layout multipleRows="true">                                             
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input value="{!v.ShippingAddLine1}" label="Address Line 1" />
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input value="{!v.ShippingAddLine2}" label="Address Line 2" />
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input value="{!v.Account.ShippingCity}" label="City"/>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:select name="shippingControllerFld"
+                                                  value="{!v.Account.Shipping_Country_List__c}"
+                                                  label="Country"
+                                                  onchange="{!c.shippingControllerFieldChange}" >
+                                    <aura:iteration items="{!v.shippingListControllingValues}" var="val">
+                                        <option value="{!val}">{!val}</option>
+                                    </aura:iteration>
+                                </lightning:select>  
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">        
+                                <div class="label" style="padding-top: 6px;font-family: Lato;overflow-wrap: break-word;                                           
+                                                          color: rgb(105, 105, 105);
+                                                          font-size: 0.75rem;">
+                                    <ui:inputSelect disabled="{!v.shippingDisabledDependentFld}" aura:id="levels" label="State" value="{!v.Account.Shipping_State_List__c}">
+                                        <aura:iteration items="{!v.shippingListDependingValues}" var="level">
+                                            <ui:inputSelectOption text="{!level}" label="{!level}"/>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </lightning:layoutItem> 
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input value="{!v.Account.ShippingPostalCode}" label="Postal Code" />
+                            </lightning:layoutItem>                                                                  
+                        </lightning:layout> 
+                        
+                        <div class= "heading">Billing Address</div>
+                        <lightning:layout multipleRows="true">                                             
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input value="{!v.BillingAddLine1}" messageWhenValueMissing="Address line 1" label="Address Line 1" />
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input value="{!v.BillingAddLine2}" label="Address Line 2" />
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input value="{!v.Account.Billing_City__c}" label="City"/>
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:select name="billingControllerFld"
+                                                  value="{!v.Account.Billing_Country_List__c}"
+                                                  label="Country"
+                                                  onchange="{!c.billingControllerFieldChange}" >
+                                    <aura:iteration items="{!v.billingListControllingValues}" var="val">
+                                        <option value="{!val}">{!val}</option>
+                                    </aura:iteration>
+                                </lightning:select>  
+                            </lightning:layoutItem>
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">        
+                                <div class="label" style="padding-top: 6px;font-family: Lato;overflow-wrap: break-word;                                           
+                                                          color: rgb(105, 105, 105);
+                                                          font-size: 0.75rem;">
+                                    <ui:inputSelect disabled="{!v.billingDisabledDependentFld}" aura:id="levels" label="State" value="{!v.Account.Billing_State_List__c}">
+                                        <aura:iteration items="{!v.billingListDependingValues}" var="level">
+                                            <ui:inputSelectOption text="{!level}" label="{!level}"/>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </div>
+                            </lightning:layoutItem> 
+                            
+                            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                                <lightning:input value="{!v.Account.Billing_ZIP__c}" label="Postal Code" />
+                            </lightning:layoutItem>                                                                  
+                        </lightning:layout><br/>
+                        
+                        <aura:if isTrue="{!v.cancelButtonOnEdit}">
+                            <center><lightning:button variant="brand" label="Cancel Request" title="Cancel Request" onclick="{! c.confirmCancelOrNot }"/></center>
+                        </aura:if>
+                        
+                    </lightning:tab>
+                    
+                    <lightning:tab label="Profile Data" id="3">
+                        <lightning:button class="slds-float_left" disabled="{!v.selTabId == '1'}" variant="Brand" label="Previous" onclick="{!c.back}" />
+                        <lightning:button class="slds-float_right" disabled="{!v.selTabId == '4'}" variant="brand" label="Next" onclick="{!c.next}" /><br/><br/>  
+                        
+                        <div class= "heading">IP Ranges</div>
+                        <table class="slds-table slds-table_cell-buffer"> 
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col">
+                                        <div class="slds-truncate tableHeader" title="Description">Description</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate tableHeader" title="IP List">IP List</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate tableHeader" title="Type">Type</div>
+                                    </th>
+                                </tr>
+                            </thead>   
+                            <tbody>                            
+                                <aura:iteration items="{!v.ListForIP}" var="EndUser" indexVar="rowIndex">
+                                    <tr class="slds-text-title_caps">
+                                        <td>
+                                            <lightning:input value="{!EndUser.Description__c}"/>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div class="help-position"><lightning:helptext content="Add IP Ranges in any of the following formats: 128.23.12.15 or 112.12.11.15:112.12.12.36"/></div>
+                                                <lightning:input aura:id="ipRange" class="IPList" value="{!EndUser.IP_Range__c}"/></div>
+                                        </td>
+                                        <td>
+                                            <lightning:select aura:id="InputType" value="{!EndUser.Type__c}">
+                                                <option value="">--None--</option>
+                                                <aura:iteration items="{!v.TypeMap}" var="con" indexVar="key">
+                                                    <option text="{!con.value}" value="{!con.key}" selected="{!con.key==EndUser.Type__c}" />
+                                                </aura:iteration>
+                                            </lightning:select> 
+                                        </td>
+                                        <td>
+                                            <aura:if isTrue="{!rowIndex == 0}">
+                                                <a onclick="{!c.addRow}">
+                                                    <lightning:icon iconName="utility:add" class="slds-icon slds-icon_small" size="small" alternativeText="add"/>
+                                                    <span class="slds-assistive-text">Add Icon</span>
+                                                </a>
+                                                <aura:set attribute="else">
+                                                    <a onclick="{!c.removeRow}" data-record="{!rowIndex}">
+                                                        <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                                        <span class="slds-assistive-text">Delete Icon</span>
+                                                    </a>
+                                                </aura:set> 
+                                            </aura:if>
+                                        </td> 
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                        <lightning:textarea value="{!v.RequestNotes}" messageWhenValueMissing="Notes" label="IP Request Notes" class="topText"/>
+                            
+                        
+                        <!--<div class= "heading">Remote Access</div>
+                        <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                            <aura:iteration items="{!v.EndUserRemoteAccess}" var="EndUserRemote" indexVar="rowIndex">
+                                <lightning:input class="remoteAccesInput" value="{!EndUserRemote.Entity_ID__c}" label="SHIBBOLETH / OPEN ATHENS" />
+                            </aura:iteration>
+                        </lightning:layoutItem><br/>-->
+                        
+                        <aura:if isTrue="{!v.cancelButtonOnEdit}">
+                            <center><lightning:button variant="brand" label="Cancel Request" title="Cancel Request" onclick="{! c.confirmCancelOrNot }"/></center>
+                        </aura:if>
+                    </lightning:tab>
+                    
+                    <lightning:tab label="Authorised User Information" id="4">
+                        <lightning:button class="slds-float_left" disabled="{!v.selTabId == '1'}" variant="Brand" label="Previous" onclick="{!c.back}" />
+                        <lightning:button class="slds-float_right" disabled="{!v.selTabId == '4'}" variant="brand" label="Next" onclick="{!c.next}" /><br/><br/>       
+                        
+                        <table class="slds-table slds-table_cell-buffer"> 
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col">
+                                        <div class="slds-grid slds-gutters">
+                                            <div class="slds-col asterisk">*</div>
+                                            <div class="slds-col tableHeader" Style="padding: inherit;">Contact Name</div>
+                                        </div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate tableHeader" title="Title">Title</div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-grid slds-gutters">
+                                            <div class="slds-col asterisk">*</div>
+                                            <div class="slds-truncate tableHeader" title="Email">Email</div>
+                                        </div>
+                                    </th>
+                                    <th scope="col">
+                                        <div class="slds-truncate tableHeader" title="Phone">Phone</div>
+                                    </th>
+                                    <!--<th scope="col">
+                                        <div class="slds-truncate tableHeader" title="Role">Role</div>
+                                    </th>-->
+                                </tr>
+                            </thead>   
+                            <tbody>                            
+                                <aura:iteration items="{!v.ListForContact}" var="Contact" indexVar="rowIndex">
+                                    <tr>
+                                        <td>
+                                            <lightning:input aura:id="ContactName" messageWhenValueMissing="Contact Name is required" value="{!Contact.LastName}"/>
+                                        </td>
+                                        <td>
+                                            <lightning:input value="{!Contact.Title}"/>
+                                        </td>
+                                        <td>
+                                            <!--<lightning:input type="email" value="{!Contact.Email}"/>-->
+                                            <lightning:input aura:id="formFieldToValidate" type="email" value="{!Contact.Email}" />
+                                        </td>
+                                        <td>
+                                            <!--<lightning:input type="number" value="{!Contact.Phone}"/>-->
+                                            <!--<lightning:input aura:id="contactPhone" value="{!Contact.Phone}" type="integer" maxlength="10" minlength="10"/>-->
+                                        	<!-- <lightning:input aura:id="fieldToValidate" messageWhenPatternMismatch="Please enter the 10 digit number in this pattern - XXXXXXXXXX" type="tel" value="{!Contact.Phone}" pattern="[0-9]{10}"/> -->
+                                            <lightning:input aura:id="fieldToValidate" type="tel" value="{!Contact.Phone}" />
+                                        </td>
+                                        <!--<td>
+                                            <lightning:select aura:id="InputContactRole" value="{!Contact.Functional_Role__c}">
+                                                <option value="">None</option>
+                                                <aura:iteration items="{!v.ContactRoleMap}" var="role" indexVar="key">
+                                                    <option text="{!role.value}" value="{!role.key}" selected="{!role.key==Contact.Functional_Role__c}" />
+                                                </aura:iteration>
+                                            </lightning:select> 
+                                        </td>-->
+                                        <td>
+                                            <aura:if isTrue="{!rowIndex == 0}">
+                                                <a onclick="{!c.addContactRow}">
+                                                    <lightning:icon iconName="utility:add" class="slds-icon slds-icon_small" size="small" alternativeText="add"/>
+                                                    <span class="slds-assistive-text">Add Icon</span>
+                                                </a>
+                                                <aura:set attribute="else">
+                                                    <a onclick="{!c.removeContactRow}" data-record="{!rowIndex}">
+                                                        <lightning:icon variant="error" iconName="utility:delete" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                                        <span class="slds-assistive-text">Delete Icon</span>
+                                                    </a>
+                                                </aura:set> 
+                                            </aura:if>
+                                        </td> 
+                                    </tr>
+                                </aura:iteration>
+                            </tbody>
+                        </table><br/>
+                        
+                        <center><lightning:button  aura:id="SubmitButtom" variant="brand" label="Save" title="Save" onclick="{! c.submitAccountRequest }"/>
+                            <lightning:button variant="brand" label="Submit For Approval" title="Submit For Approval" onclick="{! c.submitAccountRequest }"/>
+                            
+                            <aura:if isTrue="{!v.cancelButtonOnEdit}">
+                                <lightning:button variant="brand" label="Cancel Request" title="Cancel Request" onclick="{! c.confirmCancelOrNot }"/>
+                            </aura:if></center>
+                        
+                    </lightning:tab>
+                </lightning:tabset>    
+                
+            </lightning:tab>
+            
+            <lightning:tab label="Pending Request" id="two">
+                <!--Show list of Accounts in a table-->
+                
+                <!--Total records badges--> 
+                <aura:if isTrue="{!v.showTotalRecordsPending}">
+                    <div class="slds-m-around_x-small" id="test">
+                        {!v.RecordStart}-{!v.RecordEnd} of {!v.TotalNumberOfRecordPendingAll} | Page {!v.PageNumber} of {!v.TotalPages}
+                    </div><br/>
+                </aura:if>
+              
+                <!--Error message if no records found--> 
+                <aura:if isTrue="{!v.Message}">
+                    <div class="slds-notify_container slds-is-relative">
+                        <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                            <div class="slds-notify__content">
+                                <h2 class="slds-text-heading_small">No Records Found...</h2>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <!--Define Spinner after delete account request-->
+                <aura:if isTrue="{!v.deleteSpinner}">
+                    <div class="demo-only" style="height:6rem">
+                        <div class="slds-spinner_container">
+                            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                                <span class="slds-assistive-text">Loading</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+                <div class="pending-request">
+                    <aura:if isTrue="{!v.showPendingRequestTable}">
+                        
+                        <lightning:datatable data="{! v.pandingReqAcctList }"
+                                             columns="{! v.pendingRequestTabColumn }"
+                                             keyField="id"
+                                             hideCheckboxColumn="true"
+                                             sortedBy="{!v.sortBy}"
+                                             sortedDirection="{!v.sortDirection}"
+                                             onsort="{!c.SortPendingRequestTable}"
+                                             onrowaction="{! c.EditAccount }"/>
+                        <div style="padding-top:15px">
+                            <lightning:button label="Previous" variant="brand" onclick="{!c.OnPrevious}" value="Prev" disabled="{!v.prev}"/>
+                            <lightning:button label="Next" variant="brand" onclick="{!c.OnNext}" value="Next" disabled="{!v.next}"/>
+                        </div>
+                    </aura:if>
+                </div>
+            </lightning:tab>
+            
+            <lightning:tab label="Approved Customer" id="three">
+                <!--Search Filter-->
+                <center><div class= "heading">Search Account</div></center><br/><br/>
+                <lightning:layout multipleRows="true">
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                        <lightning:input value="{!v.searchNameKeyword}" aura:id="searchNameField" label="Name" placeholder="Search By Account Name" class="sfdc_usernameinput"/> 
+                    </lightning:layoutItem> 
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                        <lightning:input type="date" aura:id="StartDateField" label="Start date" placeholder="Select End Date" value="{!v.startDate}"/>
+                    </lightning:layoutItem> 
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                        <lightning:input  type="date" label="End Date" placeholder="Select Start Date" value="{!v.endDate}"/>
+                    </lightning:layoutItem> 
+                    <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small"> 
+                        <lightning:button class="slds-float--right searchButton" variant="brand" label="Search" title="Search" onclick="{!c.SearchAccount}"/>
+                    </lightning:layoutItem>
+                </lightning:layout><br/><br/>
+                
+                <!--Total records badges In Search Case--> 
+                <aura:if isTrue="{!v.showTotalRecordsApproved}">
+                    <div class="slds-m-around_x-small">
+                        {!v.RecordStartSearch}-{!v.RecordEndSearch} of {!v.TotalNumberOfRecordPendingAllSearch} | Page {!v.PageNumberSearch} of {!v.TotalPagesSearch}
+                    </div><br/>
+                </aura:if>
+                
+                <!--Total records badges in approved customer list on page load-->
+                <aura:if isTrue="{!v.showTotalApprovedCustomerList}">
+                    <div class="slds-m-around_x-small">
+                        {!v.RecordStartSearch}-{!v.RecordEndSearch} of {!v.TotalNumberOfRecordPendingAllSearch} | Page {!v.PageNumberSearch} of {!v.TotalPagesSearch}
+                    </div><br/>
+                </aura:if>
+                
+                <!--Error message if no records found on page load in approved customer tab--> 
+                <aura:if isTrue="{!v.messageNoRecordsApproved}">
+                    <div class="slds-notify_container slds-is-relative">
+                        <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                            <div class="slds-notify__content">
+                                <h2 class="slds-text-heading_small">No Records Found...</h2>
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+                
+                <!--Show Searched Accounts in a table-->
+                <aura:if isTrue="{!v.showSearchTable}">
+                    <lightning:datatable data="{! v.searchedAccountList }"
+                                         columns="{! v.searchedAccountColumn }"
+                                         keyField="id"
+                                         hideCheckboxColumn="true"
+                                         sortedBy="{!v.sortApprovedCustomerTab}"
+                                         sortedDirection="{!v.sortDirectionApprovedTab}"
+                                         onsort="{!c.SortApprovedCustomerTable}"/>
+                    <div style="padding-top:15px">
+                        <lightning:button label="Previous" variant="brand" onclick="{!c.OnPreviousSearch}" value="PrevSearch" disabled="{!v.prevSearch}"/>
+                        <lightning:button label="Next" variant="brand" onclick="{!c.OnNextSearch}" value="nextSearch" disabled="{!v.nextSearch}"/>
+                    </div>
+                </aura:if> 
+                
+                <aura:if isTrue="{!v.showApprovedCustomerList}">
+                    <lightning:datatable data="{! v.ApprovedCustomerList }"
+                                         columns="{! v.searchedAccountColumn }"
+                                         keyField="id"
+                                         hideCheckboxColumn="true"
+                                         sortedBy="{!v.sortApprovedCustomerTab}"
+                                         sortedDirection="{!v.sortDirectionApprovedTab}"
+                                         onsort="{!c.SortApprovedCustomerTableOnLoad}"/>
+                    <div style="padding-top:15px">
+                        <lightning:button label="Previous" variant="brand" onclick="{!c.OnPreviousSearch}" value="PrevSearch" disabled="{!v.prevSearch}"/>
+                        <lightning:button label="Next" variant="brand" onclick="{!c.OnNextSearch}" value="nextSearch" disabled="{!v.nextSearch}"/>
+                    </div>
+                </aura:if>
+            </lightning:tab>
+        </lightning:tabset>
+    </aura:if>
+    
+    <!--Thank You Page-->
+    <aura:if isTrue="{!v.ThankYouPage}"><br/><br/><br/><br/>
+        <!--Error message if address is invalid--> 
+        <aura:if isTrue="{!v.addressInvalidMessage}">
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small">Account is saved as draft.</h2><br/>
+            			<aura:if isTrue="{!v.showMailingAddressError}">
+                            <div>Mailing Address- {!v.mailingAddressError}</div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.showShippingAddressError}">
+                            <div>Shipping Address- {!v.shippingAddressError}</div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.showBillingAddressError}">
+                            <div>Billing Address- {!v.billingAddressError}</div>
+                        </aura:if>                        
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        <br/>
+        <center>
+            <aura:if isTrue="{!v.showAccCreatedMessage}">
+                <div class="heading">Thank You for submitting your Account Request. We will notify you once it's get approved.</div>
+            </aura:if><br/>
+            <lightning:button variant="brand" label="Create Another Request" title="Create Another Request" onclick="{! c.BackToAccountRequestPage }"/></center>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.ThankYouUpdatePage}"><br/><br/><br/><br/>
+        <!--Error message if address is invalid--> 
+        <aura:if isTrue="{!v.addressInvalidMessage}">
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small">Account is saved as draft.</h2><br/>
+                        <aura:if isTrue="{!v.showMailingAddressError}">
+                            <div>Mailing Address Error- {!v.mailingAddressError}</div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.showShippingAddressError}">
+                            <div>Shipping Address Error- {!v.shippingAddressError}</div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.showBillingAddressError}">
+                            <div>Billing Address Error- {!v.billingAddressError}</div>
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        <br/>
+        <center>
+            <aura:if isTrue="{!v.showAccUpdatedMessage}">
+                <div class="heading">Your Account has been updated successfully. We will notify you once it's get approved.</div>
+            </aura:if><br/>
+            <lightning:button variant="brand" label="Create Another Request" title="Create Another Request" onclick="{! c.BackToAccountRequestPage }"/>
+        </center>
+    </aura:if>
+    
+    
+    
+</aura:component>

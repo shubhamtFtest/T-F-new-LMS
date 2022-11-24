@@ -1,0 +1,69 @@
+<aura:component controller="TF_PPDProcessController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="gridColumns" type="List" access="PRIVATE" />
+    <aura:attribute name="term" type="String" default=""/>
+     <aura:attribute name="selectedIds" type="List" default="[]"/>
+    <aura:attribute name="backEndLabel" type="List" default="[]"/>
+    <aura:attribute name="checkedValuesListBox" type="List" />
+    <aura:attribute name="typeOfClassification" type="String" />
+    <aura:attribute name="gridData" type="Object" access="PRIVATE" />
+    <aura:attribute name="gridDataAll" type="Object" access="PRIVATE" />
+    <aura:attribute name="gridExpandedRows" type="List" access="PRIVATE" />
+    <aura:attribute name="currentExpandedRows" type="String" />
+    <aura:attribute name="valueInp" type="String" />
+   <!-- <aura:registerEvent name="appNetbaseEvent" type="c:TF_AG_SendSelectSubjectClassifyEvt"/>-->
+   <aura:handler event="c:PPDSearchProductResetComp" action="{!c.resetSubject}"/>
+
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+      <aura:if isTrue="{!v.IsSpinner}">
+       <lightning:spinner variant="brand"  size="large" />
+      </aura:if>
+    
+    <div class="c-container">
+       <!-- <p>Subject Classifications</p>-->
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem  padding="around-small">
+                <div class="slds-form-element">
+                    <aura:if isTrue="{!v.typeOfClassification=='Subject'}">
+                        <lightning:input type="text" value="{!v.term}" label="Filter" variant="label-hidden" placeholder="Filter Subject Classifications" />
+                    </aura:if>
+                    <aura:if isTrue="{!v.typeOfClassification=='BISAC'}">
+                        <lightning:input type="text" value="{!v.term}" label="Filter" variant="label-hidden" placeholder="Filter BISAC Classifications" />
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem  padding="around-small">
+                <lightning:button variant="brand" label="Filter" title="Brand action" onclick="{!c.filterNetbaseEnter}" disabled=""/>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div >
+        <lightning:layout>
+            <lightning:layoutItem  padding="around-small"></lightning:layoutItem>
+           <!-- <lightning:layoutItem  padding="around-small">
+                <lightning:button variant="base" label="Expand All" title="Expand All" onclick="{! c.expandAll}"/> <label style="color:red">   </label>
+            </lightning:layoutItem>-->
+           <!-- <lightning:layoutItem padding="horizontal-large">
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="horizontal-medium">
+            </lightning:layoutItem>-->
+           <!-- <lightning:layoutItem  padding="around-small">
+                <lightning:button variant="base" label="Collapse All" title="Collapse All" onclick="{! c.collapseAll}"/>
+           </lightning:layoutItem> -->          
+            
+        </lightning:layout>
+    </div>
+<div class="Netbases">
+    
+        <lightning:treeGrid
+            aura:id="treeGrid"
+            columns="{! v.gridColumns }"
+            data="{! v.gridData }"
+            expandedRows="{! v.gridExpandedRows }"
+            onrowselection="{! c.getSelectedRows}"
+            selectedRows = "{!v.selectedIds}"
+            keyField="labelValue"/>
+   
+        </div>
+    
+</aura:component>

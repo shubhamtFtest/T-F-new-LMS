@@ -1,0 +1,251 @@
+<!--
+* Created by Hailey Niemand - 2015.09.21 - CHG0068080
+* Modified by Jeff Lup - 2015.11.19 - INC1646381 & WRQ0503135
+-->
+
+<apex:page standardController="Opportunity" extensions="CAS_OpportunityProductController" action="{!priceBookCheck}" showHeader="true" sidebar="true" standardStylesheets="true">
+
+    <apex:sectionHeader title="Manage Products for" subtitle="{!opportunity.name}"/>
+
+    <style>
+        .search {
+            font-family: Arial,Helvetica,sans-serif;
+            font-size:1.2em;
+            font-weight:bold;
+            margin-right: 20px;
+        }
+        
+        .label {
+            margin-right:10px;
+            font-weight:bold;
+        }
+    </style>
+
+    <script type='text/javascript'>
+        // This script assists the search bar functionality
+        // It will execute a search only after the user has stopped typing for more than 1 second
+        // To raise the time between when the user stops typing and the search, edit the following variable:
+        
+        var waitTime = 1;
+        var countDown = waitTime+1;
+        var started = false;
+        
+        function resetTimer() {        
+            countDown=waitTime+1;
+            if(started==false){
+                started=true;
+                runCountDown();
+            }
+        }
+                
+        function runCountDown(){
+            countDown--;
+            if(countDown<=0){
+                fetchResults();
+                started=false;
+            } else {
+                window.setTimeout(runCountDown,1000);
+            }
+        }        
+        
+    </script>
+
+    <apex:form >
+    
+        <apex:pageBlock title="Hidden Fields" rendered="false">
+            <apex:outputField value="{!Opportunity.Pricebook2Id}" />
+            <apex:outputField value="{!Opportunity.CurrencyIsoCode}" />
+        </apex:pageBlock>
+
+        <apex:pageBlock id="selectedProducts" title="Selected Products" mode="view" >
+        
+            <apex:pagemessages />
+            
+            <apex:pageBlockButtons location="Both">
+                <apex:commandButton value="Save" action="{!save}" status="saveStatus"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+                <apex:actionStatus startText=" saving..." stopText=" " id="saveStatus"/>
+            </apex:pageBlockButtons>
+
+            <apex:pageblockTable value="{!productWrapperList}" var="w" >
+
+                <apex:column >
+                    <apex:commandButton value="Remove" action="{!removeFromSelectedProducts}" reRender="selectedProducts" immediate="true">
+                        <!--this param is how we send an argument to the controller, so it knows which row we clicked 'remove' on -->
+                        <apex:param value="{!w.tempOliId}" assignTo="{!selectedTempOliId}" name="selectedTempOliId"/>
+                    </apex:commandButton>
+                </apex:column>
+
+                <apex:column headervalue="Product Name" style="min-width:300px">
+                    <apex:outputLink target="_blank" value="/{!w.oli.PricebookEntry.Product2Id}">{!w.oli.PriceBookEntry.Product2.Name}</apex:outputLink>    
+                </apex:column>
+                
+                <apex:column headervalue="Opportunity Product">
+                    <apex:outputLink rendered="{!w.oli.Id != ''}" target="_blank" value="/{!w.oli.Id}">View Opp Product</apex:outputLink>    
+                </apex:column>
+                            
+                <apex:column headervalue="Quantity">
+                    <apex:inputField value="{!w.oli.Quantity}" required="true" style="width:50px" onkeydown="if(event.keyCode==13){this.blur();}" />
+                </apex:column>
+                  
+                <apex:column headervalue="IC Quantity">
+                    <apex:inputField value="{!w.oli.IC_Quantity__c}" required="true" style="width:60px" onkeydown="if(event.keyCode==13){this.blur();}" />
+                </apex:column>  
+                                
+                <apex:column headervalue="Sales Price" > 
+                    <apex:inputField value="{!w.oli.UnitPrice}" required="true" style="width:75px" onkeydown="if(event.keyCode==13){this.blur();}" />
+                </apex:column>  
+
+                <apex:column headervalue="Textbook Feedback Notification">
+                    <apex:inputField value="{!w.oli.Feedback_Notification__c}" required="true" style="width:160px" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Date">
+                    <apex:inputField value="{!w.oli.ServiceDate}" required="false" style="width:75px" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column>  
+
+                <apex:column headervalue="Contact">
+                    <apex:inputField value="{!w.oli.Recipient__c}" required="false" style="width:150px" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Order Type">
+                    <apex:inputField value="{!w.oli.Order_Type__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Adoption Stage">
+                    <apex:inputField value="{!w.oli.Adoption_Stage__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Adoption Level">
+                    <apex:inputField value="{!w.oli.Adoption_Level__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Adoption Type">
+                    <apex:inputField value="{!w.oli.Adoption_Type__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Delivery Address">
+                    <apex:inputField value="{!w.oli.Recipient_Address__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column>  
+                
+                <apex:column headervalue="Delivery Method">
+                    <apex:inputField value="{!w.oli.Delivery_Method__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column>
+                
+                <apex:column headervalue="VitalSource Access Period">
+                    <apex:inputField value="{!w.oli.VitalSource_Access_Period__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="FulFillment Houst" rendered="{!isSgIn}">
+                    <apex:inputField value="{!w.oli.Fulfillment_House__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Future Ship Date">
+                    <apex:inputField value="{!w.oli.Future_Ship_Date__c}" style="width:75px" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Rep Verified">
+                    <apex:inputField value="{!w.oli.Rep_Verified__c}" required="false" style=" text-align:center" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Adoption Date">
+                    <apex:inputField value="{!w.oli.Adoption_Date__c}" required="false" style="width:75px" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column> 
+
+                <apex:column headervalue="Adoption Owner">
+                    <apex:inputField value="{!w.oli.Adoption_Owner__c}" required="false" style="width:150px" onkeydown="if(event.keyCode==13){this.blur();}" /> 
+                </apex:column>
+                
+                <apex:column headervalue="Created By">
+                    <apex:outputLink target="_blank" value="/{!w.oli.CreatedById}" >{!w.oli.CreatedBy.Name}</apex:outputLink>    
+                </apex:column> 
+                
+                <apex:column headervalue="Created Date">
+                    <apex:outputField value="{!w.oli.CreatedDate}"/> 
+                </apex:column>
+                
+            </apex:pageblockTable>
+        </apex:pageblock>
+
+        <apex:pageBlock >
+        
+            <apex:outputPanel styleClass="search">
+                Search for Products:
+            </apex:outputPanel>
+
+            <apex:actionRegion renderRegionOnly="false" immediate="true">
+            
+                <apex:actionFunction name="fetchResults" action="{!updateAvailableList}" reRender="searchResults,errormsg" status="searchStatus"/>
+                
+                <!-- here we invoke the scripting to get out fancy 'no button' search bar to work -->
+                <apex:inputText value="{!searchString}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:300px"/>
+                &nbsp;&nbsp;
+                <i>
+                    <!-- actionStatus component makes it easy to let the user know when a search is underway -->
+                    <apex:actionStatus id="searchStatus" startText="searching..." stopText=" "/>
+                </i>
+                
+            </apex:actionRegion>
+        
+            <br/>
+            <br/>
+            
+            <apex:pageBlockTable id="searchResults" value="{!availableProducts}" var="a" style="width:1600px">
+
+                <apex:column >
+                    <apex:commandButton value="Select" action="{!addToSelectedProducts}" reRender="selectedProducts" immediate="true">         
+                        <!-- again we use apex:param to be able to tell the controller which row we are working with -->
+                        <apex:param value="{!a.Id}" assignTo="{!selectedPbeId}" name="selectedPbeId"/>
+                    </apex:commandButton>
+                </apex:column>
+                
+                <apex:column headervalue="Product Name">
+                    <apex:outputLink target="_blank" value="/{!a.Product2Id}" >{!a.Product2.Name}</apex:outputLink>    
+                </apex:column>
+                
+                <apex:column headerValue="Product Code" value="{!a.Product2.ProductCode}"/>
+                
+                <apex:column headerValue="List Price" value="{!a.UnitPrice}"/>
+                
+                <apex:column headerValue="Author/Editor" value="{!a.Product2.Lead_Author_Editor__c}"/>
+                
+                <apex:column headerValue="Version Type" value="{!a.Product2.Version_Type__c}"/>
+                
+                <apex:column headerValue="Edition" value="{!a.Product2.Edition_Number__c}"/>
+                
+                <apex:column headerValue="Group Company" value="{!a.Product2.Group_Company__c}"/>
+                
+                <apex:column headerValue="VitalSource Status" value="{!a.Product2.VitalSource_Status__c}"/>
+                
+                <apex:column headerValue="Inventory Status" value="{!a.Product2.UK_Inventory_Status__c}" rendered="{!isUK}"/>
+                
+                <apex:column headervalue="Planned Publication Date" rendered="{!isUK}">
+                    <apex:outputField value="{!a.Product2.UK_Planned_Publication_Date__c}" rendered="{!AND(OR(a.Product2.US_Inventory_Status__c = 'Planned', a.Product2.US_Inventory_Status__c = 'Contracted', a.Product2.US_Inventory_Status__c = 'In Production'), isUK)}"/> 
+                </apex:column> 
+                
+                <apex:column headervalue="Publication Date" rendered="{!isUK}">
+                    <apex:outputField value="{!a.Product2.UK_Publication_Date__c}" rendered="{!AND(OR(a.Product2.US_Inventory_Status__c == 'Available', a.Product2.US_Inventory_Status__c == 'Out of Print', a.Product2.US_Inventory_Status__c == 'Out of Stock', a.Product2.US_Inventory_Status__c == 'Withdrawn'), isUK)}"/> 
+                </apex:column> 
+                
+                <apex:column headerValue="Inventory Status" value="{!a.Product2.US_Inventory_Status__c}" rendered="{!NOT(isUK)}"/>
+                
+                <apex:column headervalue="Planned Publication Date" rendered="{!NOT(isUK)}" >
+                    <apex:outputField value="{!a.Product2.US_Planned_Publication_Date__c}" rendered="{!AND(OR(a.Product2.US_Inventory_Status__c = 'Planned', a.Product2.US_Inventory_Status__c = 'Contracted', a.Product2.US_Inventory_Status__c = 'In Production'), NOT(isUK))}"/> 
+                </apex:column> 
+                
+                <apex:column headervalue="Publication Date" rendered="{!NOT(isUK)}" >
+                    <apex:outputField value="{!a.Product2.US_Publication_Date__c}" rendered="{!AND(OR(a.Product2.US_Inventory_Status__c == 'Available', a.Product2.US_Inventory_Status__c == 'Out of Print', a.Product2.US_Inventory_Status__c == 'Out of Stock', a.Product2.US_Inventory_Status__c == 'Withdrawn'), NOT(isUK))}"/> 
+                </apex:column> 
+                
+            </apex:pageBlockTable>
+            
+        </apex:pageBlock>
+
+        <!-- We put up a warning if results exceed 150 rows -->
+        <apex:outputPanel id="errormsg" styleClass="error" >
+            <apex:outputText rendered="{!overLimit}" value="Your search returned over 150 results, use a more specific search string if you do not see the desired {!$ObjectType.Product2.Label}."></apex:outputText>
+            <br/><br/>
+        </apex:outputPanel>
+
+    </apex:form>
+</apex:page>

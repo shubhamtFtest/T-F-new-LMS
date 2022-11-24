@@ -1,0 +1,166 @@
+<apex:page showheader="false" controller="IR_PdfGeneratorController" renderAs="pdf">
+    <head>
+        <style>
+            body
+            {
+            font-family: Verdana;
+            font-size: 12px;
+            }
+            
+            @page
+            {
+            size: landscape;
+            padding: 1px;
+            }
+            
+        </style>
+    </head>
+    <table style="width:100%;border-collapse: collapse;" >
+        <tr >
+            <td style="width:10%;"><img src="{!$Resource.IR_Logo}" width="100%"/></td>
+            <td><h1 style="font-weight: 100;font-size: x-large;">Taylor &amp; Francis Group plc</h1></td>
+        </tr>
+        <tr>
+            <td style="width:10%;"></td>
+            <td><p>From -  {!loginusername}<br/>Date: {!createddate}</p></td>
+        </tr>
+        <tr>
+            <td style="width:10%;"></td>
+            <td><strong>Purchase Order (Printing and Binding ):</strong></td>
+        </tr>
+        <apex:repeat value="{!printOrderrecList}" var="privar">
+            
+            <tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>T and F Invoice no   </strong>-{!privar.Invoice_Number__c}</p></td>
+            </tr>
+            <!--tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>Reference Number  </strong> - {!privar.Reference_Number__c}</p></td>
+            </tr-->
+            <tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>TO </strong> - {!privar.Printer__r.Name}</p></td>
+            </tr>
+        </apex:repeat>
+    </table>
+    
+    <table style = "width: 100%;border: 1px solid #CCC;
+                    border-collapse: collapse;" border="1" >
+        
+        <thead style="background-color:white">
+			
+            <th scope="col" style="background-color:yellow;height: 30px;text-align:center;">
+                Ref No
+            </th>
+            <th scope="col" style="background-color:yellow;height: 30px;text-align:center;">
+                Print Quantity
+            </th>
+              <th scope="col" style="background-color:yellow;height: 30px;text-align:center;">
+                Gratis Quantity
+            </th>
+          
+            <th scope="col" style="background-color:yellow;height: 30px;text-align:center;">
+                Indian ISBN
+            </th>
+            <th scope="col" style="background-color:yellow;height: 30px;text-align:center;">
+                Title  
+            </th>
+              <th scope="col" style="background-color:yellow;height:30px;text-align:center;">
+                UMC 
+            </th>
+            <th scope="col" style="background-color:yellow;height: 30px;text-align:center;">
+                Total UMC
+            </th>
+        </thead>
+        <apex:repeat value="{!PrintOrderList}" var="printvar">
+            <tr>
+
+                <th scope="row" >
+                    {!printvar.Reference_Number__c}
+                    
+                </th>
+                <th scope="row" style="text-align:center">
+                    {!printvar.Print_Run__c}
+                    
+                </th>
+                
+                <th scope="row"  style="text-align:center">
+                    {!printvar.Gratis__c}
+                    
+                </th>
+                <th scope="row">
+                    {!printvar.Indian_Isbn__c}
+                    
+                </th>
+                <th scope="row">
+                    {!printvar.Title__c}
+                    
+                </th>
+                
+                <th scope="row">
+                    <center>{!ROUND(printvar.UMC__c, 2)}</center>
+                    
+                </th>
+                <th scope="row">
+                    {!ROUND(printvar.Total_UMC__c, 2)}
+                    
+                </th>
+            </tr>
+            
+        </apex:repeat>          	  
+        <tbody>
+        </tbody>
+        
+    </table> 
+    <table><tr><td></td></tr><tr><td></td></tr></table>
+    <table style="width:100%;border-collapse: collapse;" >
+        <apex:repeat value="{!printOrderrecList}" var="prinvar">
+            
+            <tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>Packing Instructions :  </strong>-{!prinvar.Packing_Instructions__c}</p></td>
+            </tr>
+            <tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>Total PO Value In Pounds :   </strong> - {!ROUND(aggreedpricepercopy, 2)}</p></td>
+            </tr>
+            <tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>Customer Name : </strong> - {!prinvar.Customer__r.Name} {!prinvar.To__c} </p></td>
+            </tr>
+            <tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>Delivery Date : </strong> - {!prinvar.Delivery_Date__c}</p></td>
+            </tr>
+            <tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>Special Instructions if Any : </strong> - {!prinvar.Special_Instructions__c}</p></td>
+            </tr>
+            
+            <tr>
+                <td style="width:10%;"></td>
+                <td><p style="margin-top: 0px;margin-bottom: 5px;"><strong>Payment Terms : </strong> - {!prinvar.Payment_Terms__c}</p></td>
+            </tr>
+            
+        </apex:repeat>
+    </table>
+        <table style="height:50px;"></table>
+
+    <table style="width:100%;border-collapse: collapse;" >
+        <tr>
+          <td><small> <font style="  margin-right: 214px;    font-family: auto;">Group Headquarters 2
+                Park Square, Milton Park, Abingdon, Oxfordshire OX14 4RN Psychology Press Tel: +44 (0) 20 7107 5000
+              Fax: +44 (0) 20 7842 2298  www.tandf.co.uk</font></small></td>
+            <td style="width:33px;"> <small><font style="    margin-right: 62px;    font-family: auto;">
+                Martin Dunitz</font></small></td>
+            <td style="width:33px;  "><small> <font style="  margin-right: 214px;    font-family: auto;">
+                Routledge Taylor and Francis Routledge Falmer Garland Science Europa Publications
+                Spon Press Brunner-Routledge Carfax
+                Publishing RoutledgeCurzon BIOS Scientific Publishers Fitzroy Dearborn CRC Press Registered Office 2
+                Park Square, Milton Park, Abingdon, Oxfordshire OX14 4RN. Registered No 3215483 Parthenon</font></small></td>
+        </tr>      
+        
+    </table>
+    <p>Registered Office 2 Park Square, Milton Park, Abingdon, Oxfordshire OX14 4RN. Registered No 3215483</p>
+</apex:page>

@@ -1,0 +1,74 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="steps" type="List"/>
+    <aura:attribute name="selectedStep" type="string" default="step1"/>
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="typeOfCollection" type="String" default="Manual Curation"/>    
+    <aura:attribute name="dateValidationError" type="boolean"/>
+    <aura:attribute name="valueValidFrom" type="String"/>
+    <aura:attribute name="valueValidTo" type="String"/>
+    <aura:attribute name="valueUpdatedFrom" type="String"/>
+    <aura:attribute name="valueUpdatedTo" type="String"/>
+    
+    <div class="c-container" >  
+        <lightning:formattedText value="Collection Validity" class="align"/>
+        <lightning:layout>
+            <lightning:layoutItem padding="around-small" size="2">
+                <lightning:input 
+                                 type="date"
+                                 label="Enter ValidFrom Date"
+                                 aura:id="validFrom"
+                                 value="{!v.valueValidFrom}"
+                                 name="date"
+                                 onchange="{!c.checkValidity}"
+                                 required="true"
+                                 />
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="2">
+                <lightning:input 
+                                 type="date"
+                                 label="Enter ValidTo Date"
+                                 aura:id="ValidTo"
+                                 value="{!v.valueValidTo}"
+                                 name="date"
+                                 onchange="{!c.checkValidity}"
+                                 />
+            </lightning:layoutItem>
+        </lightning:layout>
+         <aura:if isTrue="{!v.typeOfCollection == 'Rule based'}">
+        <lightning:layout>
+            <lightning:layoutItem padding="around-small" size="2">
+                <lightning:input 
+                                 type="date"
+                                 label="Enter UpdatedFrom Date"
+                                 aura:id="updatedFrom"
+                                 value="{!v.valueUpdatedFrom}"
+                                 name="date"
+                                  onchange="{!c.checkUpdateValidity}"
+                                 required="true"
+                                 />
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="around-small" size="2">
+                <lightning:input 
+                                 type="date"
+                                 label="Enter UpdatedTo Date"
+                                 aura:id="updatedTo"
+                                 value="{!v.valueUpdatedTo}"
+                                 name="date"
+                                 onchange="{!c.checkUpdateValidity}"
+                                 required="true"/>
+            </lightning:layoutItem>
+        </lightning:layout>
+             </aura:if>
+        
+          <aura:if isTrue="{!v.IsRecordLocked=='true'}">
+        <lightning:layout>
+            <lightning:layoutItem padding="around-small" size="2">
+                <lightning:button aura:id="btnUpdate" disabled="{!v.dateValidationError}" label="Save" variant="brand" onclick="{!c.saveValidity }"/>
+                
+            </lightning:layoutItem>
+        </lightning:layout>
+        </aura:if>
+    </div>
+</aura:component>

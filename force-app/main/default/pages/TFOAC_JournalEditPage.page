@@ -1,0 +1,297 @@
+<apex:page standardController="TFOAC_Journal__c" extensions="TFOAC_JournalController">
+    
+    
+    <apex:includeScript value="{!URLFOR($Resource.TFAcqusition,'/Scripts/jQuery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.TFAcqusition,'/Scripts/BlockUI.js')}"/>
+    
+    
+    <style>
+        div.bPageBlock.brandSecondaryBrd.apexDefaultPageBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }
+    </style>
+    <apex:form id="pageContentForm" >
+
+        <div id="pageContent">
+            
+            <apex:outputPanel id="ProductsDetails">
+                               
+                <apex:pageBlock id="journalDetails" mode="edit">
+                    <apex:inputHidden id="availableHostAreas" value="{!userAvailableHostAreas}"/>
+                    <apex:pageMessages id="errorMessages"/>
+                    <apex:pageBlockButtons >
+                        <apex:commandButton action="{!saveProduct}" value="Save"/>
+                        <apex:commandButton value="Cancel" action="{!cancel}"/>
+                        
+                    </apex:pageBlockButtons>
+                   
+                    
+                    <apex:pageBlockSection columns="1" title="Journal Information">
+                         <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Journal__c.fields.Bid_Lead__c.inlineHelpText}">
+                        	<apex:outputLabel for="bidlead" value="{!$ObjectType.TFOAC_Journal__c.fields.Bid_Lead__c.label}"/>
+                        	<apex:inputfield id="bidlead" value="{!productToCreate.Bid_Lead__c}" required="true"/>
+                    	</apex:pageBlockSectionItem> 
+                        
+                        <apex:inputField label="Opportunity Name" rendered="{!isAllowedToSwithcProduct}" value="{!productToCreate.OACOpportunity__c}" />
+                        <apex:outputField label="Opportunity Name" rendered="{!NOT(isAllowedToSwithcProduct)}" value="{!productToCreate.OACOpportunity__c}" />
+                        
+                        <apex:pageBlockSectionItem HelpText="Full name and common abbreviation">
+                            <apex:outputLabel for="journalName" value="{!$ObjectType.TFOAC_Journal__c.fields.Name.label}"/>
+                            <apex:outputPanel layout="block" styleClass="requiredInput">
+                                <apex:outputPanel layout="block" styleClass="requiredBlock"/> 
+                                <apex:inputText id="journalName" required="true" size="100"  value="{!productToCreate.Name}"/>
+                            </apex:outputPanel>
+                        </apex:pageBlockSectionItem>
+                        
+                        
+                        <!--<apex:inputField rendered="{!NOT(isAlignedToOpportunity)}" value="{!productToCreate.CurrencyIsoCode}"/>-->
+                       
+                    </apex:pageBlockSection>   
+                        <apex:outputPanel layout="block" id="journalAcronym">
+                            <apex:pageBlockSection columns="1">
+                                    <apex:inputField rendered="{!AND(productToCreate.AcqType__c != 'Digital Content',OR(productToCreate.Status__c == 'Contract Signed',productToCreate.Status__c == 'T&F Published'))}" required="{!IF(productToCreate.Status__c == 'T&F Published',true,false)}" value="{!productToCreate.JournalAcronym__c}"/>
+                            </apex:pageBlockSection>
+                        </apex:outputPanel>
+                    <apex:pageBlockSection columns="1">
+                        
+                        <apex:pageBlockSectionItem helpText="{!$ObjectType.TFOAC_Journal__c.fields.AcqType__c.inlineHelpText}">
+                            <apex:outputLabel value="Contract Type" for="acqType"/>
+                            <apex:actionRegion id="acqTypeRegion">
+                                <apex:inputField id="acqType" required="true" value="{!productToCreate.AcqType__c}">
+                                    <apex:actionSupport event="onchange" action="{!checkCurrentAcqType}" onbeforedomupdate="blockLayout();" oncomplete="unblockLayout();" reRender="errorMessages,journalAcronym,statusSection,divisionArea,meidiaAreaBlok,issnArea,currentPublisher,nonDigitalContentArea" />
+                                    <!--reRender= purchaseTypeBlock,journalStatus,subStatusField,statusWeight"ProductsDetails,journalDetails,journalAcronym,acqType,purchaseTypeBlock,divisionArea,meidiaAreaBlok,issnArea,currentPublisher,nonDigitalContentArea"-->
+                                </apex:inputField>
+                                
+                            </apex:actionRegion>
+                        </apex:pageBlockSectionItem>
+                        
+                        
+                    </apex:pageBlockSection>
+                    <!--
+                    <apex:outputPanel id="purchaseTypeBlock">
+                           <apex:pageBlockSection columns="1" rendered="{!AND(productToCreate.AcqType__c != 'Digital Content',NOT(ISBLANK(productToCreate.AcqType__c)))}"> 
+                                 <apex:pageBlockSectionItem id="purchaseTypeItem" helpText="{!$ObjectType.TFOAC_Journal__c.fields.PurchaseType__c.inlineHelpText}" >
+                                        <apex:outputLabel value="{!$ObjectType.TFOAC_Journal__c.fields.PurchaseType__c.label}" for="PurchaseType__c"/>
+                                        <apex:inputField required="true" id="PurchaseType__c" value="{!productToCreate.PurchaseType__c}"/>
+                                 </apex:pageBlockSectionItem>
+                         </apex:pageBlockSection>
+
+                    </apex:outputPanel>
+                    -->
+                    <apex:outputPanel id="statusSection">
+
+                        <apex:pageBlockSection columns="1" rendered="{!AND(OR(productToCreate.AcqType__c == 'Copyright Purchase',productToCreate.AcqType__c == 'Publish with Society - Copyright buy out'),NOT(ISBLANK(productToCreate.AcqType__c)))}"> 
+                                 <apex:pageBlockSectionItem id="purchaseTypeItem" helpText="{!$ObjectType.TFOAC_Journal__c.fields.PurchaseType__c.inlineHelpText}" >
+                                        <apex:outputLabel value="{!$ObjectType.TFOAC_Journal__c.fields.PurchaseType__c.label}" for="PurchaseType__c"/>
+                                        <apex:inputField required="true" id="PurchaseType__c" value="{!productToCreate.PurchaseType__c}"/>
+                                 </apex:pageBlockSectionItem>
+                         </apex:pageBlockSection>
+
+                        <apex:pageBlockSection columns="1" rendered="{!NOT(ISBLANK(productToCreate.AcqType__c))}">       
+                            <apex:pageBlockSectionItem >
+                                <apex:outputLabel value="Status" for="journalStatus"/>
+                                <apex:actionRegion id="statusRegion">
+                                    <apex:inputField id="journalStatus" required="true" value="{!productToCreate.Status__c}">
+                                        <apex:actionSupport event="onchange"  reRender="journalAcronym" />
+                                    </apex:inputField>
+                                </apex:actionRegion>
+                            </apex:pageBlockSectionItem>
+                            <apex:inputField required="true" id="subStatusField" value="{!productToCreate.SubStatus__c}"/>
+                            <apex:inputField required="true" id="statusWeight" value="{!productToCreate.Status_Weight__c}"/>
+                        </apex:pageBlockSection>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel id="divisionArea">
+                        <apex:pageBlockSection rendered="{!AND(productToCreate.AcqType__c != 'Digital Content',NOT(ISBLANK(productToCreate.AcqType__c)))}"  columns="1"> 
+                            
+                            <apex:pageBlockSectionItem rendered="{!AND(productToCreate.AcqType__c != 'Digital Content')}"  helpText="{!$ObjectType.TFOAC_Journal__c.fields.DivisionCode__c.inlineHelpText}">
+                                <apex:outputLabel for="division" value="{!$ObjectType.TFOAC_Journal__c.fields.DivisionCode__c.label}"/>
+                                <apex:outputPanel rendered="{!AND(productToCreate.AcqType__c != 'Digital Content')}" layout="block" styleClass="requiredInput">
+                                    <apex:actionRegion id="divisionRegion">
+                                        <apex:selectList required="true"  id="division" value="{!productToCreate.DivisionCode__c}" multiselect="false" size="1" >  
+                                        <apex:outputPanel layout="block" styleClass="requiredBlock"/>                                         
+                                          <apex:selectOptions id="divisionOptions" value="{!Division}"/>       
+                                                 <apex:actionSupport event="onchange"  action="{!resetFieldsWhenDivisionChange}"   oncomplete="hideHostAreas();"  rerender="divisionArea"/>     
+                                        </apex:selectList>
+                                    </apex:actionRegion>
+                                </apex:outputPanel>    
+                            </apex:pageBlockSectionItem>
+
+                            <apex:pageBlockSectionItem rendered="{!AND(productToCreate.AcqType__c != 'Digital Content')}" helpText="{!$ObjectType.TFOAC_Journal__c.fields.Host_AreaCode__c.inlineHelpText}">
+                                <apex:outputLabel for="Host_AreaCode__c" value="{!$ObjectType.TFOAC_Journal__c.fields.Host_AreaCode__c.label}"/>
+                                <apex:outputPanel layout="block" styleClass="requiredInput">
+                                    <apex:actionRegion id="hostAreaRegion">
+                                        <apex:selectList required="true" id="Host_AreaCode__c" value="{!productToCreate.Host_AreaCode__c}" multiselect="false" size="1" >  
+                                        <apex:outputPanel layout="block" styleClass="requiredBlock"/>                                         
+                                          <apex:selectOptions id="HostAreaOptions" value="{!HosArea}"/>       
+                                                 <apex:actionSupport event="onchange" action="{!resetFieldsWhenHostAreaChange}"  rerender="divisionArea"/>     
+                                        </apex:selectList>
+                                    </apex:actionRegion>    
+                                </apex:outputPanel>    
+                            </apex:pageBlockSectionItem>
+
+                            <apex:pageBlockSectionItem rendered="{!AND(productToCreate.AcqType__c != 'Digital Content')}" helpText="{!$ObjectType.TFOAC_Journal__c.fields.SegmentCode__c.inlineHelpText}">
+                                <apex:outputLabel for="SegmentCode__c" value="{!$ObjectType.TFOAC_Journal__c.fields.SegmentCode__c.label}"/>
+                                <apex:outputPanel layout="block" styleClass="requiredInput">
+                                    <apex:actionRegion id="segmentRegion">
+                                        <apex:selectList required="true"  id="SegmentCode__c" value="{!productToCreate.SegmentCode__c}" multiselect="false" size="1" >  
+                                        <apex:outputPanel layout="block" styleClass="requiredBlock"/>                                         
+                                          <apex:selectOptions id="SegmentOptions" value="{!Segment}"/>       
+                                                 <apex:actionSupport event="onchange" action="{!resetFieldsWhenSegmentChange}"  rerender="divisionArea"/>     
+                                        </apex:selectList>
+                                    </apex:actionRegion> 
+                                </apex:outputPanel>    
+                            </apex:pageBlockSectionItem>
+
+                            <apex:pageBlockSectionItem rendered="{!AND(productToCreate.AcqType__c != 'Digital Content')}" helpText="{!$ObjectType.TFOAC_Journal__c.fields.SectorCode__c.inlineHelpText}">
+                                <apex:outputLabel for="SectorCode__c" value="{!$ObjectType.TFOAC_Journal__c.fields.SectorCode__c.label}"/>
+                                <apex:outputPanel layout="block" styleClass="requiredInput">
+                                    <apex:actionRegion id="sectorRegion">
+                                        <apex:selectList required="true"  id="SectorCode__c" value="{!productToCreate.SectorCode__c}" multiselect="false" size="1" >  
+                                        <apex:outputPanel layout="block" styleClass="requiredBlock"/>                                         
+                                          <apex:selectOptions id="SectorOptions" value="{!Sector}"/>       
+                                                 <apex:actionSupport event="onchange" action="{!resetFieldsWhenSectorChange}"  rerender="divisionArea"/>     
+                                        </apex:selectList>
+                                    </apex:actionRegion>
+                                </apex:outputPanel>    
+                            </apex:pageBlockSectionItem>
+
+                            <apex:pageBlockSectionItem rendered="{!AND(productToCreate.AcqType__c != 'Digital Content')}" helpText="{!$ObjectType.TFOAC_Journal__c.fields.Subject_AreaCode__c.inlineHelpText}">
+                                <apex:outputLabel for="Subject_AreaCode__c" value="{!$ObjectType.TFOAC_Journal__c.fields.Subject_AreaCode__c.label}"/>
+                                <apex:outputPanel layout="block" styleClass="requiredInput">
+                                    <apex:actionRegion id="subjectAreaRegion">
+                                        <apex:selectList required="true" id="Subject_AreaCode__c" value="{!productToCreate.Subject_AreaCode__c}" multiselect="false" size="1" >  
+                                        <apex:outputPanel layout="block" styleClass="requiredBlock"/>                                         
+                                          <apex:selectOptions id="SubjectAreaOptions" value="{!SubjectArea}"/>            
+                                        </apex:selectList>
+                                    </apex:actionRegion>
+                                </apex:outputPanel>    
+                            </apex:pageBlockSectionItem>
+                        </apex:pageBlockSection>    
+                   </apex:outputPanel>     
+                   <apex:pageBlockSection columns="1"> 
+                       
+                    <apex:inputField required="true" value="{!productToCreate.LaunchYear__c}"/>
+                     </apex:pageBlockSection>
+                     <apex:outputPanel id="meidiaAreaBlok">
+                        <apex:pageBlockSection columns="1" rendered="{!AND(productToCreate.AcqType__c != 'Digital Content',NOT(ISBLANK(productToCreate.AcqType__c)))}"> 
+                                 <apex:pageBlockSectionItem rendered="{!AND(productToCreate.AcqType__c != 'Digital Content')}" id="mediaArea">
+                                        <apex:outputLabel value="Media" for="mediafield"/>
+                                        <apex:actionRegion id="mediaRegion">
+                                            <apex:inputField required="true" id="mediafield" value="{!productToCreate.Media__c}">
+                                                <apex:actionSupport event="onchange" reRender="issnArea" />
+                                            </apex:inputField>
+                                        </apex:actionRegion>
+                                 </apex:pageBlockSectionItem>
+                         </apex:pageBlockSection>
+                    </apex:outputPanel>     
+                            
+                  
+                    <apex:outputPanel id="issnArea">
+                        <apex:pageBlockSection rendered="{!AND(productToCreate.AcqType__c != 'Digital Content', NOT(ISBLANK(productToCreate.AcqType__c)))}" columns="1"> 
+                            <apex:inputField rendered="{!OR(productToCreate.Media__c == 'Online',productToCreate.Media__c == 'Print & online')}" value="{!productToCreate.OnlineISSN__c}"/>
+                            <apex:inputField rendered="{!OR(productToCreate.Media__c == 'Print',productToCreate.Media__c == 'Print & online')}" value="{!productToCreate.PrintISSN__c}"/>
+                        </apex:pageBlockSection>    
+                    </apex:outputPanel>    
+                    
+                    <apex:outputPanel layout="block" id="currentPublisher">
+                        <apex:pageBlockSection columns="1">
+                            <apex:inputField rendered="{!AND(NOT(ISBLANK(productToCreate.AcqType__c)),productToCreate.AcqType__c != 'New Launch',productToCreate.AcqType__c != 'New Launch - with Society')}" required="{!AND(NOT(ISBLANK(productToCreate.AcqType__c)),productToCreate.AcqType__c != 'Digital Content',productToCreate.AcqType__c != 'New Launch - with Society',productToCreate.AcqType__c != 'New Launch')}" value="{!productToCreate.CurrentPublisher__c}"/>
+                        </apex:pageBlockSection>
+                    </apex:outputPanel>  
+                    <apex:pageBlockSection columns="1">
+                        <apex:inputField value="{!productToCreate.ContractExpires__c}"/>
+                    </apex:pageBlockSection>
+                    <apex:outputPanel id="nonDigitalContentArea">
+                        <apex:pageBlockSection rendered="{!AND(productToCreate.AcqType__c != 'Digital Content',NOT(ISBLANK(productToCreate.AcqType__c))) }" columns="1">
+                            <apex:inputField rendered="{!AND(productToCreate.AcqType__c != 'New Launch',productToCreate.AcqType__c != 'New Launch - with Society')}" value="{!productToCreate.YearFirstPublished__c}"/>
+                            <apex:inputField value="{!productToCreate.JCRCovered__c}"/>
+                            <apex:inputField value="{!productToCreate.Country__c}"/>
+                            <apex:inputField value="{!productToCreate.Current_Open_Acess__c}"/>
+                            <apex:inputField value="{!productToCreate.Open_Access_T_F_Year_1__c}"/>
+                            <apex:inputField value="{!productToCreate.ProductProfile__c}"/>
+                            <apex:outputField label="Currency" value="{!productToCreate.CurrencyIsoCode}"/>
+                        </apex:pageBlockSection>
+                             
+                    </apex:outputPanel>    
+                    
+                    <apex:pageBlockSection columns="1" title="Financial Information">
+                        <apex:inputField value="{!productToCreate.EstimatedYear1Turnover__c}"/>
+                        <apex:inputField value="{!productToCreate.EstimatedGrossMarginYear1__c}"/>
+                        <apex:inputField value="{!productToCreate.CurrentAnnualTurnover__c}"/>
+                        <apex:inputField label="Purchase Price" value="{!productToCreate.Purchase_price__c}"/>  
+                        <apex:inputField value="{!productToCreate.SignOnFee__c}"/>
+                        
+                    </apex:pageBlockSection>
+                    
+                </apex:pageBlock>
+               
+                
+            </apex:outputPanel>    
+        </div>
+                
+    </apex:form>
+    <apex:relatedList subject="{!productToCreate.Id}" list="Relationships__r"/>
+
+    <script>
+    //$(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+        
+        var $j = jQuery.noConflict();
+        $j( document ).ready(function() {
+            hideHostAreas();
+            hideContractTypes();
+        });
+
+
+        function hideHostAreas(){
+            
+            var availableOptions = $j("[id$='availableHostAreas']").val();
+            console.log(availableOptions);
+            $j("[id$='Host_AreaCode__c']").find('option').each(function(){
+                console.log($j(this).text());
+                if(availableOptions.indexOf($j(this).text()) == -1){
+                    $j(this).hide();
+                   
+                }
+                
+            });
+            
+            
+
+        }
+        
+        function hideContractTypes(){
+            if('{!isDigitalContentUser}' === 'true'){
+                $j("[id$='acqType']").find('option').each(function(){
+                    // console.log('method executed for'+$(this).val());
+                    if($j(this).val() != 'Digital Content' && '{!isAllowedToSwithcProduct}' !== 'true'){
+                        $j(this).hide();
+                    }
+                });
+            }else{
+                $j("[id$='acqType']").find('option').each(function(){
+                    // console.log('method executed for'+$(this).val());
+                    if($j(this).val() == 'Digital Content' && '{!isAllowedToSwithcProduct}' !== 'true'){
+                        $j(this).hide();
+                    }
+                });
+            }
+        }
+    
+        function blockLayout(){
+            $j.blockUI({ message: '<h1>Please Wait...</h1>' });
+        }
+    
+        function unblockLayout(){
+            setTimeout(unblockUIJS, 2000);
+            //$j.unblockUI();
+        }
+        
+        function unblockUIJS(){
+            $j.unblockUI();
+        }
+        
+        
+    </script>
+</apex:page>

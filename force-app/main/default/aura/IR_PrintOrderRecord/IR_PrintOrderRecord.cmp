@@ -1,0 +1,459 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="IR_Controller" access="global" >
+    <!-- Invoke handler Toast handler-->
+    <c:IR_CommonServerAction aura:id="server" />
+    <c:IR_CommonToastService aura:id="toast" />
+    
+    <!-- All the Aura Attributes-->
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+    <aura:attribute name="isCreditReq" type="boolean" default="false"/>
+    <aura:attribute name="UploadFileSection" type="boolean" default="false"/>
+    <aura:attribute name="isDocumentApproved" type="boolean" default="false"/>
+    <aura:attribute name="isApproved" type="boolean" default="false"/>
+    <aura:attribute name="isDistributerCheckForsave" type="boolean" default="false"/>
+    <aura:attribute name="showuploadbutton" type="boolean" default="false"/>
+    <aura:attribute name="isCreditreqCheckCheckForsave" type="boolean" default="false"/>
+    <aura:attribute name="ShowUploadSec" type="boolean" default="false"/> 
+    <aura:attribute name="Selectedval" type="String" default="" />
+    <aura:attribute name="parentId" type="Id" default="a3d6E000000DPjk" />
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:attribute name="selectedDocumentId" type="string"/>
+    <aura:attribute name="lstContentDoc" type="List"/>
+    <aura:attribute name="hasModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="PrintorderiteamList" type="List" default="[]" access="private" />
+    <aura:attribute name="PrintOrder" type="List" default="[]" access="private" />
+    <aura:attribute name="ShowModel" type="boolean" default="false"/>
+    <aura:attribute name="columns" type="List" default="[]" access="private" />
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="fileTooLarge" type="boolean" default="false"/> 
+    <aura:attribute name="maxFileSize" type="integer" default="0"/>
+    <aura:attribute name="removeButtonLabel" type="string" default=""/> 
+    <aura:attribute name="islock" type="Boolean" default="false"/>
+    <aura:attribute name="isPrinter" type="Boolean" default="false"/>
+    <aura:attribute name="arrowDirection" type="string" default="arrowdown" description="Use for change arrow sign direction on header based on click"/>
+    <aura:attribute name="isAsc" type="boolean" default="true" description="boolean flag for pass sorting condition to apex class"/> 
+    <aura:attribute name="selectedTabsoft" type="string" default="Name" description="Use for show/hide arraow sign on header based on conditions"/>
+    <!-- Aura handler-->
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />  
+    
+    <!-- Print Order Record Detail View --> 
+    <lightning:layoutItem size="12" padding="around-small">
+        <div class="slds-text-heading_large">Print Order</div>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_6-of-12">
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Status</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].Status}"/></span>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Invoice Number</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].InvoiceNumber}"/></span>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Reference Number</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].ReferenceNumber}"/></span>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Printer</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].Printer}"/></span>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">PaymentTerm</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].PaymentTerm}"/></span>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-size_6-of-12">
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Packing Instructions</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].PackingInstructions}"/></span>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Customer Name</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].CustomerName}"/></span>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Special Instructions Name</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].SpecialInstructions}"/></span>
+                    </div>
+                </div>
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                        <span> <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Delivery Date</label>
+                            <ui:outputText  aura:id="text-input-id-1" class="field" value="{!v.PrintOrder[0].DeliveryDate}"/></span>
+                        &nbsp;<lightning:button disabled="{!v.islock}" variant="brand" label="Edit" iconName="utility:edit" iconPosition="left" onclick="{! c.EditRec }" />
+                    </div>
+                </div>
+                <aura:if isTrue="{!v.isDistributerCheckForsave}">
+                    <div class="slds-grid slds-gutters"> 
+                        <div class="slds-col">
+                            <span> 
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col slds-size_1-of-2" >
+                                        <span>  <label class="slds-form-element__label" for="text-input-id-1" id="inline-text-label">Approve Packing Detail/Delivery address</label></span>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-3">
+                                        <br/>
+                                        
+                                        <span>  <ui:inputCheckbox aura:id="output" value="{!v.isApproved}"/>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                            </span>
+                        </div>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        <aura:if isTrue="{!v.isDistributerCheckForsave}">
+            <lightning:button disabled="{!v.islock}" variant="brand" label="Save" iconName="utility:save" iconPosition="left" onclick="{! c.SaveRec}" />
+        </aura:if>
+    </lightning:layoutItem>
+    
+    <!-- List Of Related Print order Items-->
+    <lightning:layoutItem size="12" padding="around-small">
+        <div class="slds-text-heading_large">Print Order Items</div>
+        <aura:if isTrue="{!v.PrintorderiteamList.length > 0}">
+            <div style="overflow-y: hidden;">
+                <table class="slds-table slds-table--bordered slds-table--cell-buffer" >
+                    <thead>
+                        <tr class="slds-text-title--caps">
+                            <th>           
+                        <label class="slds-checkbox">
+                            <ui:inputCheckbox value="{!v.isSelectAll}" change="{!c.handleSelect}" aura:id="selectAll"/>
+                            <span class="slds-checkbox--faux" />
+                            <span class="slds-form-element__label"></span>
+                        </label>
+                    </th>
+                            <th class="slds-is-sortable slds-text-title--caps" scope="col" onclick="{!c.sortStatus}">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset">
+                                    <span class="slds-assistive-text">Sort</span>
+                                    <span class="wideCell" title="ISBN">ISBN</span>  
+                                    <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Application_Status__c') }">&nbsp;  &#9660; </aura:if>  
+                                    <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Application_Status__c') }"> &nbsp;  &#9650; </aura:if>                        
+                                </a>
+                            </th>
+                            
+                            <th class="slds-is-sortable slds-text-title--caps" scope="col" onclick="{!c.sortApplicant}">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset">
+                                    <span class="slds-assistive-text">Sort</span>
+                                    <span class="wideCell" title="Title">Title</span>
+                                    <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9660;</aura:if>
+                                    <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9650;</aura:if>     
+                                    
+                                </a>
+                            </th>
+                            
+                            <th class="slds-is-sortable slds-text-title--caps" scope="col" onclick="{!c.sortApplicant}">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset">
+                                    <span class="slds-assistive-text">Sort</span>
+                                    <span class="wideCell" title="List Price(GBP">List Price(GBP)</span>
+                                    <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9660;</aura:if>
+                                    <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9650;</aura:if>     
+                                    
+                                </a>
+                            </th>
+                            <aura:if isTrue="{!v.isPrinter}">
+                                
+                                <th class="slds-is-sortable slds-text-title--caps" scope="col" onclick="{!c.sortApplicant}">
+                                    <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset">
+                                        <span class="slds-assistive-text">Sort</span>
+                                        <span class="wideCell" title="List Price(GBP">MRP</span>
+                                        <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9660;</aura:if>
+                                        <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9650;</aura:if>     
+                                        
+                                    </a>
+                                </th><th class="slds-is-sortable slds-text-title--caps" scope="col" onclick="{!c.sortApplicant}">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset">
+                                    <span class="slds-assistive-text">Sort</span>
+                                    <span class="wideCell" title="List Price(GBP">UMC</span>
+                                    <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9660;</aura:if>
+                                    <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9650;</aura:if>     
+                                </a>
+                                </th><th class="slds-is-sortable slds-text-title--caps" scope="col" onclick="{!c.sortApplicant}">
+                                <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset">
+                                    <span class="slds-assistive-text">Sort</span>
+                                    <span class="wideCell" title="List Price(GBP">Printed Pages</span>
+                                    <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9660;</aura:if>
+                                    <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9650;</aura:if>     
+                                    
+                                </a>
+                                </th>
+                                <th class="slds-is-sortable slds-text-title--caps" scope="col" onclick="{!c.sortApplicant}">
+                                    <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset">
+                                        <span class="slds-assistive-text">Sort</span>
+                                        <span class="wideCell" title="List Price(GBP">Text Color</span>
+                                        <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9660;</aura:if>
+                                        <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9650;</aura:if>     
+                                        
+                                    </a>
+                                </th>
+                            </aura:if>
+                            <aura:if isTrue="{!!v.isPrinter}">
+                                <th class="slds-is-sortable slds-text-title--caps" scope="col" onclick="{!c.sortApplicant}">
+                                    <a href="javascript:void(0);" class="slds-th__action slds-text-link--reset">
+                                        <span class="slds-assistive-text">Sort</span>
+                                        <span class="wideCell" title="List Price(GBP">Customer Quote</span>
+                                        <aura:if isTrue="{! and(v.arrowDirection == 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9660;</aura:if>
+                                        <aura:if isTrue="{! and(v.arrowDirection != 'arrowdown', v.selectedTabsoft == 'Applicant__c') }">&nbsp;  &#9650;</aura:if>     
+                                        
+                                    </a>
+                                </th>
+                            </aura:if>
+                        </tr>
+                    </thead>
+                    
+                    <aura:iteration items="{!v.PrintorderiteamList}" var="con">  
+                        <tr>
+                          <th>
+                            <label class="slds-checkbox">
+                                <ui:inputCheckbox aura:id="checkPrintitems" value="" text="{!con.Id}"/>
+                                <span class="slds-checkbox--faux" />
+                                <span class="slds-form-element__label"></span>
+                            </label>
+                        </th>   
+                            <th scope="row">
+                                <div class="wideCell" title="{!con.ISBN__c}">{!con.ISBN__c}</div> 
+                                
+                            </th>
+                            <th scope="row">
+                                <div class="wideCell" title="{!con.Title__c}">{!con.Title__c}</div>
+                            </th>
+                            
+                            <!--th scope="row">
+                                <div class="wideCell" title="{!con.Agreed_Price_Per_Copy__c}">{!con.Agreed_Price_Per_Copy__c}</div>
+                            </th-->
+                            
+                            <th scope="row">
+                                <div class="wideCell" title="{!con.List_Price_GBP__c}">{!con.List_Price_GBP__c}</div>
+                            </th>
+                            <aura:if isTrue="{!v.isPrinter}">
+                                <th scope="row">
+                                    <div class="wideCell" title="{!con.MRP__c}">{!con.MRP__c}</div>
+                                </th>
+                                <th scope="row">
+                                    <div class="wideCell" title="{!con.UMC__c}">{!con.UMC__c}</div>
+                                </th>
+                                <th scope="row">
+                                    <div class="wideCell" title="{!con.Printed_Pages__c}">{!con.Pages__c}</div>
+                                </th>
+                                <th scope="row">
+                                    <div class="wideCell" title="{!con.Text_Color__c}">{!con.Text_Color__c}</div>
+                                </th>
+                                
+                                
+                            </aura:if>
+                            <aura:if isTrue="{!!v.isPrinter}">
+                                
+                                <th scope="row">
+                                    <div class="wideCell" title="{!con.Customer_Quote__c}">{!con.Customer_Quote__c}</div>
+                                </th>
+                            </aura:if>
+                        </tr>
+                        
+                    </aura:iteration>
+                    
+                    <tbody>
+                    </tbody>
+                </table> 
+            </div>   
+            <aura:set attribute="else">
+                <b> No Record Found</b>
+            </aura:set>
+        </aura:if>
+    </lightning:layoutItem>
+
+    <aura:if isTrue="{!v.showuploadbutton}">
+        <lightning:button  variant="brand" label="Upload File"  iconPosition="left" onclick="{! c.UploadFile }" />
+    </aura:if>
+    <aura:if isTrue="{!v.isCreditReq}">
+        <lightning:button  variant="brand" label="Export Excel"  iconPosition="right" onclick="{! c.ExportExcel }" />
+    </aura:if>
+               <!-- Custom DataTable to Display List Of Available ContentDocuments Start-->  
+    <lightning:layoutItem size="12" padding="around-small">
+        <div class="slds-text-heading_large">Files</div>
+        <aura:if isTrue="{!v.isDocumentApproved}">
+            <aura:if isTrue="{!v.lstContentDoc.length > 0}">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-title_caps" scope="col">
+                                <div class="slds-truncate" title="Title">Title</div>
+                            </th>
+                            <th class="slds-text-title_caps" scope="col">
+                                <div class="slds-truncate" title="Content ModifiedDate ">Content ModifiedDate </div>
+                            </th>
+                            <th class="slds-text-title_caps" scope="col">
+                                <div class="slds-truncate" title="Created By">Created By</div>
+                            </th>
+                            <th class="slds-text-title_caps" scope="col">
+                                <div class="slds-truncate" title="size">size(bytes)</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.lstContentDoc}" var="CD">
+                            <tr>
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!CD.Title}">
+                                        <!--store contentDocument Id in data-Id attribute-->
+                                        <a onclick="{!c.getSelected}" data-Id="{!CD.Id}">{!CD.Title}</a>
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!CD.ContentModifiedDate }">{!CD.ContentModifiedDate }</div>
+                                </th>
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!CD.CreatedBy.Name}">{!CD.CreatedBy.Name}</div>
+                                </th>
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!CD.ContentSize}">{!CD.ContentSize}</div>
+                                </th>
+                            </tr>  
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                <aura:set attribute="else">
+                    <b> No Files Found</b>
+                </aura:set>
+            </aura:if>
+            <aura:set attribute="else">
+                <b> No Files Found</b>
+            </aura:set>
+        </aura:if>
+    </lightning:layoutItem>
+    
+    <!-- Custom DataTable to Display List Of Available ContentDocuments End-->  
+    <!--###### FILE PREVIEW MODAL BOX START ######--> 
+    <aura:if isTrue="{!v.hasModalOpen}">
+        <section onclick="{!c.closeModel}"
+                 role="dialog"
+                 aria-modal="true"
+                 class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal__content slds-p-around_medium slds-text-align_center"
+                     style="background: transparent;">
+                    <div style="width: 50%; margin: 0 auto; text-align: left">
+                        <!--<lightning:fileCard> to preview file using content document Id -->
+                        <lightning:fileCard fileId="{!v.selectedDocumentId}"/>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+    <!-- Upload Document Section-->
+    <aura:if isTrue="{!v.UploadFileSection}">
+        <div class="demo-only" >
+            
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="height: 50%;">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideUpload }"
+                                              alternativeText="Close" class="slds-modal__close" />
+                        <h2 id="modal-heading-01" class="slds-text-heading_large">Upload File</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <table >
+                            <tbody>
+                                <tr > 
+                                    
+                                    
+                                    <th class="tblHead" scope="col">
+                                        <div class="slds-truncate" > <lightning:select aura:id="select1" name="select1" label="File-Type" required="true" onchange="{!c.onSelectChange}">
+                                            <option value="0">choose one...</option>
+                                            <option value="Delivery challan">Delivery challan</option>
+                                            <option value="Transporter bilty">Transporter bilty</option>
+                                            <option value="Printer Invoice">Printer Invoice</option>
+                                            <option value="Printer Invoice">Permission Letter</option>
+                                            </lightning:select></div>
+                                    </th>
+                                    
+                                    
+                                </tr>
+                                <tr> <aura:if isTrue="{!v.ShowUploadSec}">
+                                    <lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}" type="file" name="file" label="Attach a File" multiple="false" />
+                                    <div aura:id="fileName" class="fileNameOk"> 
+                                        {!v.fileName} 
+                                        &nbsp;
+                                        <lightning:button variant="base" aura:id="removeButton" class="removeButton" label="{!v.removeButtonLabel}" onclick="{! c.removeFile }"/>
+                                        <button class="slds-button slds-button_brand" onclick="{!c.doSave}">Upload Attachment</button>
+                                        
+                                    </div>
+                                    </aura:if></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    <!-- Edit Delievery Date-->
+    <aura:if isTrue="{!v.ShowModel}">
+        <div class="demo-only" >
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="height: 50%;">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideMe }"
+                                              alternativeText="Close" class="slds-modal__close" />
+                        <h2 id="modal-heading-01" class="slds-text-heading_Small slds-hyphenate">Edit Print Order</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <table >
+                            <tbody>
+                                <tr > 
+                                    <th class="tblHead" scope="col">
+                                        <div class="slds-truncate" >Edit Date</div>
+                                    </th>
+                                    <td  scope="col">
+                                        <div class="slds-truncate" ><lightning:input  aura:id="DateField"  type="date" name="input4" label="Delivery Date" placeholder="type here..."/></div>
+                                    </td>                                
+                                </tr>
+                                <tr > 
+                                    <th class="tblHead" scope="col">
+                                        <div class="slds-truncate" >Remarks</div>
+                                    </th>
+                                    <td  scope="col">
+                                        <div class="slds-truncate" ><lightning:input name="Remarks" label="Remarks" aura:id="Remarks" placeholder="Remarks"/></div>
+                                    </td>                                
+                                </tr>
+                                <lightning:button variant="brand" label="Save" iconName="utility:save" iconPosition="left" onclick="{! c.SaveRecord }" />
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    <!-- Splinner-->
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+</aura:component>

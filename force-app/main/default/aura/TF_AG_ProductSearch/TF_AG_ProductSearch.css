@@ -1,0 +1,131 @@
+.THIS.c-container {
+    /*border: 1px solid #d8dde6;*/
+    /*margin: 14px 0 20px 0;*/
+}
+
+.THIS .custom-box {
+    text-align: center;
+    background-color: #f4f6f9;
+    padding: 1rem;
+    border: 1px solid #d8dde6;
+    width:25%;
+}
+
+.THIS .slds-checkbox_faux,.THIS .slds-radio_faux, .THIS .multiple  {
+    border:1px solid #ccc;
+}
+.THIS .slds-input{
+    border-radius:unset;
+    border:1px solid #ccc;
+}
+
+.THIS.prodtext{
+    font-size: xx-large;
+    text-align: center;
+}
+.THIS .searchBtn{
+    text-align:center;
+}
+.THIS.slds-spinner_container {  
+    z-index: 10000;
+    position: fixed;   
+}
+.THIS .slds-tabs_scoped__item{
+    width:50%;
+}
+.THIS .slds-tabs_scoped__overflow-button{
+    display:none;
+}
+.THIS .slds-tabs_scoped{
+    margin-top: 2%;
+}
+.THIS .sendCSVBtn{
+    margin-top:2%;
+}
+.THIS .slds-form-element__label {
+    font-family: Lato!important;
+    font-size: 0.9rem!important;
+    line-height: 1.5em!important;
+    font-weight: 400!important;
+}
+.THIS .srchBtn{
+    text-align: right;
+}
+.THIS .slds-dueling-list__column.slds-dueling-list__column_responsive {
+    width: 44% !important;
+}
+.THIS .slds-dueling-list__column_responsive {
+    flex: none;
+    flex-wrap: wrap;
+    overflow: hidden;
+    min-width: 6rem;
+    width: 42%;
+}
+.THIS .slds-dueling-list__column_responsive .slds-dueling-list__options{
+    max-width: none;
+}
+.THIS .slds-dueling-list__options, .THIS .slds-picklist__options {
+    height: 11rem;
+}
+.THIS #container {height: 100%; width:100%;}
+.THIS .left,.THIS .right {display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 12px;}
+.THIS .left {width: 98%; }
+.THIS .right {width: 2%;margin-top: -6px;}
+.THIS .slds-table{
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(212, 212, 212);
+    border-radius: 0 0 .25rem .25rem;
+    padding: 1rem;
+}
+.THIS .slds-button-Exel{
+    /*margin-left: 89%;*/
+    float: left;
+    border:none;
+    padding-top: 0.4%;
+    background-color: transparent;
+    
+    
+}
+.THIS .clickDownload{
+    padding-top: 0.5rem;
+}
+
+.THIS #container_Paging {margin:4px;height: 100%; width:100%;}
+.THIS .left_paging,.THIS .right_paging {display: inline-block; *display: inline; zoom: 1; font-size: 12px;}
+.THIS .left_paging {width: 90%; }
+.THIS .right_paging {width: 10%;}
+.THIS .mainDiv{
+    width:100%;
+}
+.THIS .leftDiv{
+    float:left;
+    width:42%;
+    
+    
+}
+.THIS .centerDiv{
+    display: inline-block;
+    margin:0 auto;
+    width:10%;
+    margin-top:25px;
+    
+}
+.THIS .rightDiv{
+    float:right;
+    margin-right:150px;
+    margin-top:30px;
+    
+}
+.THIS .showPage{
+    color:black;
+}
+.THIS .showPage2{
+    color:darkblue;
+    margin:0 5px;
+}
+.THIS .titleLeft{
+    text-align:left;
+}
+.THIS .slds-truncate{
+    white-space: normal!important;
+}

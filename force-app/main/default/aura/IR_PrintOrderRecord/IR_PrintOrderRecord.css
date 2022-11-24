@@ -1,0 +1,17 @@
+.THIS .wideCell{
+    text-overflow: inherit;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.THIS.slds-spinner_container {  
+  z-index: 10000;
+  position: fixed;   
+}
+.THIS.slds-modal_container{
+margin-top:100%;
+}
+.THIS.selectclass{
+      width: 60% !important;
+}

@@ -1,0 +1,296 @@
+<aura:component controller="OppDetailPageSapBpLookupCtr" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global" >
+    
+    <aura:handler name="init" action="{!c.init}" value="{!this}" /> 
+    <!--HANDLE EVENT-->
+    <aura:handler event="c:SapBpCreationResponse" action="{!c.sapBpResponse}"/> 
+    
+    <aura:attribute name="accountNameUserInput" type="string"/>
+    <aura:attribute name="issearching" type="Boolean" default="false"/>
+    <aura:attribute name="showSearchComponent" type="Boolean" default="false"/>
+    <aura:attribute name="bpRecordsList" type="List"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" /> 
+    <aura:attribute name="wrapperData" type="object" />
+    <aura:attribute name="accountSearchDisabledOrEnabled" type="boolean" default="false"/>
+    <aura:attribute name="billToBP" type="String"/>
+    <aura:attribute name="shipToBP" type="String"/>
+    <aura:attribute name="bpDetail" type="String"/>
+    <aura:attribute name="pickedValue" type="String" default="Account"/>
+    <aura:attribute name="isShowSapBpCreationCmp" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="accRecordId" type="Id" />
+    <aura:attribute name="billToBpName" type="string"/>
+    <aura:attribute name="billToBpUrl" type="Id"/>
+    <aura:attribute name="shipToBpName" type="string"/>
+    <aura:attribute name="shipToBpUrl" type="Id"/>
+    <aura:attribute name="isEventFire" type="Boolean" default="true"/>
+    <aura:attribute name="noRecordsFoundMsg" type="Boolean" default="false"/>
+    <aura:attribute name="isSapBpListPresent" type="Boolean" default="false"/>
+    <aura:attribute name="searchBpName" type="String"/>
+    <aura:attribute name="searchBpEmail" type="String"/>
+    <aura:attribute name="originalSapList" type="Object"/>
+    
+    
+    <aura:attribute name="selectedRecord" type="sObject" default="{}" description="Use,for store SELECTED Account Record"/>
+    <aura:attribute name="oppRecordId" type="String"/>
+    
+    
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <article>
+        <div class="slds-card__header slds-grid customHeader slds-p-around_medium" style="background-color: #f3f2f2;">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate ">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container ">
+                        <!-- <lightning:icon iconName="action:priority" size="x-small"
+                              class="slds-icon_container slds-icon-standard-opportunity" /> -->
+                        
+                        <lightning:icon iconName="action:priority" size="x-small"
+                                        class="slds-icon_container slds-icon-standard-opportunity" />
+                        
+                        <span class="slds-assistive-text"></span>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h3 class="slds-card__header-title">
+                        <span class="slds-card__header-link slds-truncate">
+                            <span>SAP Business Partners </span>
+                        </span>
+                    </h3>
+                </div>
+                <div class="slds-no-flex"></div>
+            </header>
+        </div>
+        <div class="slds-border_top "></div>
+        <div class="slds-card__body slds-card__body_inner  slds-m-horizontal_x-large  ">
+            <!-- 1st row -->
+            <div class="slds-grid slds-gutters slds-grid_align-spread slds-p-vertical_x-small">
+                <div class="slds-col  slds-size_10-of-12">
+                    <span>
+                        <label class="slds-form-element__label" for="unique-id-of-input">Bill to BP</label>
+                        <div class="slds-p-vertical_x-small">
+                            
+                            BP No:&nbsp;
+                            <lightning:formattedUrl label="{!v.billToBpName}" value="{!v.billToBpUrl}" target="_blank" /><br/>
+                            
+                            <aura:unescapedHtml value="{!v.billToBP}"/>
+                        </div>
+                    </span>
+                </div>
+                <div class="slds-col slds-p-top_large slds-p-left_large">
+                    <lightning:buttonIcon name="Bill to BP" iconName="utility:edit" size="medium" variant="bare"
+                                          onclick="{!c.BilltoClick}" alternativeText="Edit" />
+                </div>
+                
+            </div>
+            <!-- 1st row -->
+            <!-- line -->
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-border_bottom"></div>
+                
+            </div>
+            <!-- line -->
+            
+            <!-- 2nd row -->
+            <div class="slds-grid slds-gutters slds-grid_align-spread slds-p-vertical_x-small">
+                <div class="slds-col  slds-size_10-of-12">
+                    <span>
+                        <label class="slds-form-element__label" for="unique-id-of-input">Ship to BP</label>
+                        <div class="slds-p-vertical_x-small">
+                            
+                            BP No:&nbsp;
+                            <lightning:formattedUrl label="{!v.shipToBpName}" value="{!v.shipToBpUrl}" target="_blank" /><br/>
+                            <aura:unescapedHtml value="{!v.shipToBP}"/>
+                        </div>
+                    </span>
+                </div>
+                <div class="slds-col slds-p-top_large slds-p-left_large ">
+                    <lightning:buttonIcon name="Bill to BP" iconName="utility:copy" size="medium" variant="bare"
+                                          onclick="{!c.copyBillToSapBP}" alternativeText="Copy Bill To SAP BP" />
+                </div>
+                <div class="slds-col slds-p-top_large slds-p-left_large">
+                    <lightning:buttonIcon name="Bill to BP" iconName="utility:edit" size="medium" variant="bare"
+                                          onclick="{!c.ShiptoClick}" alternativeText="Edit" />
+                </div>
+            </div>
+            <!-- 2nd row  -->
+        </div>
+    </article>
+    
+    
+    
+    
+    <aura:if isTrue="{!v.showSearchComponent}">
+        <!--<aura:html tag="style">
+            .slds-modal__container{
+            height : auto;
+            width: 60%;
+            max-width: 70rem;
+            }
+            .modal-body{
+            height : 500px !important;
+            max-height: 500px !important;
+            }
+            
+            .customFooter{
+            display: inline !important;
+            }
+        </aura:html>-->
+        <div class="demo-only" style="height:640px">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeSearchComponent}">
+                            <lightning:icon iconName="utility:close" size="xx-small" />
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium">BP Account Name</h2>
+                    </header>
+                    <div class="slds-modal__content" id="modal-content-id-1" style="overflow-x: auto;">
+                        
+                        <div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true" role="combobox" aria-haspopup="listbox" aria-expanded="true">
+                            
+                            <lightning:recordEditForm objectApiName="Case" >
+                                <lightning:inputField fieldName="AccountId" value="{!v.selectedRecord.Id}" onchange="{!c.handleChange}" />
+                            </lightning:recordEditForm>
+                            
+                            
+                            <aura:if isTrue="{!v.isSapBpListPresent}">
+                                <lightning:Input type="text" class="leftPaddingClass" Style="Width:250px" label="Search BP Record" value="{!v.searchBpName}" onkeyup="{!c.searchExistingBpRecord}" placeholder="Search existing sap bp record by contact name"></lightning:Input>         
+                                <lightning:Input type="text" class="leftPaddingClass" Style="Width:250px" label="" value="{!v.searchBpEmail}" onkeyup="{!c.emailSearchExistingBpRecord}" placeholder="Search existing sap bp record by Email"></lightning:Input>         
+                                <br/>
+                                <!--<div class="slds-scrollable"  style="height:25rem">-->
+                                    <!--<div class="slds-text-longform" style="width:150%">-->
+                                    <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-no-row-hover" role="listbox" id="lookup-grouped-table-id-1">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="SAP BP Number">SAP BP Number</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Account Name">Account Name</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Contact Name">Contact Name</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Email">Email</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Department">Department</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Address">Address</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate" title="Tax Registration Number">Tax Registration Number</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody> 
+                                            <aura:iteration items="{!v.wrapperData.sapBPList}" var="bpRec" indexVar="key0">
+                                                <tr>
+                                                    <td scope="row" >
+                                                        <a id="s01" href="javascript:void(0);" data-row-index="{!key0}" value="{!bpRec.id}" role="option" onclick="{!c.handleClick}">
+                                                            <div class="slds-truncate" title="{!bpRec.Name}">
+                                                                {!bpRec.Name}
+                                                            </div>
+                                                        </a>
+                                                    </td>
+                                                    <td scope="row">
+                                                        <a id="s01" href="javascript:void(0);" role="option">
+                                                            <div class="slds-truncate" title="{!bpRec.Account_Id__r.Name}">
+                                                                {!bpRec.Account_Id__r.Name}
+                                                            </div>
+                                                        </a>
+                                                    </td>
+                                                    
+                                                    <td scope="row">
+                                                        <a id="s01" href="javascript:void(0);" role="option">
+                                                            <div class="slds-truncate" title="{!bpRec.Account_Id__r.Name}">
+                                                                {!bpRec.First_Name__c}&nbsp;{!bpRec.Last_Name__c}
+                                                            </div>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="{!bpRec.Email__c}">{!bpRec.Email__c}</div>
+                                                    </td>
+                                                    <td>
+                                                        <!--<div class="slds-truncate" title="{!bpRec.Department_Id__c}">{!bpRec.Department_Id__r.Name}</div>-->
+                                                        <div class="slds-truncate" title="">
+                                                            <aura:if isTrue="{!bpRec.Department_Id__r.Name != null}">
+                                                                <div class="slds-truncate" title="{!bpRec.Department_Id__r.Name}">{!bpRec.Department_Id__r.Name}</div>
+                                                                <aura:set attribute="else">
+                                                                    <div class="slds-truncate" title="{!bpRec.Department__c}">{!bpRec.Department__c}</div>
+                                                                </aura:set>
+                                                            </aura:if> 
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="{!bpRec.Street__c}">{!bpRec.Street__c},{!bpRec.City__c},{!bpRec.State__c},{!bpRec.Country__c},{!bpRec.ZIP__c}</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="slds-truncate" title="{!bpRec.Tax_Registration_Number__c}">{!bpRec.Tax_Registration_Number__c}</div>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                        </tbody>
+                                    </table>
+                                <!--</div>-->
+                            </aura:if>
+                            
+                            <aura:if isTrue="{!v.noRecordsFoundMsg}">
+                                <br/><br/><br/><br/><br/><br/><br/><br/>
+                                <center><h2 class="slds-text-heading_large">No records found..</h2></center>
+                                <br/><br/><br/><br/><br/><br/><br/><br/>
+                            </aura:if>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer slds-modal__footer_directional">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.closeSearchComponent}">Cancel</button>
+                        <button class="slds-button slds-button_neutral" onclick="{!c.createNewSapBp}">New BP</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+        
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isShowSapBpCreationCmp}">
+        <div class="demo-only" style="height:640px">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeCreateNewSapBpCmp}">
+                            <lightning:icon iconName="utility:close" size="xx-small" />
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium">BP Account Name</h2>
+                    </header>
+                    <div class="slds-modal__content" id="modal-content-id-1" style="overflow-x: auto;">
+                        <div class="slds-lookup" data-select="multi" data-scope="single" data-typeahead="true" role="combobox" aria-haspopup="listbox" aria-expanded="true">
+                            <div class="slds-form-element slds-p-top_medium slds-p-horizontal_medium slds-m-bottom_small">
+                                
+                                <c:TF_SAP_BP_VerificationDS oppRecordId="{!v.oppRecordId}" recordId="{!v.selectedRecord.Id}" isEventFire="{!v.isEventFire}" bpDetail="{!v.bpDetail}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer slds-modal__footer_directional">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.closeCreateNewSapBpCmp}">Cancel</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+</aura:component>

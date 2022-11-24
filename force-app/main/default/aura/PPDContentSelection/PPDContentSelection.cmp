@@ -1,0 +1,87 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" > 
+    <!-- Attributes --> 
+    <aura:attribute name="recordId" type="String"/>
+	<aura:registerEvent name="productSearchEvent" type="c:PPDProductSearchEvent"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <!-- Markup -->
+    <div class="demo-only slds-grid" style="background: rgb(244, 246, 249); padding: 1rem;">
+        <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap">
+            <div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+                <div class="slds-panel__section slds-border_bottom">
+                    <div class="slds-media">                        
+                        <div class="slds-media__body">
+                            <h2 class="slds-truncate slds-text-heading_small">
+                                Content Selection Method
+                            </h2>                            
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-panel__section">                    
+                    <ul>
+                        <li>
+                            <span class="slds-form-element__label">
+                                 <div class="slds-form-element__control">
+                                    <div class="slds-radio_button-group">
+                                      <span class="slds-button slds-radio_button">
+                                        <input type="radio" name="radio" id="FileUpload" value="FileUpload" />
+                                        <label class="slds-radio_button__label" for="FileUpload">
+                                          <span class="slds-radio_faux">File Upload</span>
+                                        </label>
+                                      </span>
+                                      <span class="slds-button slds-radio_button">
+                                        <input checked="true" type="radio" name="radio" id="OnlineSalesForm" value="OnlineSalesForm" />
+                                        <label class="slds-radio_button__label" for="OnlineSalesForm">
+                                          <span class="slds-radio_faux">Product Search</span>
+                                        </label>
+                                      </span>
+                                      <span class="slds-button slds-radio_button">
+                                        <input type="radio" name="radio" id="Unsilo" value="Unsilo" />
+                                        <label class="slds-radio_button__label" for="Unsilo">
+                                          <span class="slds-radio_faux">Search through Unsilo</span>
+                                        </label>
+                                      </span>
+                                    </div>
+                                  </div>
+                            </span>
+                        </li>                       
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+   <aura:renderIf isTrue="{!v.isOpen}">
+    	<c:PPDProductList isOpen="{!v.isOpen}"/>   
+    </aura:renderIf>
+     
+    <div class="demo-only slds-grid" style="background: rgb(244, 246, 249); padding: 1rem;">
+        <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap">
+            <div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+                <div class="slds-panel__section slds-border_bottom">
+                    <div class="slds-media">                        
+                        <div class="slds-media__body">
+                            <h2 class="slds-truncate slds-text-heading_small">
+                                Product Search
+                            </h2>                            
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slds-panel__section slds-border_bottom">
+                      <div class="slds-form-element">
+                          <lightning:input  aura:id="productName" type="text"  placeholder="Search by products" />
+                      </div>
+                      <div class="slds-form-element">
+                        <lightning:input  aura:id="leadAuthor" type="text"  placeholder="Search by Lead Author/Editor" />  
+                      </div>
+                      <div class="slds-form-element">
+                        <lightning:input  aura:id="publisher" type="text"  placeholder="Search by publisher" />  
+                      </div> 
+                      <div class="slds-panel__section">
+                    	<lightning:button variant="brand" label="Search" onclick="{!c.search}" />
+                	</div>         
+                 </div>   
+               
+            </div>
+        </div>
+    </div>
+</aura:component>

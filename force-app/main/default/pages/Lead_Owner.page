@@ -1,0 +1,63 @@
+<!-- When placing on a standard page, set width = 100%, height = 25, scrollbars = NO, label = YES -->
+<apex:page id="pg" standardController="Lead" extensions="LeadOwnerController" tabStyle="Lead">
+    <style>
+        .fyi{
+            color:red;
+            font-style:italic;
+        }
+    </style>
+    
+    <apex:form id="frm" >
+        <apex:pageBlock title="Hidden Fields" rendered="false" >
+            <apex:outputField value="{!lead.Name}" />
+            <apex:outputField value="{!lead.Owner}" />
+            <apex:outputField value="{!lead.Owner.Name}" />
+            <apex:outputField value="{!lead.Company}" />
+        </apex:pageBlock>
+    
+        <apex:outputPanel rendered="{!NOT(showChangePage)}">
+            <apex:outputText value="{!currentOwnerName}"/>
+            &nbsp;
+            <apex:commandLink onclick="window.top.location.href='/apex/lead_owner?id={!lead.Id}&pg=2'" value="[Change]" />
+        </apex:outputPanel>
+        
+        <apex:outputPanel rendered="{!showChangePage}">
+            <apex:sectionHeader title="Change Lead Owner"/>
+            
+            This screen allows you to transfer ownership of a lead to another user or queue. When you transfer ownership of a lead, the new owner will own:
+            <ul>
+                <li>all notes and attachments recorded for the current owner</li>
+                <li>all open activities (tasks and events) owned by the current owner</li>
+            </ul>
+            Note that completed activities and open activities owned by other users will not be transferred.
+            <br/><br/>
+            
+            <apex:pageBlock mode="edit">
+                <br/>
+                <apex:pageBlockButtons location="bottom">
+                    <apex:commandButton action="{!save}" value="Save"/>
+                    <apex:commandButton action="{!exitPage}" value="Cancel"/>
+                </apex:pageBlockButtons>
+                <apex:pageBlockSection title="Select New Owner" collapsible="false" columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Transfer this lead" />
+                        <apex:outputText value="{!lead.Name}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Owner" />
+                        <apex:inputField value="{!lead.OwnerId}" />
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Comments" />
+                        <apex:inputTextarea value="{!comments}" style="width:272px; height:80px;"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputPanel >
+                        <apex:inputCheckbox value="{!sendNotificationEmail}" />
+                        <apex:outputLabel value="Send Notification Email *" /> <!--WRQ0413143 -->
+                        <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<apex:outputText style="font-size:x-small;" value="* Notifications are not sent to Queues"/> <!--WRQ0413143 -->
+                    </apex:outputPanel>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

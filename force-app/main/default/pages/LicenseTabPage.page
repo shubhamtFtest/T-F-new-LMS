@@ -1,0 +1,5 @@
+<apex:page standardController="License__c" lightningStylesheets="true" recordSetVar="licenses" tabstyle="License__c">
+    <head><apex:slds /></head>
+    <b style="font-size:20px;">&nbsp;&nbsp;Licenses<br/></b>
+    <apex:enhancedList type="License__c" height="800" rowsPerPage="200" id="LicenseList" customizable="false" listId="00B2X000008tuOd"/>
+</apex:page>

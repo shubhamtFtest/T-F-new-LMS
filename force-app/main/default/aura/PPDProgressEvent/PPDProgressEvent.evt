@@ -1,0 +1,6 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="showStatusBar" type="boolean"/>
+    <aura:attribute name="progressPercent" type="Integer"/>
+    <aura:attribute name="progressFor" type="String"/>
+
+</aura:event>

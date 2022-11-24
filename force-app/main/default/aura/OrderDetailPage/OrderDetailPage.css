@@ -1,0 +1,20 @@
+.THIS .custlabel {
+    color: grey;
+}
+
+.THIS .custwhiteBackground {
+    background-color: white;
+}
+
+.THIS .custCardBackGrnd {
+    background-color: grey;
+}
+
+.THIS .rcorners {
+    border-radius: 25px;
+    background: #CCEEF5;
+}
+
+.THIS .backBTn {
+    color: #202085;
+}

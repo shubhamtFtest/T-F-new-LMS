@@ -1,0 +1,43 @@
+<apex:page standardController="Setting__c" extensions="SettingsExtension" >
+
+    <apex:form id="frm">
+    
+    <apex:detail subject="{!setting.Id}" relatedList="false" />
+    
+    <apex:pageBlock id="pbSettingItems" title="Setting Items">
+        <apex:pageBlockButtons location="top">
+            <apex:commandButton action="{!addItem}" value="New Item"/>
+            <apex:commandButton oncomplete="LaunchLightbox()" value="Field Setup" rerender="pbSettingItems"/>
+        </apex:pageBlockButtons>
+
+        <apex:dynamicComponent componentValue="{!SettingItemTable}"/>
+        
+        <br/>
+        {!numStart}-{!numEnd} of {!numRecords}
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <apex:commandLink value="Prev" action="{!previous}"/>
+        <apex:outputText value=" | " />
+        <apex:commandLink value="Next" action="{!next}"/>
+        
+        <c:lightbox id="fieldSetup" function="LaunchLightbox" width="750" title="Field Setup" duration="0" showCancel="false"
+            content="<iframe src='/apex/settings_fieldsetup?Id={!setting.Id}' style='border:0; width:718px; min-height: 310px' &gt;&lt;/iframe&gt;" />  
+
+    </apex:pageBlock>
+
+    <script language="javascript">
+    
+        function disableEnterKey(e)
+        {
+            var key;     
+            if(window.event)
+                key = window.event.keyCode; //IE
+            else
+                key = e.which; //firefox     
+            return (key != 13);
+        }
+    
+    </script>
+
+    </apex:form>
+
+</apex:page>

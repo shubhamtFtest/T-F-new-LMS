@@ -1,0 +1,13 @@
+.THIS.slds-modal__container{
+	width: 70% !important;
+	max-width: 70% !important;
+    background: #e22319;
+} 
+
+.THIS.myModal .slds-modal__header{
+ background: #D3D3D3; 
+}
+.THIS.slds-modal{
+ max-width: 70px !important;
+ width:70px !important;
+}

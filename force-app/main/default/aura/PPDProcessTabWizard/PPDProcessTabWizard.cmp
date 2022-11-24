@@ -1,0 +1,595 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="typeOfCollection" type="String" default="Manual Curation"/>
+    <aura:attribute name="user" type="Boolean" default="false"/>
+    <!-- <aura:handler event="force:refreshView" action="{!c.init}" />-->
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="IsButtonDisabled" type="String" default="true"/>
+    <aura:attribute name="ShowModal" type="Boolean" default="false"/>
+    <aura:attribute name="ShowBusinessIdModal" type="Boolean" default="false"/>
+    <aura:attribute name="ShowClonedModal" type="Boolean" default="false"/>
+     <aura:attribute name="ShowDeleteModal" type="Boolean" default="false"/>
+     <aura:attribute name="ShowNewEditRecordModal" type="Boolean" default="false"/>
+     <aura:attribute name="IsClonedRecord" type="Boolean" default="false"/>
+    <aura:attribute name="disableDownload" type="Boolean" default="false"/>
+    <aura:attribute name="IsEditProductButtonDisabled" type="String"/>
+    <aura:attribute name="hasUnsiloContent" type="String"/>
+    <aura:attribute name="approvalStatus" type="String"/>
+    <aura:attribute name="progress" type="Integer" default="0"/> 
+    <aura:attribute name="showProgressBar" type="Boolean" default="false"/>
+    <aura:attribute name="progressBarMessage" type="String" default="Progress Status.."/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="tabId" type="String" default = 'firstTime'/>
+    <aura:attribute name="titleSeltabId" type="String" default = 'firstTime'/>
+    <aura:attribute name="mainTabId" type="String"/>
+    <aura:attribute name="showValidate" type="String" default="false"/>
+    <aura:attribute name="retrySubmit" type="String" default="false"/>
+    <aura:attribute name="SelectCriteria" type="String" default="Search"/>
+    <aura:attribute name="FileUpload" type="String" default="Identifiers File Upload"/>
+    <aura:attribute name="activeAccordion" type="String"/>
+    <aura:attribute name="isRecordAccessible" type="String" default="true"/>
+    <aura:attribute name="isRulePresent" type="String" default="false"/>
+    <aura:attribute name="isAckFailed" type="String" default="false"/>
+    <aura:attribute name="IsRecordActive" type="String" default="false"/>
+    <aura:attribute name="IsUserAdmin" type="String" default="false"/>
+    <aura:attribute name="LastModifiedBy" type="String"/>
+    <aura:attribute name="CreatedBy" type="String"/>
+    <aura:attribute name="CreatedById" type="String"/>
+    <aura:attribute name="LastModifiedById" type="String"/>
+    <aura:attribute name="RecordTypeName" type="String"/>
+    <aura:attribute name="CreatedByDate" type="String"/>
+    <aura:attribute name="ModifiedByDate" type="String"/>
+    <aura:attribute name="SelectedUnsilo" type="String" default="Chapters"/>
+    <aura:attribute name="consumer" type="String" default="Collections"/>
+    <aura:attribute name="IsBusinessIdValid" type="String"/>
+    <aura:attribute name="saveState" type="String" default="UNSAVED"/>
+    <aura:attribute name="IsBusinessIdExist" type="String" default='false'/>
+    <aura:attribute name="businessIdToValidate" type="String"/>
+    <aura:attribute name="IsBusinessIdValidatedFromPCM" type="Boolean" default="false"/>
+    <aura:attribute name="IsmsgFromBusinessModal" type="String" default="false"/>
+    <aura:attribute name="StrBusinessId" type="String"/>
+    <aura:attribute name="StrBusinessIdFromEditModal" type="String"/>
+    <aura:attribute name="descriptionValue" type="String"/>
+    <aura:attribute name="abstractValue" type="String"/>
+    <aura:attribute name="isFromFinishButton" type="String" default="False"/>
+    <aura:attribute name="disableDelete" type="Boolean" default="true"/>
+    <aura:attribute name="toggleSpinner" type="boolean" default="false"/> 
+    <aura:attribute name="IsCollectionNameValid" type="String"/>
+   <aura:attribute name="IsCollNameValidatedFromPCM" type="Boolean" default="false"/>
+    <aura:attribute name="StrTitleFromEditModal" type="String" />
+    <aura:attribute name="titleToValidate" type="String"/>
+    <aura:attribute name="IsCollectionNameExist" type="String" default='false'/>
+    <aura:attribute name="isCollectionFree" type="Boolean" default="false"/>
+    <aura:attribute name="IsSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="IsBusinessIdRegexValidated" type="Boolean" default='false'/>
+    <aura:attribute name="IsBusinessIdRegexValidatedForEditForm" type="String" default='false'/>
+    <aura:attribute name="fields" type="String[]" default="['Name','Product_Type_Author_Facing__c','Description','Product_Category__c','Applicable_Channels__c','Sales_Channels__c','Applicable_License_Types__c','Applicable_Customer_Types__c','copyrightyear__c','businessId__c']" />
+    
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="productRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    
+    <aura:attribute name="ShowCollectionNameModal" type="Boolean" default="false"/>
+    <aura:attribute name="IsmsgFromCollectionModal" type="String" default="false"/>
+    
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler event="c:PPDProductApprovalRefreshEvent" action="{! c.init}" />
+    <aura:handler event="c:PPDProgressEvent" action="{! c.progressBarUpdate}" />
+    <aura:handler event="c:PPDBusinessIdCheckEvent" action="{! c.updateBusinessIdStatus}" />
+    <!--<aura:handler event="c:PPDCollectionNameCheckEvent" action="{!c.updateCollectionStatus}"/>-->
+    <aura:registerEvent name="validate" type="c:PPDValidateEvent"/>
+    <aura:registerEvent name="RecordEditRefreshEvent" type="c:PPDRecordEditRefreshEvent"/>
+    
+    <aura:handler event="c:PPDGenericEvent" action="{! c.enableSubmitForApproval}"/>
+    
+   <!-- <aura:handler event="force:showToast" action="{!c.refreshAll}"/>-->
+    
+     <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+  
+    <!--Open Product Clone modal -->
+    <aura:if isTrue="{!v.ShowModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideMe }" 
+                                          alternativeText="Close" class="slds-modal__close" />      
+                    <c:PPDCloneCollectionProduct recordId="{! v.recordId }" ShowModal="{!v.ShowModal}"></c:PPDCloneCollectionProduct>
+                </header>
+            </div>
+        </div>         
+    </aura:if> 
+    
+    <!--End Product Clone modal -->
+    
+     <!--Open BusinessId Edit modal -->
+    <aura:if isTrue="{!v.ShowBusinessIdModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                 <header class="slds-modal__header">
+                    <!--<div style="background-color: lightgrey;padding-around:2px;">-->
+                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideBusinessIdModal }" 
+                                          alternativeText="Close" class="slds-modal__close" />      
+                  <lightning:input type="text" name="inputBusinesid" label="Enter a Business Id" required="true" value="{!v.businessIdToValidate}"/>
+                    <br></br>
+                      <!-- spinner -->
+   
+                   <lightning:button variant="brand" label="Update" title="Update" onclick="{! c.handleBusinessIdUpdateClick }"/>
+                    <br></br>
+                     
+                    <p><lightning:formattedRichText  aura:id="msgBusinessIdValidity"/></p>
+                  <!-- </div>-->
+                  
+                </header>
+            </div>
+        </div>         
+    </aura:if> 
+
+
+     <!--Open CollectionName Edit modal -->
+    <aura:if isTrue="{!v.ShowCollectionNameModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                 <header class="slds-modal__header">
+                    <!--<div style="background-color: lightgrey;padding-around:2px;">-->
+                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideCollectionModal }" 
+                                          alternativeText="Close" class="slds-modal__close" />      
+                  <lightning:input type="text" name="inputCollectionName" label="Enter Collection Name" required="true" value="{!v.titleToValidate}"/>
+                    <br></br>
+                      <!-- spinner -->
+   
+                   <lightning:button variant="brand" label="Update" title="Update" onclick="{! c.handleCollectionNameUpdateClick }"/>
+                    <br></br>
+                     
+                    <p><lightning:formattedRichText  aura:id="msgCollectionNameValidity"/></p>
+                  <!-- </div>-->
+                  
+                </header>
+            </div>
+        </div>         
+    </aura:if> 
+    
+    <!--End Product Clone modal -->
+   <!--Open New Edit Record Form-->
+    <aura:if isTrue="{!v.ShowNewEditRecordModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal_large slds-scrollable--y">
+                    
+                    <header class="slds-modal__header">
+                        <h3 class="slds-text-heading_medium">Record Update</h3>
+                        <lightning:buttonIcon iconName="utility:close" variant="brand" onclick="{! c.HideEditForm }" 
+                                              alternativeText="Close" class="slds-modal__close" />                
+                        <lightning:messages aura:id="ProdMessage" />
+                        <lightning:recordEditForm 
+                                                  recordId="{!v.recordId}"
+                                                  objectApiName="Product2"
+                                                  aura:id="myRecordForm"
+                                                  onsuccess="{!c.handleSuccess}"
+                                                  >
+                            <lightning:messages />
+                            
+                            <div class="slds-grid">
+                                
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:inputField aura:id="newProductField" fieldName="Name"  required="true"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="Description"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="Product_Category__c" required="true"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="Product_Type__c"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="Applicable_Channels__c"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="Applicable_License_Types__c"  required="true" />  
+                                    <lightning:inputField aura:id="newProductField" fieldName="copyrightyear__c"  required="true"/>
+									
+                                    <lightning:inputField class="checkBox" aura:id="newProductField" fieldName="Collection_Auto_Rollover__c" />
+                                    <lightning:inputField class="checkBox" aura:id="newProductField" fieldName="Is_collection_free__c"/>
+                                    
+                                    
+                                </div>
+                                
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning:inputField aura:id="newProductField" fieldName="Product_Type_Author_Facing__c" required="true"/>   
+                                    <lightning:inputField aura:id="newProductField" fieldName="Abstract__c" required="true"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="businessId__c"  required="true"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="doi__c"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="Sales_Channels__c"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="Applicable_Customer_Types__c" required="true"/>
+                                    <lightning:inputField aura:id="newProductField" fieldName="Collection_Subject_Area__c" required="true"/>
+                                    <lightning:inputField class="checkBox" aura:id="newProductField1" fieldName="Backlist__c" />
+                                </div>
+                               
+                            </div>
+                            <div class="slds-m-top_medium">                    
+                                <lightning:button variant="brand" name="Cancel" label="Cancel" onclick="{!c.handlemyRecordFormCancel}" />
+                           
+                                <lightning:button variant="brand" type="submit" name="update" label="Update" onclick="{!c.handlemyRecordFormSubmit}" />
+                            </div>
+                        </lightning:recordEditForm>
+                        
+                    </header> 
+                </div>                 
+            </div>           
+        </div>        
+    </aura:if> 
+    <!--End-->
+    
+    
+    <!--Open Cloned Product Edit modal -->
+    <aura:if isTrue="{!v.ShowClonedModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal_large slds-scrollable--y">
+                    
+                    
+                    <header class="slds-modal__header">
+                        <h3 class="slds-text-heading_medium">Record Update</h3>
+                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.CloneHideMe }" 
+                                              alternativeText="Close" class="slds-modal__close" />                
+                        <lightning:recordEditForm
+                                                  aura:id="ProductEditForm"
+                                                  recordId="{!v.recordId}"                                             
+                                                  objectApiName="Product2"
+                                                  onsubmit="{!c.UpdateClonedData}"
+                                                  onload="{!c.showRequiredFields}"                                              
+                                                  onsuccess="{!c.handleOnSuccess}"
+                                                  onerror="{!c.handleOnError}" >
+                            
+                            <!-- the messages component is for error messages -->
+                            <lightning:messages />
+                            
+                            <lightning:layout>
+                                <lightning:layoutItem padding="around-medium" size="6">
+                                    <lightning:inputField fieldName="Description" aura:id="description" value="{!v.descriptionValue}"/>
+                                    <lightning:inputField fieldName="Applicable_Channels__c" aura:id="deliveryChannel" />
+                                    <lightning:inputField fieldName="Applicable_License_Types__c" aura:id="businessModel" />
+                                    <lightning:inputField fieldName="doi__c" aura:id="productDoi" />
+                                    <lightning:inputField  fieldName="Collection_Auto_Rollover__c" aura:id="collectionAutorollover" />
+                                    
+                                    <lightning:inputField padding="around-small" class="checkBox" aura:id="newProductField1" fieldName="Backlist__c" />
+                                </lightning:layoutItem>
+                                
+                                <lightning:layoutItem padding="around-medium"  size="6">
+                                    <lightning:inputField fieldName="Abstract__c" aura:id="abstract" value="{!v.abstractValue}" required="true"/>
+                                    <lightning:inputField fieldName="Sales_Channels__c" aura:id="salesChannel" />
+                          			<lightning:inputField fieldName="Applicable_Customer_Types__c" aura:id="customerType" />
+                                    <lightning:inputField fieldName="Product_Type__c" aura:id="productType" />
+                                    <lightning:inputField class="checkBox" aura:id="newProductField" fieldName="Is_collection_free__c"/>
+                                    
+                                </lightning:layoutItem>
+                            </lightning:layout> 
+                            
+                            	
+                         
+                            
+                            <div class="slds-m-top_medium">                                  
+                                <lightning:button variant="brand" label="Cancel" title="Cancel" onclick="{! c.CloneHideMe }"/>
+                                <lightning:button variant="brand" type="submit" name="update" label="Update" />
+                            </div>
+                            
+                        </lightning:recordEditForm>                   
+                        
+                    </header> 
+                </div>                 
+            </div>           
+        </div>        
+    </aura:if> 
+    
+    <!--Open Cloned Product Edit modall -->
+    <aura:if isTrue="{!v.isAckFailed == 'true'}">
+        <div class="slds-card">
+            <lightning:layout>
+                <lightning:layoutItem padding="around-small" flexibility="auto">
+                    <p>
+                        <lightning:formattedRichText aura:id="msgApiFailedText"></lightning:formattedRichText>
+                    </p>                  
+                </lightning:layoutItem>
+            </lightning:layout>        
+        </div> 
+    </aura:if>
+    
+    <aura:if isTrue="{!v.retrySubmit == 'true'}">
+        <div class="slds-card">
+            <lightning:layout>
+                <lightning:layoutItem padding="around-small" flexibility="auto">
+                    <p>
+                        <lightning:formattedRichText aura:id="msgRichText"></lightning:formattedRichText>
+                    </p>
+                    <br/>
+                    <lightning:button variant="brand" aura:id="submit" type="brand" label="Submit for Approval" onclick="{! c.checkforUnsiloContent }"/>
+                </lightning:layoutItem>
+            </lightning:layout>        
+        </div> 
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isRecordAccessible == 'false'}">
+        <div class="slds-card">
+            <lightning:layout>
+                <lightning:layoutItem padding="around-small" flexibility="auto">
+                    <p>
+                        <lightning:formattedRichText aura:id="infoMsgRichText"></lightning:formattedRichText>
+                    </p>                  
+                </lightning:layoutItem>
+            </lightning:layout>        
+        </div> 
+    </aura:if>
+    
+    <aura:if isTrue="{!v.ShowDeleteModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal_large">
+                     <header class="slds-modal__header">
+                        <h3 class="slds-text-heading_medium">Record Delete</h3>
+                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.closeModal }" 
+                                              alternativeText="Close" class="slds-modal__close" />
+            <div class=".slds-text-heading_medium">Are you sure you want to delete this record?</div> 
+                         <br></br>
+            <lightning:button label="Delete"  iconPosition="left"  variant="brand" onclick="{!c.deleteCollectionRecord}"/>
+            <lightning:button label="Cancel"  iconPosition="left"  variant="brand" onclick="{!c.closeModal}"/>
+                    </header>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <div class="slds-card">
+        <lightning:layout>
+            <lightning:layoutItem size="5">
+                <div style="pointer-events:none;">
+                    <lightning:picklistPath aura:id="picklistPath" recordId="{!v.recordId}"
+                                            variant="non-linear"
+                                            picklistFieldApiName="Approval_Status__c">
+                    </lightning:picklistPath> 
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="4" padding="around-small" flexibility="auto">
+                <aura:if isTrue="{!and(v.showValidate == 'true',v.IsButtonDisabled == 'true')}">
+                    <lightning:button variant="brand" aura:id="validate" type="brand" label="Validate" onclick="{! c.validatePkg}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.IsButtonDisabled == 'false'}">
+                    <!-- <aura:if isTrue="{!or(v.IsButtonDisabled == 'false',v.isRulePresent == 'true')}">-->
+                    <lightning:button variant="brand" aura:id="submit" type="brand" label="Submit for Approval" onclick="{! c.checkforUnsiloContent }"/>
+                </aura:if>
+                <!-- <lightning:button variant="brand" aura:id="EditProduct" type="brand" label="Edit Product"  disabled="{!v.IsEditProductButtonDisabled}" onclick="{! c.checkForEditProduct }"/>-->
+                <lightning:button variant="brand" aura:id="EditProduct" type="brand" label="Edit Product" onclick="{! c.checkForEditProduct }"/>
+                <aura:if isTrue="{!v.IsRecordActive=='True'}">
+                    <lightning:button label="Download" iconName="utility:download" variant="brand" onclick = "{! c.downloadParts}" disabled = "{! v.disableDownload}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.disableDelete=='false'}">
+                  <lightning:button label="Delete" iconName="utility:delete" variant="brand" onclick = "{! c.deleteCollectionClick}" disabled = "{! v.disableDelete}"/>
+                </aura:if>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="3" padding="around-small" flexibility="auto">
+                <aura:if isTrue="{!and(v.IsRecordActive=='False', v.IsBusinessIdValid == 'valid')}">
+                    <lightning:formattedText value="BusinessId has been validated" /><lightning:icon iconName="utility:success" alternativeText="Success!" variant="Success"
+            title="success variant x-small" size="x-small" />
+                </aura:if>
+              
+                 <aura:if isTrue="{!and(v.IsRecordActive=='False', v.IsBusinessIdValid == 'Invalid')}">
+                    <lightning:formattedText value="Invalid BusinessId! Please update here " style="color:red"/><lightning:buttonIcon iconName="utility:edit" variant="container" onclick="{! c.handleBusinessIdClick }" alternativeText="Edit" title="Edit" />
+                </aura:if>
+                <br></br>
+                  <aura:if isTrue="{!and(v.IsRecordActive=='False', v.IsCollectionNameValid == 'Invalid')}">
+                    <lightning:formattedText value="Invalid Collection Name! Please update here " style="color:red"/><lightning:buttonIcon iconName="utility:edit" alternativeText="Edit!" variant="container" onclick="{! c.handleCollectionNameClick }"
+            title="Edit"  />
+                </aura:if>
+            </lightning:layoutItem>
+            
+        </lightning:layout>        
+        
+    </div> 
+    
+    <aura:if isTrue="{!v.showProgressBar}">
+        <div class="slds-card">
+            <b> {! v.progressBarMessage} </b>
+            <lightning:progressBar value="{! v.progress }" size="large" />
+            <b> Percentage : {! v.progress} </b>
+        </div>
+    </aura:if>
+    <div class="c-containerOuter">
+        <lightning:tabset aura:id="tabs" variant="scoped" onselect="{! c.handleTabSelect }" selectedTabId="{!v.mainTabId}">
+            <lightning:tab label="Title Selection" id="TitleSelection" tabindex="1">
+                <aura:if isTrue="{!v.IsRecordLocked=='true'}"> 
+                    
+                    
+                    <lightning:tabset>
+                        <lightning:tab label="{! v.SelectCriteria }" id="SelectByCriteria">
+                            <c:PPDContentSelectionScreen consumer="{! v.consumer}" recordId="{! v.recordId }" typeOfCollection = "{#v.typeOfCollection}"/>
+                        </lightning:tab>
+                        <aura:if isTrue="{!v.typeOfCollection=='Manual Curation'}">
+                            <lightning:tab label="{! v.FileUpload }" id="ProductFileUpload">
+                                <c:PPDFileUpload recordId="{! v.recordId }" CollectionType="{#v.typeOfCollection}"/> 
+                            </lightning:tab>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.typeOfCollection=='Manual Curation'}">
+                            <!-- <lightning:tab label="Content Selection" id="ContentSelection">
+                            <lightning:tabset>-->
+                            <!--commented as part of prod release on 16Dec 2020-->
+                            <!-- <lightning:tab label="UNSILO Classify" id="classify">
+                                <div class="select">
+                                    <lightning:select aura:id="selectUnsilo"  name="select" label="Please Select"  onchange="{! c.onSelectChange }" >                                    
+                                        <option value="Chapters">Chapters</option>
+                                        <option value="Articles">Articles</option>                                       
+                                    </lightning:select>
+                                </div>
+                                
+                                
+                                <aura:if isTrue="{!v.SelectedUnsilo=='Chapters'}">
+                                   
+                                    <c:PPDClassify recordId="{! v.recordId }" contentType = 'Chapter' />
+                                   
+                                    <aura:set attribute="else">
+                                        
+                                       
+                                        <c:PPDClassify recordId="{! v.recordId }" contentType = 'ScholarlyArticle' />
+                                      
+                                    </aura:set>
+                                </aura:if>
+                               
+                        </lightning:tab>-->
+                            <!--  <lightning:tab label="Content File Upload" id="ContentFileUpload">
+                                <c:PPDContentFileUpload recordId="{! v.recordId }"/>
+                            </lightning:tab>-->
+                            <!-- <lightning:tab label="Curated Content" id="ContentCurator">
+                                <c:PPDContentCurator recordId="{! v.recordId }"/>
+                            </lightning:tab>-->
+                            <!--   </lightning:tabset> 
+                        </lightning:tab>-->
+                            <!--   <lightning:tab label="Verticle" id="TestTitleSelection">
+                                <c:PPDProcessTabNewUI recordId="{! v.recordId }"/>                               
+                                
+                        </lightning:tab>-->
+                            <!-- <lightning:tab label="Tree" id="TestTitleSelection2">
+                                <c:PPDProcessTabNewUI2 recordId="{! v.recordId }"/>                              
+                                
+                        </lightning:tab>-->
+                        </aura:if>
+                        <!-- <aura:if isTrue="{!v.typeOfCollection=='Rule based'}">
+                        <lightning:tab label="Advanced Search" id="Search">
+                            <c:PPDProductSearchLandingPage recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>					
+                        </lightning:tab>
+                    </aura:if>-->
+                    </lightning:tabset>
+                </aura:if>
+                <aura:if isTrue="{!v.IsRecordLocked!='true'}"> 
+                    <p>Record locked</p>
+                </aura:if>
+            </lightning:tab>
+            
+            <!-- Start of new MetaData Tab-->
+            <lightning:tab label="Product Metadata" id="MetaData" tabindex ="2">
+                <lightning:tabset>
+                    <lightning:tab label="About" id="productdetails" >     
+                        <lightning:layout pullToBoundary="small">
+                            <lightning:layoutItem  size="6" padding="around-small" flexibility="auto">
+                                <lightning:recordViewForm recordId="{! v.recordId }" objectApiName="Product2">
+                                    <div class="slds-box">
+                                        <lightning:badge label="Details" class="align"/>
+                                        <div class="Row">
+                                            <div class="Column"> 
+                                                <lightning:outputField fieldName="Hub_Id__c" /> 
+                                                <!--  <lightning:outputField fieldName="RecordType" />-->
+                                                <lightning:outputField fieldName="version__c" />
+                                                <lightning:outputField fieldName="copyrightyear__c" />
+                                                <lightning:outputField fieldName="Product_Type__c" />
+                                                <p>
+                                                <lightning:outputField fieldName="Applicable_Channels__c" />
+                                                    </p>
+                                                <p>
+                                                <lightning:outputField fieldName="Applicable_License_Types__c" />
+                                                </p>
+                                                <p class="labelRow">
+                                                    <lightning:outputField fieldName="Product_Category__c" style="padding-bottom:5px;"/>
+                                                </p>                     
+                                                <p class="label">
+                                                    <lightning:formattedText value="Product Description" class="slds-form-element__label" Style="padding-bottom:5px;margin-bottom:5px;"></lightning:formattedText>
+                                                    <lightning:outputField fieldName="Description" style="overflow:auto; height:60px; width:200px; display:block;padding-top:5px;border: 1px solid #d8dde6;" variant="label-hidden"/>
+                                                </p>
+                                                <p class="label">
+                                                    <lightning:formattedText value="Product Abstract" class="slds-form-element__label" Style="padding-bottom:5px;margin-bottom:5px;"></lightning:formattedText>
+                                                    <lightning:outputField fieldName="Abstract__c" style="overflow:auto; height:60px; width:200px; display:block;padding-top:5px;border: 1px solid #d8dde6;" variant="label-hidden"/>
+                                                </p>
+                                                <p>
+                                                <lightning:outputField fieldName="Collection_Auto_Rollover__c"></lightning:outputField>
+                                                </p>
+                                               <p>
+                                                <lightning:outputField fieldName="Is_collection_free__c" aura:id="collectionFree"></lightning:outputField>
+                                                </p>
+                                                
+                                                  <aura:if isTrue="{!v.IsUserAdmin == 'true'}">
+                                                    <lightning:outputField fieldName="API_Error_Cause__c" />
+                                                </aura:if>
+                                                
+                                            </div>
+                                            <div class="Column">
+                                                <lightning:outputField fieldName="Name" style="Padding-bottom:10px;"/>
+                                                <lightning:outputField fieldName="Product_Type_Author_Facing__c" />
+                                               <!-- <lightning:outputField fieldName="Collection_Name__c" />-->
+                                                
+                                                <lightning:outputField fieldName="Business_Id_Calc__c" />
+                                                <lightning:outputField fieldName="doi__c" />
+                                                 <lightning:outputField fieldName="Sales_Channels__c" />
+                                                    
+                                                
+                                                 <lightning:outputField fieldName="Applicable_Customer_Types__c" />
+                                                <lightning:outputField fieldName="Collection_Subject_Area__c" />
+                                                
+                                                <p class="label">
+                                                    <lightning:formattedText title="Created By" value="Created By" class="slds-form-element__label"/><br></br>
+                                                    <!--<lightning:formattedText title="Created By" value="{!v.CreatedBy}" />-->
+                                                    <lightning:formattedUrl value="{!v.CreatedById}" tooltip="{!v.CreatedBy}" label="{!v.CreatedBy}" target="_blank" /><br></br><br></br></p>
+                                                
+                                                <p class="label">
+                                                    <lightning:formattedText title="LastModified By" value="Last Modified By" class="slds-form-element__label"/><br></br>
+                                                    <!-- <lightning:formattedText title="LastModified By" value="{!v.LastModifiedBy}" /> <br></br><br></br>-->
+                                                    <lightning:formattedUrl value="{!v.LastModifiedById}" tooltip="{!v.LastModifiedBy}" label="{!v.LastModifiedBy}" target="_blank"/><br></br><br></br>
+                                                </p>
+                                                 
+                                                <p class="label">
+                                                    <lightning:formattedText title="Record Type Name" value="Product Record Type" class="slds-form-element__label label"/><br></br>
+                                                    <lightning:formattedText title="Product Record Type" value="{!v.RecordTypeName}" class="label"/> <br></br><br></br>
+                                                </p>
+                                                
+                                              <p>
+                                                <lightning:outputField fieldName="Backlist__c"></lightning:outputField>
+                                                </p>
+                                                
+                                            </div>   
+                                        </div>
+                                    </div>
+                                </lightning:recordViewForm>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="6" padding="around-small" flexibility="auto">
+                                
+                                
+                                <aura:if isTrue="{!v.typeOfCollection=='Rule based'}">
+                                    
+                                    <c:PPDRuleForRuleBasedCollection recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>					
+                                    
+                                </aura:if>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </lightning:tab>
+                    
+                    <lightning:tab label="Additional Metadata" id="additionalMetaData" >   
+                        <c:PPDMetadata recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}" typeOfCollection="{!v.typeOfCollection}"/>
+                    </lightning:tab>
+                    
+                </lightning:tabset>
+            </lightning:tab>
+            <!--End of new Meta Data -->
+            <lightning:tab label="Preview" id="Titles" tabindex="3">
+                <aura:if isTrue="{!v.typeOfCollection=='Manual Curation'}">
+                    <aura:if isTrue="{!v.IsRecordActive=='False'}">
+                        <c:PPDUnsiloDocList recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}" isCollectionFree="{!v.isCollectionFree}"/>
+                        <!-- <c:PPDCloneCollectionPreview recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}"/>-->
+                    </aura:if>
+                    <aura:if isTrue="{!v.IsRecordActive=='True'}">
+                        <!--<c:PPDUnsiloDocSearchBar recordId="{! v.recordId }" calledFrom=''/>-->
+                        <!--<c:PPDUnsiloDocList recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}"/>-->
+                        <c:PPDPartsList recordId="{#v.recordId}"/>
+                    </aura:if>
+                </aura:if>
+                <aura:if isTrue="{!v.typeOfCollection=='Rule based'}">
+                    <aura:if isTrue="{!v.IsRecordActive=='False'}">
+                        <lightning:accordion aura:id="accordion" activeSectionName="{#v.activeAccordion}" >
+                            <lightning:accordionSection name="rule" label="Rule Based"> 
+                                <c:PPDContentSelectionResult consumer="{! v.consumer}" recordId="{! v.recordId }" typeOfCollection = "{#v.typeOfCollection}" calledFrom ='Titles' />
+                            </lightning:accordionSection>
+                            <lightning:accordionSection name="IncExc" label="Inclusion" > 
+                                <c:PPDUnsiloDocList recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}" collectionType="{!v.typeOfCollection}" additionType ='Inclusion'/>
+                            </lightning:accordionSection>
+                            <lightning:accordionSection name="IncExc" label="Exclusion" > 
+                                <c:PPDUnsiloDocList recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}" collectionType="{!v.typeOfCollection}" additionType ='Exclusion'/>
+                            </lightning:accordionSection>
+                        </lightning:accordion>
+                    </aura:if>
+                    <aura:if isTrue="{!v.IsRecordActive=='True'}">
+                        <c:PPDPartsList recordId="{#v.recordId}"/>
+                    </aura:if>
+                </aura:if>
+            </lightning:tab>
+            
+        </lightning:tabset>
+    </div>
+</aura:component>

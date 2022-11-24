@@ -1,0 +1,23 @@
+.THIS .none{
+    display:none; 
+}
+
+.THIS .customRequired{
+	font-weight: 400;
+} 
+.THIS .customRequired:before{    
+ content: "*"; 
+ margin: 0px -0.5rem 0 -0.5rem;
+ color: rgb(194, 57, 52);
+ float: left;
+ padding:2px;
+} 
+
+.THIS .CustleftPadding{
+    margin-left: 3px;
+    width: 97%;
+}
+
+.THIS .textBold{
+	font-weight: bold;
+}

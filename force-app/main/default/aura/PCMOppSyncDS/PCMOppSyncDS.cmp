@@ -1,0 +1,65 @@
+<aura:component Controller="PCMOppSyncControllerDS" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global">
+    <aura:html tag="style">
+        .slds-modal__container{ 
+        height : auto; width: 100%; max-width: 700vh; 
+        } 
+        .modal-body{ 
+        height : 70vh !important; 
+        max-height: 70vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+        .uiModal--horizontalForm .modal-container{
+        height : auto; width: 100%; max-width: 700vh; 
+        }
+        .uiModal--medium .modal-container {
+        height : auto; width: 100%; max-width: 700vh; 
+        }
+    </aura:html>
+    <!--shalini: Changes start to use pcmImplicitFilter SAL-4494-->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="implicitFltrValues" type="Object[]"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:attribute name="inSalesforce" type="Boolean" default="false" />
+    <aura:attribute name="activeTab" type="Boolean" default="false" />
+    <aura:attribute name="istypeCollection" type="Boolean" default="false" />
+    <aura:attribute name="selectedTab" type="String" default="previewTab" />
+    <aura:attribute name="uuID" type="String"/>
+    <aura:attribute name="newBespokeCollectionId" type="String"/>
+    <aura:attribute name="isBespokeCollection" type="Boolean" default="false"/>
+    <aura:attribute name="isBespokeQLI" type="Boolean" default="true"/>
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:handler name="showBundleData" event="c:ShowBundleItemsEvent" action="{!c.handleComponentEvent}"/>
+    
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div> 
+            </div>
+        </div>
+    </aura:if>
+    <!--shalini: Changes end to use pcmImplicitFilter SAL-4494-->
+    <!--rohit changes -->
+    <!--<aura:if isTrue = "{!v.isBespokeQLI}">-->
+        <lightning:tabset variant="horizontal" selectedTabId="{!v.selectedTab}" >
+            <lightning:tab label="Product Search" id="productTab" onactive="">
+                <c:PCMSearchScreen hideCheckboxColumn="False" consumer = 'OPC' implicitFltrValues= "{!v.implicitFltrValues}" isBespoke="{!v.isBespokeCollection}" bespokeProductId="{!v.newBespokeCollectionId}"/>
+                <!--<c:PCMSearchScreen hideCheckboxColumn="False" consumer = 'OPC'/>-->
+            </lightning:tab>
+            
+            <lightning:tab label="Preview" id="previewTab" onactive="">
+                <c:PCMOppPreviewScreen RecordId="{!v.recordId}" activeTab="{!v.activeTab}" />
+            </lightning:tab>
+            
+            <aura:if isTrue = "{!v.activeTab}">
+                <lightning:tab label="Bundle Information" id="bundleItems" onactive="">
+                    <c:DisplayBundleInformation isBespokeQLI ="{!v.isBespokeQLI}" uuId="{!v.uuID}" inSalesforce="{!v.inSalesforce}" isCollection = "{!v.istypeCollection}"/>
+                </lightning:tab>
+            </aura:if>
+            
+        </lightning:tabset>
+   <!-- </aura:if>-->
+</aura:component>

@@ -1,0 +1,78 @@
+<apex:page controller="CASFeedback2Controller"
+    showHeader="false"
+    standardStylesheets="true" 
+    action="{!isValidId}">
+    
+    <apex:composition template="ICSiteTemplate">
+        <apex:define name="body"> 
+
+
+            <h1 style="color: #80B4E4">Welcome!</h1>
+            <p>Welcome to the Taylor &amp; Francis online feedback form. Thank you for considering <b><i><apex:outputField value="{!ic.Book_Title__c}"/></i></b> for your course.</p>
+            <apex:form >
+            
+                <apex:pageBlock mode="detail" id="BookSection">
+             
+                <apex:pageBlockButtons location="bottom">
+                     <apex:commandButton value="Submit" action="{!save}" rendered="{!showButton}" />
+                </apex:pageBlockButtons>
+    
+                <apex:pageBlockSection title="Course Information" columns="1" collapsible="false" id="courseBlock">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Reference Number" for="bookOrder"  />
+                        <apex:outputField id="bookOrder" value="{!ic.Book_Order__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputField value="{!ic.ISBN__c}"/>
+                    <apex:outputField value="{!ic.Book_Title__c}"/>
+                  </apex:pageBlockSection> 
+                    
+                    <apex:pageBlockSection showHeader="false" columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Did you adopt this book?" for="adoptionShort" /> 
+                        <apex:inputField id="adoptionShort" value="{!ic.Adoption_Short__c}">
+                        <apex:actionSupport event="onchange" reRender="BookSection" />
+                        </apex:inputField>
+                    </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                    
+                    <apex:pageBlockSection showHeader="false" columns="1" rendered="{!showAdoptionLevel}">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="What level of recommendation would you like to give this book?" for="adoptionLevel"  />
+                        <apex:inputField id="adoptionLevel" value="{!ic.Adoption_Level__c}"/>
+                    </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                    
+                    <apex:pageBlockSection showHeader="false" columns="1" rendered="{!showReasonLost}">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Why did you not adopt this book?" for="reasonLost" /> 
+                        <apex:inputField id="reasonLost" value="{!ic.Reason_Lost__c}" >
+                        </apex:inputField>
+                    </apex:pageBlockSectionItem> 
+                    </apex:pageBlockSection>
+                    
+                    <apex:pageBlockSection showHeader="false" columns="1">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Do you want a representative to contact you?" for="contactRep" /> 
+                        <apex:inputField id="contactRep" value="{!ic.Contact_Rep__c}">
+                        </apex:inputField>
+                    </apex:pageBlockSectionItem> 
+                    </apex:pageBlockSection>
+                    <apex:pageBlockSection showHeader="false" columns="1">
+                     <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Additional Comments or Questions" for="additionalComments" /> 
+                        <apex:inputField id="additionalComments" value="{!ic.Additional_Comments__c}" style="width: 300px">
+                        </apex:inputField>
+                    </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                   
+                    
+              
+                
+                          
+ 
+                </apex:pageBlock>
+            </apex:form>
+        </apex:define>
+    </apex:composition>
+    
+</apex:page>

@@ -1,0 +1,334 @@
+<aura:component controller="TF_IndiaRePrintCtr" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute type="OpportunityLineItemWrapper[]" name="oliList"/>
+    <aura:attribute name="selectedOLIIds" type="List"/>
+    <aura:attribute name="ListOfOpportunityLineItems" type="OpportunityLineItem[]"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="showConfirmDialog" type="boolean" default="false"/>    
+    <!-- Start Modal Attributes -->
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="ispord" type="boolean" default="false"/>
+    <aura:attribute name="isOpenOverride" type="boolean" default="false"/>
+    <aura:attribute name="isHistoryModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOverrideModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isGMOverrideModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOpenAddOppProductModal" type="boolean" default="false"/>
+    <aura:attribute name="isOpenUMCCalulatorModal" type="boolean" default="false"/>
+    <aura:attribute name="isOpenInvoiceUploadModal" type="boolean" default="boolean"/>
+    <aura:attribute name="isRenegotiateUMCReasonModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isBulkUpdateModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isOpenColorInfoModal" type="boolean" default="false"/>
+    <!-- End Modal Attributes -->
+    <aura:attribute name="columns" type="List[]"/>
+    <aura:attribute name="errors" type="Object" default="[]"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>    
+    <aura:attribute name="oliId" type="String" default=""/>
+    <aura:attribute name="oliremark" type="String" default=""/>
+    <aura:attribute name="grossMargin" type="Decimal"/>    
+    <aura:attribute name="recordDeleteId" type="String" default=""/>
+    <!-- Start User Attributes -->
+    <aura:attribute name="isSalesUserBtn" type="boolean" default="false"/>
+    <aura:attribute name="isSalesUser" type="boolean" default="false"/>
+    <aura:attribute name="isCustomerServicesUser" type="boolean" default="false"/>
+    <aura:attribute name="isProductionUser" type="boolean" default="false"/>
+    <aura:attribute name="isCreditControlUser" type="boolean" default="false"/>
+    <!-- End User Attributes -->
+    <!-- Start Action Button Attributes -->
+    <aura:attribute name="overallReprintEligibility" type="boolean" default="false"/>
+    <aura:attribute name="isReprintEligibilityChecked" type="boolean" default="false"/>
+    <aura:attribute name="isPricingRequestSent" type="boolean" default="false"/>
+    <aura:attribute name="isReprintEligibilityRequestSent" type="boolean" default="false"/>
+    <aura:attribute name="isUMCRequestSent" type="boolean" default="false"/>
+    <aura:attribute name="isMRPRequestSent" type="boolean" default="false"/>
+    <aura:attribute name="isPricingEntered" type="boolean" default="false"/>
+    <aura:attribute name="isApproved" type="boolean" default="false"/>
+	<aura:attribute name="isGMOverrideDone" type="boolean" default="false"/>
+    <aura:attribute name="oppStageName" type="String" default="Prospect"/>
+    
+    <aura:attribute name="oppOwnerId" type="Id"/>
+    <aura:attribute name="oppCreatedById" type="Id"/>
+    <aura:attribute name="searchError" type="String" default=""/>
+    <aura:attribute name="isSpinner" type="boolean" default="false"/>
+    <!-- End Action Button Attributes -->
+	<!-- Event handling -->    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+    <aura:handler event="force:showToast" action="{!c.doInit}"/>
+    <!-- load more -->
+    <aura:attribute name="selectedRowsDetails" type="Object" />
+    <aura:attribute name="selectedRowsList" type="List" />
+    <aura:attribute name="maxRowSelection" type="Integer" default="5000"/>
+    <aura:attribute name="selectedRows" type="List" />
+    <aura:attribute name="enableInfiniteLoading" type="Boolean" default="true"/>
+    <aura:attribute name="initialRows" type="Integer" default="50"/>
+    <aura:attribute name="rowsToLoad" type="Integer" default="50"/>
+    <aura:attribute name="totalNumberOfRows" type="Integer" default="50"/>
+    <aura:attribute name="loadMoreStatus" type="String" default="Please scroll down to load more data"/>
+    <aura:attribute name="showRowNumberColumn" type="Boolean" default="false"/>
+    <aura:attribute name="rowNumberOffset" type="Integer" default="0"/>
+    <aura:attribute name="rowsToAdd" type="Integer" default="50"/>
+    <aura:attribute name="currentCount" type="Integer" default="50"/>
+    
+    <aura:attribute name="searchisbn" type="String" default="" />
+    <lightning:card title="" class="olihead"> 
+        <div class="slds-m-top--xx-large">
+            <div class="slds-page-header">
+                <div class="slds-align--absolute-left">
+                    <div class="slds-text-heading--medium">Products:</div>
+                </div>
+            </div>
+        </div>         
+        <lightning:layout verticalAlign="center" class="x-large" multipleRows="true">
+            <lightning:layoutItem flexibility="auto" padding="around-small">
+                <div class="custom-box-button">                                        
+                    <aura:if isTrue="{!or(v.isSalesUser, v.isCustomerServicesUser)}">                    
+                        <aura:if isTrue="{! !v.isReprintEligibilityRequestSent}">
+                        	<lightning:button variant="brand" label="Add Products" title="Add Products" onclick="{!c.openAddOppProductModal}" disabled="false"/>
+                        </aura:if>                       
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!!empty(v.oliList)}">                        
+                        <aura:if isTrue="{!or(v.isSalesUser, v.isCustomerServicesUser)}">                       
+                            <aura:if isTrue="{! !v.isReprintEligibilityRequestSent}">                           
+                                <lightning:button variant="brand" label="{!v.isSpinner == true ? 'Wait...' : 'Reprint Eligibility'}" title="Reprint Eligibility" onclick="{! c.checkReprintEligibility }" disabled="{!v.isSpinner}" />
+                                <aura:set attribute="else">
+                                    <lightning:button variant="brand" label="Reprint Eligibility" title="Reprint Eligibility" onclick="{! c.checkReprintEligibility }" disabled="true" />
+                                </aura:set>
+                            </aura:if>
+                        </aura:if> 
+                        <aura:if isTrue="{!or(v.isSalesUser, v.isCustomerServicesUser)}">
+                            <aura:if isTrue="{!and(v.isReprintEligibilityRequestSent, v.isReprintEligibilityChecked)}">                       
+                                <aura:if isTrue="{! !v.isUMCRequestSent}">
+                                    <lightning:button variant="brand" label="Request UMC" title="Request UMC" onclick="{! c.requestUMC }" disabled="false" />
+                                    <aura:set attribute="else">
+                                        <lightning:button variant="brand" label="Request UMC" title="Request UMC" onclick="{! c.requestUMC }" disabled="TRUE" />
+                                    </aura:set>
+                                </aura:if>
+                            </aura:if>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.isProductionUser}">                        
+                            <aura:if isTrue="{!v.isUMCRequestSent}">
+                                <aura:if isTrue="{! !v.isMRPRequestSent}">
+                                    <lightning:button variant="brand" label="Submit UMC" title="Submit UMC" onclick="{! c.requestMRP }" disabled="false" />
+                                    <aura:set attribute="else">
+                                        <lightning:button variant="brand" label="Submit UMC" title="Submit UMC" onclick="{! c.requestMRP }" disabled="true" />
+                                    </aura:set>
+                                </aura:if>                   
+                            </aura:if>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.isCustomerServicesUser}">                            
+                            <aura:if isTrue="{!v.isMRPRequestSent}">
+                                <aura:if isTrue="{! !v.isPricingEntered}">
+                                    <lightning:button variant="brand" label="Renegotiate UMC" title="Renegotiate UMC" onclick="{! c.renegotiateUMC }" disabled="false" />
+                                </aura:if>
+                            </aura:if> 
+                        </aura:if>
+                        <aura:if isTrue="{!and(v.isCustomerServicesUser, v.isMRPRequestSent)}">                       
+                            <aura:if isTrue="{! !v.isPricingEntered}">
+                                <lightning:button variant="brand" label="Pricing Entered" title="Pricing Entered" onclick="{! c.pricingEntered }" disabled="false" />
+                                <aura:set attribute="else">
+                                    <lightning:button variant="brand" label="Pricing Entered" title="Pricing Entered" onclick="{! c.pricingEntered }" disabled="true" />
+                                </aura:set>
+                            </aura:if>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!or(v.isSalesUser, v.isCustomerServicesUser)}">                       
+                            <aura:if isTrue="{!v.isPricingEntered}">
+                                <aura:if isTrue="{! !v.isApproved}">                           
+                                    <lightning:button variant="brand" label="{!v.isSpinner == true ? 'Wait...' : 'Submit Final Approval'}" title="Submit Final Approval" onclick="{! c.submitFinalApproval }" disabled="{!v.isSpinner}" />
+                                    <aura:set attribute="else">
+                                        <lightning:button variant="brand" label="Submit Final Approval" title="Submit Final Approval" onclick="{! c.submitFinalApproval }" disabled="true" />
+                                    </aura:set>
+                                </aura:if>
+                            </aura:if>
+                        </aura:if>
+
+                        <aura:if isTrue="{!v.isCustomerServicesUser}">                       
+                            <aura:if isTrue="{!v.isMRPRequestSent}">                         
+                                <aura:if isTrue="{! !v.isGMOverrideDone}">
+                                    <aura:if isTrue="{!v.oppStageName == 'Negotiation'}">
+                                        <lightning:button variant="brand" label="GM Override" title="GM Override" onclick="{! c.submitGMOverride }" disabled="false" />
+                                        <aura:set attribute="else">
+                                            <lightning:button variant="brand" label="GM Override" title="GM Override" onclick="{! c.submitGMOverride }" disabled="true" />
+                                        </aura:set>                                                                               
+                                    </aura:if> 
+                                </aura:if>
+                            </aura:if>
+                        </aura:if>
+                        
+                        <lightning:button class="slds-float_right" label="Color Info" title="Color Info" onclick="{! c.openColorInfoModal }" />
+                        <aura:if isTrue="{!or(or(v.isSalesUser, v.isCustomerServicesUser), v.isProductionUser)}">                           
+                            <aura:if isTrue="{! !v.isApproved}">
+                                <lightning:button class="slds-float_right" label="Bulk Update" title="Bulk Update" onclick="{! c.openBulkUpdateModal }" />    
+                            </aura:if>
+                        </aura:if>
+                        <lightning:button class="slds-float_right" label="Export" title="Export" onclick="{! c.exportCSV }" />                                              
+                    </aura:if>
+                <div class="custom-box-button-right">                
+                    <aura:if isTrue="{!or(v.isSalesUser, v.isCustomerServicesUser)}"> 
+                        <aura:if isTrue="{! !v.isReprintEligibilityRequestSent}">
+                            <lightning:helptext iconName="utility:info" content="The CSD will add product items and then will be able to check reprint eligibility. The CSD will send request to production team to provide UMC for selected items."/>
+                        </aura:if>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!and(v.isCustomerServicesUser, v.isReprintEligibilityRequestSent)}">
+                        <aura:if isTrue="{! !v.isMRPRequestSent}">
+                            <lightning:helptext content="The production team will provide UMC and revert request back to CSD."/>
+                        </aura:if>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.isProductionUser}">                        
+                        <aura:if isTrue="{!v.isUMCRequestSent}">
+                            <aura:if isTrue="{! !v.isMRPRequestSent}">
+                                <lightning:helptext content="The CSD can now review the UMC and change MRP/Customer Quote. The CSD can also request for renegotiation of UMC to production."/>
+                            </aura:if>                   
+                        </aura:if>
+                    </aura:if> 
+                    
+                    <aura:if isTrue="{!and(v.isCustomerServicesUser, v.isMRPRequestSent)}">                       
+                        <aura:if isTrue="{! !v.isPricingEntered}">
+                            <lightning:helptext content="Submit Final Approval"/>
+                        </aura:if>
+                    </aura:if>                    
+                </div>
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>  
+        <!-- open add opp products modal popup -->
+        <aura:if isTrue="{!v.isOpenAddOppProductModal}">
+            <c:IRP_AddOpportunityProducts isOpenAddOppProductModal="{!v.isOpenAddOppProductModal}" oppRecordId="{!v.recordId}"/>  
+        </aura:if>        
+        <!-- open modal popup -->
+        <aura:if isTrue="{!v.isOpen}">
+            <c:IRP_OpportunityAddProducts isOpen="{!v.isOpen}" oppRecordId="{!v.recordId}"/>  
+        </aura:if> 
+        <!-- open override modal popup -->
+        <aura:if isTrue="{!v.isOverrideModalOpen}">
+            <c:IRP_OverrideModal isOverrideModalOpen="{!v.isOverrideModalOpen}" opportunityLineItemId="{!v.oliId}" opportunityLineItemRemark="{!v.oliremark}" oppOwnerId="{!v.oppOwnerId}" oppCreatedById="{!v.oppCreatedById}" />  
+        </aura:if>
+        <!-- open gross margin override modal popup -->
+        <aura:if isTrue="{!v.isGMOverrideModalOpen}">
+            <c:IRP_GMOverrideModal isGMOverrideModalOpen="{!v.isGMOverrideModalOpen}" opportunityLineItemId="{!v.oliId}" oliGrossMargin="{!v.grossMargin}"/>  
+        </aura:if>        
+        <!-- open OLI History modal popup -->
+        <aura:if isTrue="{!v.isHistoryModalOpen}">
+            <c:IRP_OLIHistoryModal ispord="{!v.isProductionUser}" isHistoryModalOpen="{!v.isHistoryModalOpen}" opportunityLineItemId="{!v.oliId}"/>  
+        </aura:if>
+
+        <!-- open print cost calculator modal popup -->
+        <aura:if isTrue="{!v.isOpenUMCCalulatorModal}">
+            <c:IRP_PrintCostCalculator isOpenUMCCalulatorModal="{!v.isOpenUMCCalulatorModal}" opportunityLineItemId="{!v.oliId}"/>  
+        </aura:if>
+
+        <!-- open print cost calculator modal popup -->
+        <aura:if isTrue="{!v.isRenegotiateUMCReasonModalOpen}">
+            <c:RenegotiateUMCReasonModal isRenegotiateUMCReasonModalOpen="{!v.isRenegotiateUMCReasonModalOpen}" umcRenegotiateIdList="{!v.selectedOLIIds}" opportunityId="{!v.recordId}"/>  
+        </aura:if>
+        
+        <!-- open print cost calculator modal popup -->
+        <aura:if isTrue="{!v.isBulkUpdateModalOpen}">
+            <c:IRP_BulkUpdateModal isBulkUpdateModalOpen="{!v.isBulkUpdateModalOpen}" opportunityId="{!v.recordId}"/>  
+        </aura:if>
+        
+        
+        <form class="slds-form--inline">
+            <div class="slds-form-element">
+                <div class="slds-form-element__control">
+                    <lightning:input  aura:id="searchisbn" type="text"  placeholder="Search by ISBN" value="{!v.searchisbn}"/>
+                </div>
+            </div>
+            <div class="slds-form-element">
+                <lightning:button label="Search" onclick="{!c.searchIsbn}" />
+            </div>
+            <div class="slds-form-element"><span style="color:red">{!v.searchError}</span></div>
+        </form>
+        
+        <div class="slds-m-around_xx-large111" style="height: 500px" id="datatbl">
+        <!--<div class="slds-m-around_xx-large" style="height: 500px" id="datatbl">-->
+        <lightning:datatable aura:id="olidatatable" 
+                             keyField="Id"
+                             errors="{! v.errors }"
+                             draftValues="{! v.draftValues }"                             
+                             data="{!v.oliList}"
+                             columns="{!v.columns}"
+                             hideCheckboxColumn="false"
+                             onsave="{!c.handleSaveOpps}"
+                             onrowselection="{!c.handleRowAction }"
+                             onrowaction="{!c.buttonAction}"                              
+                             showRowNumberColumn="true"
+                             enableInfiniteLoading="{!v.enableInfiniteLoading}"
+                             loadMoreOffset="{!v.loadMoreOffset}"
+                             rowNumberOffset="0"
+                             selectedRows="{!v.selectedRows}"
+                             maxRowSelection="{!v.maxRowSelection}"
+                             onloadmore="{!c.handleLoadMoreOlis}"/>
+            <br/>
+            <div class="paging">
+                <div class="slds-float_left">
+                    <strong>Total Rows : {!v.totalNumberOfRows}</strong>
+                    &nbsp;&nbsp;
+                    <strong>Selected Rows: {!v.selectedRowsCount }</strong>
+                </div>
+                <div class="slds-float_right">
+                    <strong>{!v.loadMoreStatus}</strong>
+                </div>
+            </div>
+        </div>
+        <div class="slds-m-around_xx-large"></div>
+        <aura:if isTrue="{!v.showConfirmDialog}">
+            <!--Modal Box Start-->
+            <div role="dialog" class="slds-modal slds-fade-in-open ">
+                <div class="slds-modal__container">
+                    <!--Modal Box Header Start-->
+                    <header class="slds-modal__header">
+                        <h1 class="slds-text-heading--medium">Confirmation</h1>
+                    </header>
+                    <!--Modal Box Header End-->
+                    
+                    <!--Modal Box Content Start-->
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <center><b>Are you sure you want to delete this item?</b></center>
+                    </div>
+                    <!--Modal Box Content End-->
+                    
+                    <!--Modal Box Button Start-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button name='No' label='No' onclick='{!c.handleConfirmDialogNo}'/>
+                        <lightning:button variant="brand" name='Yes' label='Yes' onclick='{!c.handleConfirmDialogYes}'/>
+                    </footer>
+                    <!--Modal Box Button End-->
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop--open"></div>            
+        </aura:if>
+        <aura:if isTrue="{!v.isOpenColorInfoModal}">
+            <div role="dialog" class="slds-modal slds-fade-in-open ">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <h1 class="slds-text-heading--medium">Color Info</h1>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <p><b>Proposal Stage/Status:</b> 
+                            <table>
+                                <tr><td width="150px">Pending</td><td style="background:#800080;color:#fff">Purple</td></tr>
+                                <tr><td>UMC Requested</td><td style="background:#FF69B4;color:#fff">Hotpink</td></tr>
+                                <tr><td>UMC Entered</td><td style="background:#FFA500;color:#fff">Orangec</td></tr>
+                                <tr><td>UMC Confirmed</td><td style="background:#808000;color:#fff">Olive</td></tr>
+                                <tr><td>Pricing Entered</td><td style="background:blue;color:#fff">Blue</td></tr>
+                                <tr><td>Pricing Requested</td><td style="background:#008080;color:#fff">Teal</td></tr> 
+                                <tr><td>Approved</td><td style="background:green;color:#fff">Green</td></tr>
+                            </table> 
+                        </p>
+                    </div>
+                    <!--Modal Box Button-->
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--brand" onclick="{!c.closeColorInfoModal}">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop--open"></div>            
+        </aura:if>        
+    </lightning:card> 
+</aura:component>

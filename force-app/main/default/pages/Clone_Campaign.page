@@ -1,0 +1,17 @@
+<apex:page standardController="Campaign">
+
+	<script src="/soap/ajax/8.0/connection.js"></script>
+	<script src="/desktop/desktopApi.js"></script>
+
+    <script type="text/javascript">
+
+		var desktop = new DesktopApi();
+		if (desktop.desktopPageWindow) {
+			window.parent.location.href = "/{!Campaign.Id}/e?clone=1&00N300000013Sik=&00N300000013Si3=&isdtp=mn&nooverride=1&retURL=/{!Campaign.Id}";
+		}
+		else {
+			window.parent.location.href = "/{!Campaign.Id}/e?clone=1&00N300000013Sik=&00N300000013Si3=&nooverride=1&retURL=/{!Campaign.Id}";
+		}
+
+    </script>
+</apex:page>

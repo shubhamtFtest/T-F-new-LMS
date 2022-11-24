@@ -1,0 +1,35 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="multiResultCodes" type="List" default="[]"/>
+    <aura:attribute name="valueInp" type="String" />
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="IsRecordLocked" type="String"/>
+    <aura:attribute name="NetBaseCollections" type="String"/>
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+     <div class="c-container" >
+    <!-- body -->
+        <!--<lightning:badge label="NetBase Collections" class="align"/>-->
+         <lightning:formattedText value="NetBase Collections" class="align"/>
+    <lightning:layout>
+        <lightning:layoutItem size="4" padding="around-small"> 
+            <c:PPDNetBaseCollectionCmp values="{!v.selectedNetbaseValues}" backToProductDetail="{!v.eventFromProdDetail}" checkedValuesListBox="{!v.multiResultCodes}" typeOfClassification="NetBase" valueInp="{!v.valueInp}"/>
+         </lightning:layoutItem>
+    </lightning:layout>
+<div class="textArea">         
+             <lightning:layout>
+                  <lightning:layoutItem size="12" padding="around-small">
+                         <lightning:textarea name="inputNetBaseTextArea" value="{! v.valueInp}" readonly="true"/>
+                 </lightning:layoutItem>
+         </lightning:layout>
+         </div>
+            <aura:if isTrue="{!v.IsRecordLocked=='true'}">
+           <lightning:layout>
+                  <lightning:layoutItem padding="around-small">
+                 <!-- <aura:if isTrue="{!v.showSave}">-->
+            <lightning:button aura:id="btnSaveNetBase"  label="Save" variant="brand" onclick="{!c.saveNetBase }"/>
+               </lightning:layoutItem>
+        <!--</aura:if>-->
+         </lightning:layout>
+         </aura:if>
+    </div>
+</aura:component>

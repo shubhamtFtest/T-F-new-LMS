@@ -1,0 +1,29 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="consumer" type="String" default="OPC_External"/>
+    <aura:attribute name="hideCheckboxColumn" type="Boolean" default="true"/>
+    <aura:attribute name="implicitFltrValues" type="Object[]" access="global"/>
+    <aura:attribute name="isBespoke" type="Boolean" default="false"/>
+    <aura:attribute name="bespokeProductId" type="String"/>
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <div class="page-main">
+        <lightning:layout>
+            <lightning:layoutItem padding="around-small" size="12">
+                <div class="slds-text-align_center slds-border_bottom slds-text-heading_small">Product Search</div>
+            </lightning:layoutItem>
+        </lightning:layout>
+        <lightning:layout>
+            <lightning:layoutItem padding="around-small" size="12">
+                <aura:if isTrue="{!!v.isBespoke}">
+                    <c:PPDContentSelectionScreen consumer="{! v.consumer}" hideCheckboxColumn="{! v.hideCheckboxColumn}" implicitFltrValues="{! v.implicitFltrValues}"/>					
+                </aura:if>
+                
+                <aura:if isTrue="{!v.isBespoke}">
+                    <c:PPDContentSelectionScreen consumer="{! v.consumer}" hideCheckboxColumn="{! v.hideCheckboxColumn}" implicitFltrValues="{! v.implicitFltrValues}" recordId="{!v.bespokeProductId}" typeOfCollection="Rule based"/>
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

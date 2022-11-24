@@ -1,0 +1,78 @@
+<aura:component controller="TF_PPDProcessController">
+    <!-- attributes -->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="fullData" type="List"/>
+    <aura:attribute name="pageSize" type="Integer" default="20"/>
+    <aura:attribute name="start" type="Integer" /> 
+    <aura:attribute name="end" type="Integer"/> 
+    <aura:attribute name="totalSize" type="Integer"/> 
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="typeOfCollection" type="String"/>
+    <aura:attribute name="selectedRows" type="List"/> 
+    <aura:attribute name="selectedRowsList" type="List"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="selectedProductsDetails" type="Object" />  
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="sortedBy" type="String"/>
+    <aura:attribute name="sortedDirection" type="Boolean" default="true"/>
+    <aura:attribute type="Boolean" name="sortAsc" />
+    <aura:attribute type="Integer" name="pageNumber" default="1" />
+    <aura:attribute type="Integer" name="maxPage"	default="1" />
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute name="IsRecordLocked" type="String"/>
+    <aura:attribute type="Integer" name="recordCount"	default="0" />
+
+    
+    
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler event="c:PPDTitleRefreshEvent" action="{! c.refreshChild}" />
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+    
+    <!-- spinner -->
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    <!-- the container element determine the height of the datatable -->
+    <div >
+        <div>
+            <lightning:layout>
+                <lightning:layoutItem size="6" padding="around-small">
+                    
+                    <!-- To hide the buttons for delete if record is in locked state-->
+                    <aura:if isTrue="{!v.IsRecordLocked=='true'}">
+                        <lightning:button label="Delete Selected Products" variant="brand" onclick="{!c.deletePrds}" disabled="{!empty(v.data)}"/> 
+                        <lightning:button label="Delete All Products" variant="brand" onclick="{!c.showMsg}" disabled="{!empty(v.data)}"/> 
+                        <lightning:layoutItem size="3" padding="around-medium" class="slds-box hideCmp" aura:id="dispMsg">
+                            <p class="slds-p-horizontal_small">
+                                Are you sure you want to delete all products in the collection ?
+                            </p>
+                            <lightning:button label="Cancel" onclick="{!c.hideMsg}"/>
+                            <lightning:button label="Ok" onclick="{!c.deleteAllPrds}"/>
+                        </lightning:layoutItem>
+                        <p>Titles Selected : {!v.selectedRowsCount}</p>
+                    </aura:if>
+                    <p>Number of records : {!v.recordCount}</p>
+                </lightning:layoutItem>
+                <lightning:layoutItem size="6" padding="around-small">
+                    <!--  New Pagination   -->
+                    <div class="right">
+                        <c:PPDPagination currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" />
+                    </div>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </div>     
+        
+        
+        <lightning:datatable
+                             columns="{! v.columns }"
+                             data="{! v.data }"
+                             keyField="id"
+                             onrowselection="{!c.handleSelectedRow}"
+                             selectedRows="{! v.selectedRows }"             
+                             onsort="{!c.sortColumn}"
+                             sortedBy="{!v.sortedBy}"
+                             sortedDirection="{!v.sortedDirection}"/>
+    </div>	
+</aura:component>

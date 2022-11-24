@@ -1,0 +1,51 @@
+<apex:component id="footerComponent">
+
+			<!-- start the footer -->
+
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				
+
+			</table>
+		</td>
+	</tr>
+</table>
+								</td>
+							</tr>
+							<tr>
+								<td height="13"><spacer type="block" width="1" height="13"></td>
+							</tr>
+							<tr>
+								<!--<td width="3" nowrap><spacer type="block" width="3" height="1"></td>-->
+								<td width="100%" colspan="2">
+									<table border="0" cellpadding="0" cellspacing="0" align="center" width="95%">
+										<tr>
+											<td height="1" class="horzline"><img src="/images/blank.gif" width="1" height="1" class="pixel" /></td>
+										</tr>
+										<tr>
+											<td height="60" align="center">
+												<a href="javascript:linkBrowser('http://www.taylorandfrancisgroup.com/', 'assocwin')" target="_top" class="footerlink">Copyright&nbsp;&copy; <script>writeYear();</script> Taylor &amp; Francis Group, an informa business</a>&nbsp;&nbsp;&nbsp;<a href="http://www.taylorandfrancis.com/util/resources.asp?f=privacy" class="footerlink" target="_top">Privacy Policy</a>&nbsp;&nbsp;&nbsp;<a href="http://www.taylorandfrancis.com/util/resources.asp?f=terms" class="footerlink" target="_top">Terms and Conditions</a><br />
+												<span class="footerlink">Informa plc (&quot;Informa&quot;) Registered Office: Mortimer House, 37-41 Mortimer Street, London, W1T 3JH. Registered in England and Wales - Company Registered Number 3099067, VAT Number: GB 365 4626 36</span>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td height="13"><spacer type="block" width="1" height="13"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table> 
+		</td>
+	</tr>
+</table>
+
+</body>
+</html>
+
+</apex:component>

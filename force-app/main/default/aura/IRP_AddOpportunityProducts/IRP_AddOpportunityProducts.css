@@ -1,0 +1,9 @@
+.THIS .slds-text-color_red {
+    color: red;
+}
+.THIS slds-tabs--default__nav li.slds-active{
+     background: red;
+}
+.THIS .slds-tabs--default__item.slds-active{
+     background: blue;
+}

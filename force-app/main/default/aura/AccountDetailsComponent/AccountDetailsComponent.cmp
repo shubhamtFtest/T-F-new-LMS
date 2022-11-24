@@ -1,0 +1,157 @@
+<aura:component implements="flexipage:availableForRecordHome,force:lightningQuickAction,force:hasRecordId,force:hasSObjectName,lightning:isUrlAddressable" access="global" controller="AccountDetailsCmpController" >
+     <!-- init method loads the data attribute values -->
+    <aura:handler name="init" action="{!c.calloutCtrl}" value="{!this}"/>
+    
+    <aura:attribute name="AccRec" type="Account" />
+    <aura:attribute name="Spinner" type="boolean" default="true"/>
+    <aura:attribute name="recordId" type="String" access="global" />
+    <aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+       <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+         <span class="slds-assistive-text">Loading</span>
+         <div class="slds-spinner__dot-a"></div>
+         <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+ </aura:if>
+    
+	<lightning:card title = "Account Record Details">
+ 	<div class="slds-form" role="list">
+        <div class="slds-section slds-is-open">
+  			<h3 class="slds-section__title slds-theme_shade">
+    			<span class="slds-truncate slds-p-horizontal_small" title="Section Title">Account Information</span>
+  			</h3>
+  			<div aria-hidden="false" class="slds-section__content">
+    			<div class="slds-form__row">
+            		<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Account Name</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">{!v.AccRec.Name}</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Account Owner</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">
+									<a href="javascript:void(0);">{!v.AccRec.Owner.Name}</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+            	<div class="slds-form__row">
+					<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Type</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">{!v.AccRec.Type}</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Classification</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">{!v.AccRec.Classification__c}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="slds-form__row">
+					<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Ringgold Account Id</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">{!v.AccRec.Ringgold_Account_ID__c}</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__item" role="listitem">
+            			<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Website</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">{!v.AccRec.Website}</div>
+							</div>
+						</div>
+            		</div>
+				</div>
+				<div class="slds-form__row">
+					<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Known As</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">{!v.AccRec.Known_As__c}</div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Party Id</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">{!v.AccRec.Customer_Id__c}</div>
+							</div>
+						</div>
+					</div>
+				</div>
+ 			</div>
+		</div>
+		<div class="slds-section slds-is-open">
+  			<h3 class="slds-section__title slds-theme_shade">
+    			<span class="slds-truncate slds-p-horizontal_small" title="Section Title">Address Information</span>
+  			</h3>
+  			<div aria-hidden="false" class="slds-section__content">
+    			<div class="slds-form__row">
+            		<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Mailing Address</span>
+							<div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{!v.AccRec.BillingStreet} <br/> {!v.AccRec.BillingCity}<br/> {!v.AccRec.BillingState}<br/> {!v.AccRec.BillingCountry}<br/>{!v.AccRec.BillingPostalCode} </div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Shipping Address</span>
+							<div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{!v.AccRec.ShippingStreet} <br/> {!v.AccRec.ShippingCity}<br/> {!v.AccRec.ShippingState}<br/> {!v.AccRec.ShippingCountry}<br/>{!v.AccRec.ShippingPostalCode} </div>
+							</div>
+						</div>
+					</div>
+				</div>
+ 			</div>
+		</div>
+        <div class="slds-section slds-is-open">
+  			<h3 class="slds-section__title slds-theme_shade">
+    			<span class="slds-truncate slds-p-horizontal_small" title="Section Title">System Information</span>
+  			</h3>
+  			<div aria-hidden="false" class="slds-section__content">
+    			<div class="slds-form__row">
+            		<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Created By</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">
+                                    <a href="javascript:void(0);">{!v.AccRec.CreatedBy.Name}</a>
+                                </div>
+							</div>
+						</div>
+					</div>
+					<div class="slds-form__item" role="listitem">
+						<div class="slds-form-element slds-form-element_edit slds-form-element_readonly slds-form-element_stacked slds-hint-parent">
+							<span class="slds-form-element__label">Last Modified By</span>
+							<div class="slds-form-element__control">
+								<div class="slds-form-element__static">
+									<a href="javascript:void(0);">{!v.AccRec.LastModifiedBy.Name}</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+ 			</div>
+		</div>
+	</div>
+	</lightning:card>
+</aura:component>

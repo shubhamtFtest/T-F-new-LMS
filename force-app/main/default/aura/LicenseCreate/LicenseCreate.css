@@ -1,0 +1,36 @@
+.THIS .customRequired{
+ font-weight: 400; 
+} 
+.THIS .customRequired:before{    
+ content: "*"; 
+ margin: 0px -0.5rem 0 -0.5rem;
+ color: rgb(194, 57, 52);
+ float: left;
+ padding:2px;
+ } 
+
+.THIS .CustleftPadding{
+    margin-left: 3px;
+    width: 97%;
+}
+
+.THIS .none{
+ display:none; } 
+
+.THIS .myMesageClass{ 
+    text-align: center;
+    color: rgb(194, 57, 52);
+    font-size: 12px;
+}
+
+.THIS .parent {
+  position: relative;
+  height: 1000; /* bigger than your svg */
+  width: 1000; /* bigger than your svg */
+}
+
+.THIS .child {
+  position: absolute;
+  top: 30px;  /* relative to parent container */
+  left: 10px; /* relative to parent container */
+}

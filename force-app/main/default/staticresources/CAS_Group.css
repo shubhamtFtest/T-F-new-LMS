@@ -1,0 +1,56 @@
+.horzline
+{
+	background-color: #999999;
+	background-image: url("http://www.taylorandfrancis.com/images/dots_horz.gif");
+}
+
+.pixel
+{
+	display: block;
+}
+
+form 
+{
+	padding: 0px;
+	display: inline;
+}
+
+   .footerlink
+ {
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-style : normal;
+	text-decoration:none;
+	color: #333333;
+}
+ 
+  .footerlink:hover
+ {
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-style : normal;
+	text-decoration:underline;
+	color: #333333;
+}
+
+.smallfont
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 10px;
+	font-style : normal;
+	font-weight : normal;
+	color : #000000;
+	text-decoration:none;
+} 
+
+.smallfont:hover
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 10px;
+	font-style : normal;
+	font-weight : normal;
+	color : #000000;
+	text-decoration:none;
+} 
+
+

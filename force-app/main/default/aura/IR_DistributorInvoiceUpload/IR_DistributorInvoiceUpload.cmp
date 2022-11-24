@@ -1,0 +1,43 @@
+<!-- IRP_InvoiceUploadModal -->
+<aura:component  controller="IR_Controller" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction">
+    <aura:attribute name="oppRecordId" type="String" />
+    <aura:attribute name="opportunityLineItemId" type="string"/>
+    <aura:attribute name="isOpenInvoiceUploadModal" type="boolean" default="boolean"/>
+    <c:IR_CommonServerAction aura:id="server" />
+    <c:IR_CommonToastService aura:id="toast" />
+    <aura:attribute name="parentId" type="Id" default="a3d6E000000DPjk" />
+    <aura:attribute name="isdisabled" type="boolean" default="true" />
+    <aura:attribute name="profcheck" type="boolean" default="true" />
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />  
+
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="fileTooLarge" type="boolean" default="false"/> 
+    <aura:attribute name="maxFileSize" type="integer" default="0"/>
+    <aura:attribute name="ShowUploadSec" type="boolean" default="false"/> 
+    <aura:attribute name="spinner" type="boolean" default="false"/>     
+        <aura:if isTrue="{!v.profcheck}">
+
+    
+        <lightning:input name="input1" label="Invoice Number" aura:id="invoiceNo" />
+
+    <lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}" type="file" name="file" label="Attach a File" multiple="false" />
+    <div aura:id="fileName" class="fileNameOk"> 
+        {!v.fileName} 
+        &nbsp;
+        <lightning:button variant="base" aura:id="removeButton" class="removeButton" label="{!v.removeButtonLabel}" onclick="{! c.removeFile }"/>
+        <button disabled="{!v.isdisabled}" class="slds-button slds-button_brand" onclick="{!c.doSave}">Upload Attachment</button>
+    </div>
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+             <aura:set attribute="else">
+                    <b>You Don't have the Permission To Upload Invoice! </b>
+                </aura:set>
+    </aura:if>
+</aura:component>

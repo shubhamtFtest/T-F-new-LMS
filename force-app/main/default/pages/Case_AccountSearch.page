@@ -1,0 +1,180 @@
+<!--
+Last Modified by Hailey Niemand 2013.07.26 - CHG0051888 
+Last Modified by Hailey Niemand 2014.02.05 - CHG0056245
+Last Modified by Hailey Niemand 2014.04.11 - CHG0058014
+-->
+
+<apex:page id="pg" standardController="Case" extensions="Case_AccountSearchController">
+<script type="text/javascript" src="/resource/1340982694000/jQuery_latest"></script>
+    <apex:form id="frm">
+        <apex:sectionHeader title="Attach Account To Case" subtitle="{!case.CaseNumber}"/>
+
+        <apex:pageBlock id="pbSelectAccount" title="Select Account" mode="edit" rendered="{!pageNum==1}">
+            <apex:pageBlockButtons id="pbbSelectAccount" location="top">
+                <apex:commandButton id="buttonSearch" value="Search" action="{!doSearch}" rerender="searchResults" status="searchStatus"/>
+                <apex:commandButton id="buttonAdd" value="Add New" action="{!doAddNew}" rerender="frm" />
+                <apex:commandButton id="buttonCancel" value="Cancel" action="{!doCancel}" rerender="frm" />
+                <apex:actionStatus id="searchStatus" startText=" searching..." stopText=""/>
+            </apex:pageBlockButtons>
+
+            <apex:pageBlockSection id="pbsSearch" showHeader="false" title="" collapsible="false" columns="1" >
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Search Method" />
+                    <apex:selectList value="{!searchMethod}" size="1" multiselect="false">
+                        <apex:selectOption itemValue="Account Name" itemLabel="Account Name"/>
+                        <apex:selectOption itemValue="Ringgold ID" itemLabel="Ringgold ID"/>
+                        <apex:selectOption itemValue="BP" itemLabel="BP"/>
+                        <apex:actionSupport event="onchange" rerender="pbsSearch" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!searchMethod}" />
+                    <apex:inputText value="{!searchValue}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection id="searchResults" showHeader="false" title="Search Results" collapsible="false" columns="1" >
+                <apex:pageBlockTable value="{!accounts}" var="a">
+                    <apex:column width="40">
+                        <apex:commandLink action="{!doSelect}" value="Select" >
+                            <apex:param name="accountId" value="{!a.Id}" assignTo="{!accountId}"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    <apex:column value="{!a.Name}"/>
+                    <apex:column value="{!a.Key_Account__c}"/> <!--CHG0058014-->
+                    <apex:column value="{!a.Ringgold_Account_ID__c}"/>
+                    <apex:column value="{!a.BP__c}"/>
+                    <!--<apex:column value="{!a.Billing_City__c}"/>--> <!--CHG0056245-->
+                    <apex:column value="{!a.Shipping_City__c}"/> 
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        
+        <apex:pageBlock id="pbCreateAccount" title="Create Account & Contact" mode="edit" rendered="{!pageNum==2}">
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton id="buttonBack" value="Back" action="{!goBackToSearch}" rerender="frm" immediate="true" />
+                <apex:commandButton id="buttonSave" value="Save" action="{!doSave}" rerender="frm" status="saveStatus" />
+                <apex:commandButton id="button2Cancel" value="Cancel" action="{!doCancel}" rerender="frm" immediate="true" />
+                <apex:actionStatus id="saveStatus" startText=" saving..." stopText=""/>
+            </apex:pageBlockButtons>
+
+            <!--<apex:pageMessages />-->
+            <apex:pageMessage summary="{!errorMessage}" severity="error" strength="2" rendered="{!showErrorMessage}" escape="false" id="pmErrors">
+                <apex:outputPanel rendered="{!showDupeSelector}" >
+                    <apex:commandLink action="{!useDupe}" value="Click Here" /> to use this account instead.
+                </apex:outputPanel>
+            </apex:pageMessage> 
+
+            <apex:pageBlockSection id="pbs_CreateAccount" showHeader="true" title="Account Details" collapsible="false" columns="1" >
+                <apex:inputField value="{!a.Name}" />
+                <apex:pageBlockSectionItem > <!--CHG0051888-->
+                    <apex:outputLabel value="Account Type"/>
+                    <apex:inputField value="{!a.Type}" required="true" />
+                </apex:pageBlockSectionItem>
+                <!-- <apex:inputField value="{!a.ShippingStreet}" /> --> <!--CHG0056245-->
+                <!-- <apex:inputField value="{!a.ShippingCity}" /> --> <!--CHG0056245-->
+                <apex:inputField value="{!a.Shipping_City__c}" required="true"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Shipping Country"/>
+                    <apex:inputField value="{!a.Shipping_Country_List__c}" required="true" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Shipping State"/>
+                    <apex:inputField value="{!a.Shipping_State_List__c}" />
+                </apex:pageBlockSectionItem>
+<!--                <apex:inputField value="{!a.ShippingState}" />  -->
+                <!-- <apex:inputField value="{!a.ShippingPostalCode}" /> --> <!--CHG0056245-->
+
+<!--  
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Shipping Country"/>
+                    <apex:selectList value="{!a.ShippingCountry}" size="1">
+                        <apex:selectOptions value="{!countries}" />
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+ -->
+ 
+                <apex:inputField value="{!a.Ringgold_Access_ID__c}" />
+                <apex:inputField value="{!a.Ringgold_Account_ID__c}" />
+                <apex:inputField value="{!a.Ringgold_Org_ID__c}" />
+                <apex:inputField value="{!a.BP__c}" />
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection id="pbs_CreateContact" showHeader="true" title="Contact Details" collapsible="false" columns="1" >
+                <apex:inputField value="{!c.FirstName}" />
+                <apex:inputField value="{!c.LastName}" />
+                <apex:inputField value="{!c.Email}" required="true"/>
+            </apex:pageBlockSection>
+
+        </apex:pageBlock>
+
+        <apex:pageBlock title="Case Information" mode="edit">
+            <apex:pageBlockSection showHeader="false" title="pageBlockSection" collapsible="false" columns="2" >
+                <apex:outputField value="{!case.CaseNumber}"/>
+                <apex:outputField value="{!case.Status}"/>
+                <apex:outputField value="{!case.SuppliedEmail}"/>
+                <apex:outputField value="{!case.Priority}"/>
+            </apex:pageBlockSection>        
+            <apex:pageBlockSection showHeader="false" title="pageBlockSection" collapsible="false" columns="1" >
+                <apex:outputField value="{!case.Subject}"/>
+                <apex:outputField value="{!case.Description}"/>
+            </apex:pageBlockSection>        
+        </apex:pageBlock>
+        
+            <script type='text/javascript'>
+                j$ = jQuery.noConflict();
+                j$(document).ready(function () {
+           
+           //page 1 buttons
+           
+           //Replace type of submit button as browser doesn't allow the direct change of the type attribute. See: http://vivin.net/2009/05/26/jquery-tip-changing-the-type-attribute-of-an-input-element/
+                var oldButtonCancel = jQuery("input[id*='buttonCancel']");
+                var newButtonCancel = oldButtonCancel.clone();
+                newButtonCancel.attr("type", "button");
+                newButtonCancel.attr("id", oldButtonCancel.attr("id"));
+                oldButtonCancel.remove();
+                newButtonCancel.insertAfter(j$("input[id*='buttonAdd']"));
+            //Replace Add button to change type attribute to button
+                var oldButtonAdd = jQuery("input[id*='buttonAdd']");
+                var newButtonAdd = oldButtonAdd.clone();
+                newButtonAdd.attr("type", "button");
+                newButtonAdd.attr("id", oldButtonAdd .attr("id"));
+                oldButtonAdd.remove();
+                newButtonAdd.insertBefore(j$("input[id*='buttonCancel']"));
+            //Replace search button to change type attribute to submit
+                var oldButtonSearch = jQuery("input[id*='buttonSearch']");
+                var newButtonSearch = oldButtonSearch.clone();
+                newButtonSearch.attr("type", "submit");
+                newButtonSearch.attr("id", oldButtonSearch.attr("id"));
+                oldButtonSearch.remove();
+                newButtonSearch.insertBefore(j$("input[id*='buttonAdd']"));
+
+            //page 2 buttons
+
+            //Replace Back button to change type attribute to button
+                var oldButtonBack = jQuery("input[id*='buttonBack']");
+                var newButtonBack = oldButtonBack.clone();
+                newButtonBack.attr("type", "button");
+                newButtonBack.attr("id", oldButtonBack .attr("id"));
+                oldButtonBack.remove();
+                newButtonBack.insertBefore(j$("input[id*='buttonSave']"));
+            //Replace Cancel button to change type attribute to button
+                var oldButtonCancel2 = jQuery("input[id*='button2Cancel']");
+                var newButtonCancel2 = oldButtonCancel2.clone();
+                newButtonCancel2.attr("type", "button");
+                newButtonCancel2.attr("id", oldButtonCancel2.attr("id"));
+                oldButtonCancel2.remove();
+                newButtonCancel2.insertAfter(j$("input[id*='buttonSave']"));
+            //Replace Save button to change type attribute to submit
+                var oldButtonSave = jQuery("input[id*='buttonSave']");
+                var newButtonSave = oldButtonSave.clone();
+                newButtonSave.attr("type", "submit");
+                newButtonSave.attr("id", oldButtonSave.attr("id"));
+                oldButtonSave.remove();
+                newButtonSave.insertBefore(j$("input[id*='button2Cancel']"));
+
+                });
+              </script>
+    
+    </apex:form>
+</apex:page>

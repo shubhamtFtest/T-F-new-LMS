@@ -1,0 +1,23 @@
+<aura:component Controller="OA_OrderWebServiceCalloutRetryController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:attribute name="retryDeactivated" type="Boolean" default="true" />
+    <aura:handler name="init" action="{!c.onLoad}" value="{!this}" />
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+     <div style="padding-top:82px;text-align: center;">
+               Are you sure to retry OrderHub Callout? <lightning:button variant="brand" 
+                                  label="Yes"
+                                  title="Yes"
+                                  onclick="{!c.retryButton}"
+                                  disabled ="{!v.retryDeactivated}"/>
+                
+            </div>
+</aura:component>

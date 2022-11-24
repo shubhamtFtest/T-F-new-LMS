@@ -1,0 +1,4 @@
+<aura:event type="APPLICATION" description="used to send values to parent component product search" >
+	<!--<aura:attribute name="selectedSubjectCodes" type="List" default="[]"></aura:attribute>-->
+    <aura:attribute name="selectedSubjectCodes" type="Object[]"></aura:attribute>
+</aura:event>

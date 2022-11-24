@@ -1,0 +1,31 @@
+<apex:page controller="CASContactSearchExportController" contentType="application/vnd.ms-excel#export.xls" cache="true">
+	<apex:pageBlock title="" >
+		<apex:pageBlockTable value="{!wrapperList}" var="w">
+			<!--<apex:column value="{!w.contact.Account.Name}"/>Case#21910 - 2010.05.11-->
+			<apex:column value="{!w.CleanedAccountName}"/><!--Case#21910 - 2010.05.11-->
+			<apex:column value="{!w.contact.Salutation}"/><!--Case#21910 - 2010.05.11-->
+			<apex:column value="{!w.contact.FirstName}"/>
+			<apex:column value="{!w.contact.LastName}"/>
+			<apex:column value="{!w.contact.Title}"/>
+			<apex:column value="{!w.contact.Email}"/>
+			<apex:column value="{!w.contact.Phone}"/>
+			<!--<apex:column value="{!w.MailingStreetFull}" headervalue="Mailing Street"/>Case#21910 - 2010.05.11-->
+			<apex:column value="{!w.MailingStreet1}" headervalue="Mailing Address Line 1"/>
+			<apex:column value="{!w.MailingStreet2}" headervalue="Mailing Address Line 2"/>
+			<apex:column value="{!w.MailingStreet3}" headervalue="Mailing Address Line 3"/>
+			<apex:column value="{!w.contact.MailingCity}"/>
+			<apex:column value="{!w.contact.MailingState}"/>
+			<apex:column value="{!w.contact.MailingPostalCode}"/>
+			<apex:column value="{!w.contact.MailingCountry}"/>		   
+			<apex:column value="{!w.OtherStreetFull}" headervalue="Other Street"/>
+			<apex:column value="{!w.OtherStreet1}" headervalue="Other Address Line 1"/>
+			<apex:column value="{!w.OtherStreet2}" headervalue="Other Address Line 2"/>
+			<apex:column value="{!w.OtherStreet3}" headervalue="Other Address Line 3"/>
+			<apex:column value="{!w.contact.OtherCity}"/>
+			<apex:column value="{!w.contact.OtherState}"/>
+			<apex:column value="{!w.contact.OtherPostalCode}"/>
+			<apex:column value="{!w.contact.OtherCountry}"/>		 			 
+			<apex:column value="{!w.contact.Status__c}"/>		 			 
+		</apex:pageBlockTable>             
+	</apex:pageBlock>
+</apex:page>

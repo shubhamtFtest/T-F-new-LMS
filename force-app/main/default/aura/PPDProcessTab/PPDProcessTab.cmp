@@ -1,0 +1,341 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController"> 
+    <!-- Attributs -->
+    <aura:attribute name="typeOfCollection" type="String" default="Manual Curation"/>
+    <aura:attribute name="user" type="Boolean" default="false"/>
+    <!-- <aura:handler event="force:refreshView" action="{!c.init}" />-->
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="IsButtonDisabled" type="String" default="true"/>
+    <aura:attribute name="ShowModal" type="Boolean" default="false"/>
+    <aura:attribute name="ShowClonedModal" type="Boolean" default="false"/>
+    <aura:attribute name="IsClonedRecord" type="Boolean" default="false"/>
+    <aura:attribute name="disableDownload" type="Boolean" default="false"/>
+    <aura:attribute name="IsEditProductButtonDisabled" type="String"/>
+    <aura:attribute name="hasUnsiloContent" type="String"/>
+    <aura:attribute name="approvalStatus" type="String"/>
+    <aura:attribute name="progress" type="Integer" default="0"/> 
+    <aura:attribute name="showProgressBar" type="Boolean" default="false"/>
+    <aura:attribute name="progressBarMessage" type="String" default="Progress Status.."/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="tabId" type="String" default = 'firstTime'/>
+    <aura:attribute name="titleSeltabId" type="String" default = 'firstTime'/>
+    <aura:attribute name="mainTabId" type="String"/>
+    <aura:attribute name="showValidate" type="String" default="false"/>
+    <aura:attribute name="retrySubmit" type="String" default="false"/>
+    <aura:attribute name="SelectCriteria" type="String" default="Select By Criteria"/>
+    <aura:attribute name="FileUpload" type="String" default="File Upload"/>
+    <aura:attribute name="activeAccordion" type="String"/>
+    <aura:attribute name="isRecordAccessible" type="String" default="true"/>
+    <aura:attribute name="isRulePresent" type="String" default="false"/>
+    <aura:attribute name="isAckFailed" type="String" default="false"/>
+    <aura:attribute name="IsRecordActive" type="String" default="false"/>
+    <aura:attribute name="IsUserAdmin" type="String" default="false"/>
+    <aura:attribute name="LastModifiedBy" type="String"/>
+    <aura:attribute name="CreatedBy" type="String"/>
+    <aura:attribute name="CreatedById" type="String"/>
+    <aura:attribute name="LastModifiedById" type="String"/>
+    <aura:attribute name="RecordTypeName" type="String"/>
+    <aura:attribute name="CreatedByDate" type="String"/>
+    <aura:attribute name="ModifiedByDate" type="String"/>
+    
+    
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="productRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    
+    
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler event="c:PPDProductApprovalRefreshEvent" action="{! c.init}" />
+    <aura:handler event="c:PPDProgressEvent" action="{! c.progressBarUpdate}" />
+    <aura:registerEvent name="validate" type="c:PPDValidateEvent"/>
+    <aura:handler event="c:PPDGenericEvent" action="{! c.enableSubmitForApproval}"/>
+    
+    
+    <!--Open Product Clone modal -->
+    <aura:if isTrue="{!v.ShowModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideMe }" 
+                                          alternativeText="Close" class="slds-modal__close" />      
+                    <c:PPDCloneCollectionProduct recordId="{! v.recordId }" ShowModal="{!v.ShowModal}"></c:PPDCloneCollectionProduct>
+                </header>
+            </div>
+        </div>         
+    </aura:if> 
+    
+    <!--End Product Clone modal -->
+    
+    
+    <!--Open Cloned Product Edit modal -->
+    <aura:if isTrue="{!v.ShowClonedModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal_large">
+                    
+                    
+                    <header class="slds-modal__header">
+                        <h3 class="slds-text-heading_medium">Record Update</h3>
+                        <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.CloneHideMe }" 
+                                              alternativeText="Close" class="slds-modal__close" />                
+                        <lightning:recordEditForm
+                                                  aura:id="ProductEditForm"
+                                                  recordId="{!v.recordId}"                                             
+                                                  objectApiName="Product2"
+                                                  onsubmit="{!c.UpdateClonedData}"
+                                                  onload="{!c.showRequiredFields}"                                              
+                                                  onsuccess="{!c.handleOnSuccess}"
+                                                  onerror="{!c.handleOnError}" >
+                            
+                            <!-- the messages component is for error messages -->
+                            <lightning:messages />
+                            <lightning:layout>
+                                <lightning:layoutItem padding="around-medium" size="6">
+                                    <!--  <lightning:inputField fieldName="Sales_Channels__c" aura:id="Sales_Channels__c" class="customRequired none"  />-->
+                                    <!-- <lightning:inputField fieldName="Applicable_Channels__c" aura:id="Applicable_Channels__c" class="customRequired none"/>-->
+                                    <lightning:inputField fieldName="Description" aura:id="Description" class="customRequired none"/>
+                                </lightning:layoutItem>
+                                <lightning:layoutItem padding="around-medium"  size="6"> 
+                                    <!--  <lightning:inputField fieldName="Applicable_Customer_Types__c" aura:id="Applicable_Customer_Types__c" class="customRequired none"/>-->
+                                    <!--<lightning:inputField fieldName="Applicable_License_Types__c" aura:id="Applicable_License_Types__c" class="customRequired none"/>-->
+                                </lightning:layoutItem>
+                            </lightning:layout>
+                            
+                            <div class="slds-m-top_medium">                                  
+                                <lightning:button variant="brand" label="Cancel" title="Cancel" onclick="{! c.CloneHideMe }"/>
+                                <lightning:button  variant="brand" type="submit" name="update" label="Update" />
+                            </div>
+                            
+                        </lightning:recordEditForm>                   
+                        
+                    </header> 
+                </div>                 
+            </div>           
+        </div>        
+    </aura:if> 
+    
+    <!--Open Cloned Product Edit modall -->
+    <aura:if isTrue="{!v.isAckFailed == 'true'}">
+        <div class="slds-card">
+            <lightning:layout>
+                <lightning:layoutItem padding="around-small" flexibility="auto">
+                    <p>
+                        <lightning:formattedRichText aura:id="msgApiFailedText"></lightning:formattedRichText>
+                    </p>                  
+                </lightning:layoutItem>
+            </lightning:layout>        
+        </div> 
+    </aura:if>
+    
+    <aura:if isTrue="{!v.retrySubmit == 'true'}">
+        <div class="slds-card">
+            <lightning:layout>
+                <lightning:layoutItem padding="around-small" flexibility="auto">
+                    <p>
+                        <lightning:formattedRichText aura:id="msgRichText"></lightning:formattedRichText>
+                    </p>
+                    <br/>
+                    <lightning:button variant="brand" aura:id="submit" type="brand" label="Submit for Approval" onclick="{! c.checkforUnsiloContent }"/>
+                </lightning:layoutItem>
+            </lightning:layout>        
+        </div> 
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isRecordAccessible == 'false'}">
+        <div class="slds-card">
+            <lightning:layout>
+                <lightning:layoutItem padding="around-small" flexibility="auto">
+                    <p>
+                        <lightning:formattedRichText aura:id="infoMsgRichText"></lightning:formattedRichText>
+                    </p>                  
+                </lightning:layoutItem>
+            </lightning:layout>        
+        </div> 
+    </aura:if>
+    
+    <div class="slds-card">
+        <lightning:layout>
+            <lightning:layoutItem size="9" padding="around-small">
+                <div style="pointer-events:none;">
+                    <lightning:picklistPath aura:id="picklistPath" recordId="{!v.recordId}"
+                                            variant="non-linear"
+                                            picklistFieldApiName="Approval_Status__c">
+                    </lightning:picklistPath> 
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="3" padding="around-small" flexibility="auto">
+                <aura:if isTrue="{!and(v.showValidate == 'true',v.IsButtonDisabled == 'true')}">
+                    <lightning:button variant="brand" aura:id="validate" type="brand" label="Validate" onclick="{! c.validatePkg}"/>
+                </aura:if>
+                <aura:if isTrue="{!v.IsButtonDisabled == 'false'}">
+                    <!-- <aura:if isTrue="{!or(v.IsButtonDisabled == 'false',v.isRulePresent == 'true')}">-->
+                    <lightning:button variant="brand" aura:id="submit" type="brand" label="Submit for Approval" onclick="{! c.checkforUnsiloContent }"/>
+                </aura:if>
+                <!-- <lightning:button variant="brand" aura:id="EditProduct" type="brand" label="Edit Product"  disabled="{!v.IsEditProductButtonDisabled}" onclick="{! c.checkForEditProduct }"/>-->
+                <lightning:button variant="brand" aura:id="EditProduct" type="brand" label="Edit Product" onclick="{! c.checkForEditProduct }"/>
+                <aura:if isTrue="{!and(v.IsRecordActive=='True', v.typeOfCollection == 'Rule based')}">
+                    <lightning:button label="Download" iconName="utility:download" variant="brand" onclick = "{! c.downloadParts}" disabled = "{! v.disableDownload}"/>
+                </aura:if>
+            </lightning:layoutItem>
+        </lightning:layout>        
+        
+    </div> 
+    
+    <aura:if isTrue="{!v.showProgressBar}">
+        <div class="slds-card">
+            <b> {! v.progressBarMessage} </b>
+            <lightning:progressBar value="{! v.progress }" size="large" />
+            <b> Percentage : {! v.progress} </b>
+        </div>
+    </aura:if>
+    
+    <!-- Body -->                  
+    <lightning:tabset variant="scoped" onselect="{! c.handleTabSelect }" selectedTabId="{!v.mainTabId}">
+        
+        <lightning:tab label="Details" id="Details" tabindex ="1">
+            <lightning:tabset>
+                <lightning:tab label="Product Details" id="productdetails" >     
+                    
+                    
+                    <lightning:recordViewForm recordId="{! v.recordId }" objectApiName="Product2">
+                        <div class="slds-box">
+                            <div class="Row">
+                                <div class="Column"> 
+                                    <lightning:outputField fieldName="Hub_Id__c" />
+                                    <lightning:outputField fieldName="Name" />
+                                    <lightning:outputField fieldName="RecordType" />
+                                    <!-- <lightning:outputField fieldName="alternateName__c" />-->
+                                    <lightning:outputField fieldName="version__c" />                     
+                                    <lightning:outputField fieldName="Product_Publisher__c" /> 
+                                    <!-- <lightning:outputField fieldName="Applicable_Channels__c" />-->
+                                    <!--<lightning:outputField fieldName="Applicable_Customer_Types__c" /> -->                            
+                                    <lightning:outputField fieldName="inLanguage__c" />
+                                    <p class="label">
+                                        <lightning:formattedText title="Created By" value="Created By" class="slds-form-element__label"/><br></br>
+                                        <!--<lightning:formattedText title="Created By" value="{!v.CreatedBy}" />-->
+                                        <lightning:formattedUrl value="{!v.CreatedById}" tooltip="{!v.CreatedBy}" label="{!v.CreatedBy}" target="_blank" /><br></br><br></br></p>
+                                </div>
+                                <div class="Column">
+                                    <!--  <lightning:outputField fieldName="Description" />--> 
+                                    <lightning:outputField fieldName="Product_Type_Author_Facing__c" />                                    
+                                    <lightning:outputField fieldName="copyrightyear__c" />
+                                    <lightning:outputField fieldName="Lead_Author_Editor__c" />
+                                    <!--   <lightning:outputField fieldName="CreatedBy" value="test" />                                
+                                
+                                    
+                                    
+                                     <lightning:outputField fieldName="LastModifiedBy" />-->
+                                    <p class="label">
+                                        <lightning:formattedText title="Record Type Name" value="Product Record Type" class="slds-form-element__label label"/><br></br>
+                                        <lightning:formattedText title="Product Record Type" value="{!v.RecordTypeName}" class="label"/> <br></br><br></br>
+                                    </p>
+                                    
+                                    <p class="label">
+                                        <lightning:formattedText title="LastModified By" value="Last Modified By" class="slds-form-element__label"/><br></br>
+                                        <!-- <lightning:formattedText title="LastModified By" value="{!v.LastModifiedBy}" /> <br></br><br></br>-->
+                                        <lightning:formattedUrl value="{!v.LastModifiedById}" tooltip="{!v.LastModifiedBy}" label="{!v.LastModifiedBy}" target="_blank"/><br></br><br></br>
+                                    </p>
+                                    <!-- <lightning:outputField fieldName="Applicable_License_Types__c" />-->
+                                    <!--<lightning:outputField fieldName="Sales_Channels__c" />-->
+                                    <aura:if isTrue="{!v.IsUserAdmin == 'true'}">
+                                        <lightning:outputField fieldName="API_Error_Cause__c" />
+                                    </aura:if>
+                                </div>   
+                            </div>
+                        </div>
+                    </lightning:recordViewForm>
+                </lightning:tab>
+                <lightning:tab label="Keywords" id="keywords">
+                    <c:PPDKeywords recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>
+                </lightning:tab>
+                <lightning:tab label="Contributors" id="contributors">
+                    <c:PPDContributors recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>
+                    <!--<c:DynamicTabPOC/>-->
+                </lightning:tab>
+                <aura:if isTrue="{!v.typeOfCollection=='Rule based'}">
+                    <lightning:tab label="Rule" id="rule">
+                        <c:PPDRuleForRuleBasedCollection recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}"/>					
+                    </lightning:tab>
+                </aura:if>
+                
+            </lightning:tabset>
+        </lightning:tab>
+        
+        <lightning:tab label="Title Selection" id="TitleSelection" tabindex="2">
+            <aura:if isTrue="{!v.IsRecordLocked=='true'}"> 
+                <lightning:tabset selectedTabId="{!v.titleSeltabId}">
+                    <lightning:tab label="Product Selection" id="productselection">
+                        <lightning:tabset variant="scoped">
+                            <lightning:tab label="{! v.SelectCriteria }" id="SelectByCriteria">
+                                <c:PPDContentSelectionScreen recordId="{! v.recordId }" typeOfCollection = "{#v.typeOfCollection}"/>
+                            </lightning:tab>
+                            <lightning:tab label="{! v.FileUpload }" id="ProductFileUpload">
+                                <c:PPDFileUpload recordId="{! v.recordId }" CollectionType="{#v.typeOfCollection}"/> 
+                            </lightning:tab>
+                        </lightning:tabset> 
+                    </lightning:tab>
+                    <aura:if isTrue="{!v.typeOfCollection=='Manual Curation'}">
+                        <lightning:tab label="Content Selection" id="ContentSelection">
+                            <lightning:tabset variant="vertical">
+                                <lightning:tab label="UNSILO Classify" id="classify">
+                                    <lightning:tabset>
+                                        <lightning:tab label="Chapters" id="classifyChapter">
+                                            <c:PPDClassify recordId="{! v.recordId }" contentType = 'Chapter' />
+                                        </lightning:tab>
+                                        <lightning:tab label="Articles" id="classifyArticle">
+                                            <c:PPDClassify recordId="{! v.recordId }" contentType = 'ScholarlyArticle' />
+                                        </lightning:tab>
+                                    </lightning:tabset>
+                                </lightning:tab>
+                                <lightning:tab label="File Upload" id="ContentFileUpload">
+                                    <c:PPDContentFileUpload recordId="{! v.recordId }"/>
+                                </lightning:tab>
+                                <lightning:tab label="Curated Content" id="ContentCurator">
+                                    <c:PPDContentCurator recordId="{! v.recordId }"/>
+                                </lightning:tab>
+                            </lightning:tabset> 
+                        </lightning:tab>
+                        
+                    </aura:if>
+                </lightning:tabset>
+            </aura:if>
+            <aura:if isTrue="{!v.IsRecordLocked!='true'}"> 
+                <p>Record locked</p>
+            </aura:if>
+        </lightning:tab>
+        
+        <lightning:tab label="Titles" id="Titles" tabindex="3">
+            <aura:if isTrue="{!v.typeOfCollection=='Manual Curation'}">
+                <!--aura:if isTrue="{!v.IsRecordActive=='False'}"-->
+                <c:PPDUnsiloDocList recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}"/>
+                <!--/aura:if-->
+                <!--aura:if isTrue="{!v.IsRecordActive=='True'}">
+                    <c:PPDPartsList recordId="{#v.recordId}"/>
+                </aura:if-->
+            </aura:if>
+            <aura:if isTrue="{!v.typeOfCollection=='Rule based'}">
+                <aura:if isTrue="{!v.IsRecordActive=='False'}">
+                    <lightning:accordion aura:id="accordion" activeSectionName="{#v.activeAccordion}" >
+                        <lightning:accordionSection name="rule" label="Rule Based"> 
+                            <c:PPDContentSelectionResult recordId="{! v.recordId }" typeOfCollection = "{#v.typeOfCollection}" calledFrom ='Titles' />
+                        </lightning:accordionSection>
+                        <lightning:accordionSection name="IncExc" label="Inclusion" > 
+                            <c:PPDUnsiloDocList recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}" collectionType="{!v.typeOfCollection}" additionType ='Inclusion'/>
+                        </lightning:accordionSection>
+                        <lightning:accordionSection name="IncExc" label="Exclusion" > 
+                            <c:PPDUnsiloDocList recordId="{#v.recordId}" IsRecordLocked="{!v.IsRecordLocked}" collectionType="{!v.typeOfCollection}" additionType ='Exclusion'/>
+                        </lightning:accordionSection>
+                    </lightning:accordion>
+                </aura:if>
+                <aura:if isTrue="{!v.IsRecordActive=='True'}">
+                    <c:PPDContentSelectionResult recordId="{! v.recordId }" typeOfCollection = "{#v.typeOfCollection}" calledFrom ='Titles' />
+                    <!--<c:PPDPartsList recordId="{#v.recordId}"/>-->
+                </aura:if>
+            </aura:if>
+        </lightning:tab>
+        
+        <lightning:tab label="Price Summary " id="Price" tabindex="4">
+            <c:PPDPriceSummary recordId="{! v.recordId }" IsRecordLocked="{!v.IsRecordLocked}" typeOfCollection = "{#v.typeOfCollection}" />
+        </lightning:tab> 
+    </lightning:tabset>
+</aura:component>

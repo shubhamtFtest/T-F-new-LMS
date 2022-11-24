@@ -1,0 +1,69 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+<head>
+<title>Page not found</title>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript for bootstrap -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<!-- Font Awsome -->
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"/>
+<!--To allow @media-->
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+  .jumbotron{
+
+        background-color: rgb(0, 109, 180);
+        Padding-left:5em;
+    }
+    .Footer{
+        background-color: rgb(0, 109, 180);
+        font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-weight: 300;
+        Padding-left:5em;
+        padding-top:2em;
+        padding-bottom:2em;
+    }
+    .container{
+        background-color:#e6e6e6;
+        border-radius:2em;
+        margin-bottom:3em;
+    }
+    .ImagePlaceHolder{
+        padding-top:2em;
+        padding-bottom:2em; 
+    }
+</style>
+</head>
+<body>
+     <div class="jumbotron">
+           
+        </div>      
+        <div class="container">
+                <div class="Row">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-7">
+                            <div class="Row">
+                                <div class="col-sm-9">                                    
+                                    <div class="Row"><div class="col-sm-12"><h2>Due to a technical issue, our Taylor &amp; Francis Online Help Center is currently unavailable</h2></div></div>
+                                    <div class="Row"><div class="col-sm-12"><h4>If you require further assistance, please email our Support team</h4></div></div>
+                                    <div class="Row"><div class="col-sm-12"><h4><a href="mailto:support@tandfonline.com">support@tandfonline.com</a></h4></div></div>                                   
+                                    <div class="Row"><div class="col-sm-12"><h4>Apologies for any inconvenience caused.</h4></div></div>                                   
+                                </div>
+                                <div class="col-sm-3"><apex:image id="BookImage" value="{!$Resource.Book_icon_For_Community_Error_Page}"/></div>     
+                            </div>
+                        </div>
+                        <div class="col-sm-3"></div>
+                        
+                    </div>
+        </div>
+        <div class="Footer">
+                <p>Registered in England &amp; Wales No. 3099067 5 Howick Place | London | SW1P 1WG <span>© 2019 Informa UK Limited</span></p>
+        </div>
+</body>
+<site:previewAsAdmin />
+</apex:page>

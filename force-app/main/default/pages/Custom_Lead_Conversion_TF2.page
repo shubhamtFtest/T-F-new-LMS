@@ -1,0 +1,1090 @@
+<!--
+    Custom Lead Conversion TF2 Created Date: 2017/01/30
+    Rishabh Singh: Modified on 2017/06/20 CHG0033760
+    Modified by Matthew Smith - 2020.12.14 - 01733308 - Update Manual Lead Convert For Corporate Leads
+    Modified by Matthew Smith - 2022.02.21 - SAL-5376 - Updating F1000 Record Types
+-->
+
+<apex:page standardController="Lead" extensions="CustomLeadConversionTF2Controller" id="LeadConversion" standardStylesheets="true"  lightningStylesheets="true" docType="html-5.0" action="{!init}">
+ <c:jQuery /> 
+ 
+    <apex:form id="frm">
+        <apex:outputPanel rendered="{!isFinalPage}">
+            Lead Converted Successfully !! <br />
+            Converted Contact <a href="/{!convertedContact.Id}"> {!convertedContact.Name} </a>  <br />
+            Converted Account <a href="/{!convertedAccount.Id}"> {!convertedAccount.Name} </a>  <br />
+            Converted Opportunity <a href="/{!convertedOpportunity.Id}"> {!convertedOpportunity.Name} </a>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!!isFinalPage}">
+        <apex:outputPanel rendered="{!isContactPage}">
+        
+            <apex:sectionHeader title="Convert Lead" subtitle="{!lead.name}"/>
+            <apex:pageBlock title="Lead to Convert" id="pbLead">
+                
+                <apex:inputHidden value="{!campusJsonString}" id="cjs"/> 
+                <apex:inputHidden value="{!departmentJsonString}" id="djs"/> 
+                <apex:pageBlockSection collapsible="false" showHeader="false" title="pageBlockSection" columns="2">
+                    <apex:outputField value="{!leadObj.Name}"/>
+                    <apex:outputField value="{!leadObj.Title}"/>
+                    <apex:outputField value="{!leadObj.Company}"/>
+                    <apex:outputField value="{!leadObj.Phone}"/>
+                    <apex:outputField value="{!leadObj.Department__c}"/>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Address"/>
+                        <apex:outputText value="{!leadAddress}"/>
+                    </apex:pageBlockSectionItem>
+                     <apex:outputField value="{!leadObj.Email}"/>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Copy Lead Address To"/>
+                        <apex:selectList size="1" value="{!copyAddressTo}" style="width:120px;">
+                            <apex:selectOption itemLabel="--None--" itemValue="--None--" ></apex:selectOption>                   
+                            <apex:selectOption itemLabel="Mailing" itemValue="Mailing" ></apex:selectOption>                   
+                            <apex:selectOption itemLabel="Other" itemValue="Other" ></apex:selectOption>                   
+                            <apex:selectOption itemLabel="Both" itemValue="Both" ></apex:selectOption>                   
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputField value="{!leadObj.Job_Category__c}"/>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Delivery Address"/>
+                        <apex:selectList size="1" value="{!deliveryAddress}" style="width:120px;">
+                            <apex:selectOption itemLabel="Mailing" itemValue="Mailing" ></apex:selectOption>                   
+                            <apex:selectOption itemLabel="Other" itemValue="Other" ></apex:selectOption>                   
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            
+            <apex:pageBlock >
+                <strong>Select Contact/Account</strong>
+                <center>
+                <apex:commandButton action="{!cancel}" value="Cancel" reRender="frm" status="sts" /> &nbsp;
+                <apex:commandButton action="{!next}" rendered="{!!isNotValidEamilId}" value="Next" reRender="frm" status="sts" />
+                </center>
+                 <apex:pageMessage summary="{!errorMessage}" severity="error" strength="2" rendered="{!showErrorMessage}" escape="false" id="pmErrors"/>
+                <div id="pagenationContactAccount" style="float: right;">
+                    <span > Showing Page # {!IF(TotalPagesContactAccount ==0,0,PageNumberContactAccount)} of {!TotalPagesContactAccount}  </span>
+                    {!IF(DisablePreviousContactAccount==false,' | ','')}<apex:commandLink value="Previous" action="{!PreviousContactAccount}" title="Previous" rerender="frm" status="sts"  rendered="{!!DisablePreviousContactAccount}" />
+                    {!IF(DisableNextContactAccount ==false,' | ','')} <apex:commandLink value="Next" title="Next" action="{!NextContactAccount}" rerender="frm" status="sts"  rendered="{!!DisableNextContactAccount}" />
+                </div>
+            
+            <!-- <apex:pageMessage rendered="{!noAccountCreate}" summary="You do not have rights to create Accounts.  So if you do not find the desired Account, please contact your administrator and request one by the usual process." severity="warning" strength="2" escape="false"/>  -->
+                <apex:pageBlockTable id="pbt1" value="{!cawList}" var="cawObj">
+                
+                    <apex:column style="width:1%;" >
+                         <apex:inputCheckbox id="chkContactOrAccount" value="{!cawObj.checked}" onclick="uncheckOthers(this,'pbt1','chkContactOrAccount')"/>    
+                    </apex:column>
+                    
+                    <apex:column headerValue="Contact" styleClass="colWidth">
+                         <apex:outputPanel rendered="{!cawObj.isContact}">
+                            <a href="/{!cawObj.contactObj.Id}">{!cawObj.contactObj.salutation} {!cawObj.contactObj.Name}</a>
+                        </apex:outputPanel>
+                         <apex:outputPanel rendered="{!!cawObj.isContact}">
+                           Create New Contact
+                        </apex:outputPanel>
+                    </apex:column>
+                    
+                    <apex:column headerValue="Email" styleClass="colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            {!cawObj.contactObj.Email}
+                        </apex:outputPanel>
+                    </apex:column>
+                    
+                    <apex:column headerValue="Mailing Address" styleClass="colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            {!cawObj.contactMailingAddress}
+                        </apex:outputPanel>
+                    </apex:column>
+                    
+                    <apex:column headerValue="Other Address" styleClass="colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            {!cawObj.contactOtherAddress}
+                        </apex:outputPanel>
+                    </apex:column>
+                    <apex:column headerValue="Contact Type" styleClass="colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            {!cawObj.contactObj.Contact_Type__c}
+                        </apex:outputPanel>
+                    </apex:column>
+                    
+                    <apex:column headerValue="Institution" styleClass="colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            <a href="/{!cawObj.contactObj.accountId}"> {!cawObj.contactObj.account.Name} </a>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!!cawObj.isContact}">
+                            <a href="/{!cawObj.accountObj.Id}"> {!cawObj.accountObj.Name} </a>
+                        </apex:outputPanel>
+                        
+                        <apex:outputPanel rendered="{!cawObj.isLookup}">
+                            <apex:inputField value="{!lookup.Account__c}" onChange="campusForLoolupJS('{!cawObj.index}')"/>
+                        </apex:outputPanel>
+                    
+                    </apex:column>
+                    
+                    <apex:column headerValue="Campus" rendered="{!showCampusAndDepartment}" styleClass="columnMw150 colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            <apex:outputPanel rendered="{! OR (cawObj.campusId==null,cawObj.campusId=='-None-') }">
+                                <apex:selectList id="FirstCampus" value="{!cawObj.campusId}"  size="1" style="width:120px;" onChange="getDepartmentJS({!cawObj.Index},this.value)">
+                                    <apex:selectOptions value="{!cawObj.campusOptions}"/>
+                                </apex:selectList>  
+                                <apex:commandButton id="campusCreate3" onclick="popupwindow1('{!cawObj.accountObj.ID}','{!SUBSTITUTE(cawObj.accountObj.Name,"'",'`')}','{!cawObj.campusId}','{!leadId}','Y','{!cawObj.index}')" image="{!URLFOR($Resource.Add_Item_Icon)}" styleClass="customBtn" reRender="frm"/>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{! If(cawObj.campusId !=null && cawObj.contactObj.Campus__c == null && cawObj.campusId!='-None-' ,true,false) }">
+                                <apex:selectList id="SecondCampus" value="{!cawObj.campusId}"  size="1" style="width:120px;" onChange="getDepartmentJS({!cawObj.Index},this.value)">
+                                    <apex:selectOptions value="{!cawObj.campusOptions}"/>
+                                </apex:selectList>  
+                                <apex:commandButton id="campusCreate4" onclick="popupwindow1('{!cawObj.accountObj.ID}','{!SUBSTITUTE(cawObj.accountObj.Name,"'",'`')}','{!cawObj.campusId}','{!leadId}','Y','{!cawObj.index}')" image="{!URLFOR($Resource.Add_Item_Icon)}" styleClass="customBtn" reRender="frm"/>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{! If(cawObj.campusId==null && cawObj.contactObj.Campus__c != null ,false,true) }">
+                                <a href="/{!cawObj.contactObj.Campus__c}">{!cawObj.contactObj.Campus__r.Name} </a> 
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        
+                        <apex:outputPanel rendered="{!!cawObj.isContact}">
+                            <apex:selectList value="{!cawObj.campusId}" id="campusSelectList"  size="1" onChange="getDepartmentJS({!cawObj.Index},this.value)" style="width:120px;">
+                                <apex:selectOptions value="{!cawObj.campusOptions}" />
+                            </apex:selectList>
+                            <apex:outputPanel rendered="{!cawObj.isLookup}">
+                                <apex:outputPanel rendered="{!cawObj.isLookupButton}">
+                                    <apex:commandButton id="campusCreate1" onclick="popupwindow1('{!lookup.Account__c}','{!SUBSTITUTE(lookup.Account__r.Name,"'",'`')}','{!cawObj.campusId}','{!leadId}','Y','{!cawObj.index}')" image="{!URLFOR($Resource.Add_Item_Icon)}" styleClass="customBtn" reRender="frm"/>
+                                </apex:outputPanel>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!!cawObj.isLookup}">
+                                <apex:commandButton id="campusCreate2" onclick="popupwindow1('{!cawObj.accountObj.ID}','{!SUBSTITUTE(cawObj.accountObj.Name,"'",'`')}','{!cawObj.campusId}','{!leadId}','Y','{!cawObj.index}')" image="{!URLFOR($Resource.Add_Item_Icon)}" styleClass="customBtn" reRender="frm"/>
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                    </apex:column>
+                    
+                    <apex:column headerValue="Department" rendered="{!showCampusAndDepartment}" styleClass="columnMw150 colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            <apex:outputPanel rendered="{! IF ((cawObj.departmentId==null || cawObj.departmentId =='-None-') &&  cawObj.contactObj.Department_Object__r.Name == null,true,false)}">
+                                <apex:selectList value="{!cawObj.departmentId}"  size="1" style="width:120px;">
+                                    <apex:selectOptions value="{!cawObj.departmentOptions}"/>
+                                </apex:selectList>
+                                <apex:commandButton id="deptCreate3" onclick="popupwindow1('{!cawObj.accountObj.ID}','{!SUBSTITUTE(cawObj.accountObj.Name,"'",'`')}','{!cawObj.campusId}','{!leadId}','N','{!cawObj.index}')" image="{!URLFOR($Resource.Add_Item_Icon)}" styleClass="customBtn" reRender="frm"/>
+                            </apex:outputPanel>
+                             <apex:outputPanel rendered="{! IF (cawObj.departmentId !=null && cawObj.departmentId !='-None-' && cawObj.contactObj.Department_Object__c == null,true,false) }">
+                                 <apex:selectList value="{!cawObj.departmentId}"  size="1" style="width:120px;">
+                                    <apex:selectOptions value="{!cawObj.departmentOptions}"/>
+                                </apex:selectList>
+                                <apex:commandButton id="deptCreate4" onclick="popupwindow1('{!cawObj.accountObj.ID}','{!SUBSTITUTE(cawObj.accountObj.Name,"'",'`')}','{!cawObj.campusId}','{!leadId}','N','{!cawObj.index}')" image="{!URLFOR($Resource.Add_Item_Icon)}" styleClass="customBtn" reRender="frm"/>
+                            </apex:outputPanel>
+                            <!-- <apex:outputPanel rendered="{! If(cawObj.departmentId==null ,false,true) }">  -->
+                            <apex:outputPanel rendered="{! IF (cawObj.departmentId == null && cawObj.departmentId !='-None-' && cawObj.contactObj.Department_Object__c != null,false,true) }">
+                                <a href="/{!cawObj.contactObj.Department_Object__c}">{!cawObj.contactObj.Department_Object__r.Name} </a> 
+                            </apex:outputPanel>
+                        </apex:outputPanel>
+                        
+                        <apex:outputPanel rendered="{!!cawObj.isContact}">
+                            <apex:selectList value="{!cawObj.departmentId}"  size="1" style="width:120px;">
+                                <apex:selectOptions value="{!cawObj.departmentOptions}"/>
+                            </apex:selectList>
+                            
+                             <apex:outputPanel rendered="{!cawObj.isLookup}">
+                                <apex:outputPanel rendered="{!cawObj.isLookupButton}">
+                                    <apex:commandButton id="deptCreate1" onclick="popupwindow1('{!lookup.Account__c}','{!SUBSTITUTE(lookup.Account__r.Name,"'",'`')}','{!cawObj.campusId}','{!leadId}','N','{!cawObj.index}')" image="{!URLFOR($Resource.Add_Item_Icon)}" styleClass="customBtn" reRender="frm"/>
+                                </apex:outputPanel>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!!cawObj.isLookup}">
+                                <apex:commandButton id="deptCreate2" onclick="popupwindow1('{!cawObj.accountObj.ID}','{!SUBSTITUTE(cawObj.accountObj.Name,"'",'`')}','{!cawObj.campusId}','{!leadId}','N','{!cawObj.index}')" image="{!URLFOR($Resource.Add_Item_Icon)}" styleClass="customBtn" reRender="frm"/>
+                            </apex:outputPanel>
+                            
+                            
+                            
+                        </apex:outputPanel>
+                    </apex:column>
+                    
+                    <apex:column headerValue="Ringgold Id" rendered="{!showRinggoldAndBP}" styleClass="colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            {!cawObj.contactObj.Account.Ringgold_Account_ID__c}
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!!cawObj.isContact}">
+                            {!cawObj.accountObj.Ringgold_Account_ID__c}
+                        </apex:outputPanel>
+                    </apex:column>
+                    
+                    <apex:column headerValue="BP" rendered="{!showRinggoldAndBP}" styleClass="colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            {!cawObj.contactObj.Account.BP__c}
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!!cawObj.isContact}">
+                            {!cawObj.accountObj.BP__c}
+                        </apex:outputPanel>
+                        
+                    </apex:column>
+                    
+                    <apex:column headerValue="Account Site" rendered="{!showAccountSite}" styleClass="colWidth">
+                        <apex:outputPanel rendered="{!cawObj.isContact}">
+                            {!cawObj.contactObj.Account.Site}
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!!cawObj.isContact}">
+                            {!cawObj.accountObj.Site}
+                        </apex:outputPanel>
+                        
+                    </apex:column>
+                    
+                </apex:pageBlockTable>
+                
+                
+                Show email domain matches (longer search)
+                <apex:inputCheckbox id="id1" value="{!showEmailDomainMathes}" onclick="searchByDomainJS()"/> <br/>
+                Show Campus and Department
+                <apex:inputCheckbox id="id2" value="{!showCampusAndDepartment}" onclick="manageChecksJS()"/> <br/>
+                Show Ringgold and BP
+                <apex:inputCheckbox id="id3" value="{!showRinggoldAndBP}" onclick="manageChecksJS()"/> <br/>
+                Show Account Site
+                <apex:inputCheckbox id="id4" value="{!showAccountSite}" onclick="manageChecksJS()"/> <br/>
+            </apex:pageBlock>
+            
+            
+        </apex:outputPanel>
+        
+        <!--   ************** Opportunity **************  -->
+        <apex:outputPanel rendered="{!!isContactPage}" id="oOP">
+            <apex:sectionHeader title="Convert Lead" subtitle="{!lead.name}"/>
+            <apex:pageBlock id="opb">
+                <apex:pageBlockSection collapsible="false" title="Opportunity Information" id="opbs" columns="1">
+                    <div>
+                        <h3 class="redVerticalLine">
+                            = for new Opportunities 
+                        </h3>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <h3 class="blueVerticalLine">
+                            = for new and existing Opportunities
+                        </h3>
+                    </div>
+                    <apex:pageBlockSectionItem >
+                        Record Type 
+                        <apex:selectList value="{!selectedOppRecordType}"  size="1" onChange="selectOppRTJS(this.value)">
+                            <apex:selectOptions value="{!OppRTList}"/>
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection collapsible="false" title="Opportunity Information" showHeader="false" id="opbs1" columns="2" rendered="{!renderedSection1}">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Currency"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="redMarker">
+                                <apex:selectList value="{!oppObj.CurrencyIsoCode}" size="1" required="false">
+                                    <apex:selectOptions value="{!currencies}"/>
+                                </apex:selectList> 
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Course Name"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.Name}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Owner"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.OwnerId}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Course Start Date"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="blueMarker">
+                                <apex:inputField value="{!oppObj.Course_Start_Date__c}"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Order Type"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="blueMarker">
+                                <apex:inputField value="{!oppProductOBj.Order_Type__c}">
+                                    <apex:actionSupport event="onchange" rerender="opbs1" status="sts" />
+                                </apex:inputField>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Anticipated Enrollment"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="blueMarker">
+                                <apex:inputField value="{!leadObj.Anticipated_Enrollment__c}"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Course Category 1" for="cbxlevel1"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="redMarker">
+                                <apex:selectList value="{!selectedLevel1}" id="cbxlevel1" size="1" required="false" >
+                                    <apex:selectOptions value="{!level1items}"/> 
+                                    <apex:actionSupport event="onchange" rerender="opbs1" action="{!resetLevel2}" status="sts"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="IC Quantity"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppProductOBj.IC_Quantity__c}" />
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Course Category 2" for="cbxlevel2"/>
+                        <apex:selectList value="{!selectedLevel2}" id="cbxlevel2" size="1">
+                            <apex:selectOptions value="{!level2items}"/>
+                            <apex:actionSupport event="onchange" rerender="opbs1" status="sts"/>
+                        </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Textbook Feedback Notification"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="blueMarker">
+                                <apex:inputField id="FeedbackNotification" value="{!oppProductOBj.Feedback_Notification__c}"/>
+                            </div>
+                            
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Course Category 3" for="cbxlevel3"/>
+                            <apex:selectList value="{!selectedLevel3}" id="cbxlevel3" size="1">
+                                <apex:selectOptions value="{!level3items}"/>
+                            </apex:selectList>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Contact Role"/>
+                        <apex:panelGrid columns="2">
+                            <div class="blueMarker">
+                                <apex:selectList value="{!ocrObj.Role}" size="1">
+                                    <apex:selectOption itemValue="Lecturer" itemLabel="Lecturer"/>
+                                    <apex:selectOption itemValue="Decision Maker" itemLabel="Decision Maker"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem rendered="{!showAccessPeriod}" > <!-- CHG0033760 - Updated -->
+                        <apex:outputLabel value="VitalSource Access Period"/>
+                        <apex:panelGrid columns="2">  
+                                <div class="blueMarker">  
+                                <apex:inputField id="vitalsourceAccessPeriod" value="{!oppProductOBj.VitalSource_Access_Period__c}"  />
+                                <script> 
+                                    var vitalsource = document.getElementById("LeadConversion:frm:opb:opbs1:j_id207:vitalsourceAccessPeriod");
+                                    vitalsource.remove(0);
+                                </script>
+                                </div>
+                        </apex:panelGrid>
+                        
+                    </apex:pageBlockSectionItem>
+                    <script> 
+                        
+                        var x = document.getElementById("LeadConversion:frm:opb:opbs1:j_id182:FeedbackNotification");
+                        x.remove(0);
+                        
+                    </script>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection collapsible="false" showHeader="false" title="Opportunity Information" id="opbs2" columns="2" rendered="{!renderedSection2}">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Opportunity Name"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.Name}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Currency"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:selectList value="{!oppObj.CurrencyIsoCode}" size="1" required="false">
+                                    <apex:selectOptions value="{!Currencies}"/>
+                                </apex:selectList> 
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Owner"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.OwnerId}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Volume Year"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.Volume_Year__c}"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Contact Role"/>
+                        <apex:panelGrid columns="2">
+                            <div class="blueMarker">
+                                <apex:selectList value="{!ocrObj.Role}" size="1">
+                                    <apex:selectOption itemValue="Decision Maker" itemLabel="Decision Maker"/>
+                                    <apex:selectOption itemValue="Influencer" itemLabel="Influencer"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection collapsible="false" showHeader="false" title="Opportunity Information" id="opbs_F1000_Record_Types" columns="2" rendered="{!renderedSection5}">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Opportunity Name"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.Name}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Currency"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:selectList value="{!oppObj.CurrencyIsoCode}" size="1" required="false">
+                                    <apex:selectOptions value="{!Currencies}"/>
+                                </apex:selectList> 
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Owner"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.OwnerId}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Contact Role"/>
+                        <apex:panelGrid columns="2">
+                            <div class="blueMarker">
+                                <apex:selectList value="{!ocrObj.Role}" size="1">
+                                    <apex:selectOption itemValue="Decision Maker" itemLabel="Decision Maker"/>
+                                    <apex:selectOption itemValue="Influencer" itemLabel="Influencer"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection collapsible="false" title="Opportunity Information" showHeader="false" id="opbs_Corporate" columns="2" rendered="{!renderedSection4}">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Currency"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="redMarker">
+                                <apex:selectList value="{!oppObj.CurrencyIsoCode}" size="1" required="false">
+                                    <apex:selectOptions value="{!currencies}"/>
+                                </apex:selectList> 
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Opportunity Name"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.Name}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Owner"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.OwnerId}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Order Type"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="blueMarker">
+                                <apex:inputField value="{!oppProductOBj.Order_Type__c}">
+                                    <apex:actionSupport event="onchange" rerender="opbs1" status="sts" />
+                                </apex:inputField>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Textbook Feedback Notification"/>
+                        <apex:panelGrid columns="2">                        
+                            <div class="blueMarker">
+                                <apex:inputField id="FeedbackNotification" value="{!oppProductOBj.Feedback_Notification__c}"  />
+                            </div>
+                            
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                   
+                    <apex:pageBlockSectionItem > <!-- CHG0033760 - Updated -->
+                        <apex:outputLabel value="VitalSource Access Period"/>
+                        <apex:panelGrid columns="2">  
+                                <div class="blueMarker">  
+                                <apex:inputField id="vitalsourceAccessPeriod" value="{!oppProductOBj.VitalSource_Access_Period__c}"  />
+                                </div>
+                        </apex:panelGrid>
+                        
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Contact Role"/>
+                        <apex:panelGrid columns="2">
+                            <div class="blueMarker">
+                                <apex:selectList value="{!ocrObj.Role}" size="1">
+                                    <apex:selectOption itemValue="Lecturer" itemLabel="Lecturer"/>
+                                    <apex:selectOption itemValue="Decision Maker" itemLabel="Decision Maker"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection collapsible="false" showHeader="false" title="Opportunity Information" id="opbs3" columns="2" rendered="{!renderedSection3}">
+                <!--  rendered="{!oppRTToVFSectionMap[selectedOppRecordType]=='opbs1'}"> -->
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Currency"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:selectList value="{!oppObj.CurrencyIsoCode}" size="1" required="false">
+                                    <apex:selectOptions value="{!Currencies}"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Close Date"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                            <!--<apex:input type="date" value="{!oppCloseDate}" required="fasle"/>-->
+                            
+                                <apex:inputfield value="{!oppObj.CloseDate}" required="fasle"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Owner"/>
+                        <apex:panelGrid columns="2">
+                            <div class="redMarker">
+                                <apex:inputField value="{!oppObj.OwnerId}" required="false"/>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Contact Role"/>
+                        <apex:panelGrid columns="2">
+                            <div class="blueMarker">
+                                <apex:selectList value="{!ocrObj.Role}" size="1">
+                                    <apex:selectOption itemValue="Decision Maker" itemLabel="Decision Maker"/>
+                                    <apex:selectOption itemValue="Influencer" itemLabel="Influencer"/>
+                                </apex:selectList>
+                            </div>
+                        </apex:panelGrid>
+                    </apex:pageBlockSectionItem> 
+                </apex:pageBlockSection>
+                
+                <apex:pageBlockSection collapsible="false" title="Product Information" id="opbs4" columns="2" rendered="true">
+                    <apex:pageBlockSectionItem >
+                        <!-- <apex:outputLabel value="Requested ISBN"/>
+                        <apex:outputField value="{!leadObj.ISBN__c}"/>
+                        <apex:outputText value=" (Previously Ordered)" style="font-style:italic; color:red;" rendered="{!isRequestedPreviouslyOrdered}" /> -->
+                        <apex:outputLabel value="Requested ISBN"/>
+                        <apex:outputPanel >
+                            <apex:outputField value="{!lead.ISBN__c}"/>
+                            <apex:outputText value=" (Previously Ordered)" style="font-style:italic; color:red;" rendered="{!IF(isRequestedPreviouslyOrdered && lead.ISBN__c != null,true,false)}" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:outputField value="{!product.Version_Type__c}"/>
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Delivered Product"/>
+                        <apex:outputPanel >
+                            <apex:inputField value="{!Lookup.Product__c}" id="chkProduct" style="width:300px">
+                                <apex:actionSupport event="onchange" action="{!getProductDetail}" oncomplete="hideUserDropdown('oppOwner','oppOwner_Me')" rerender="opbs4" />
+                            </apex:inputField>
+                            <apex:outputlink value="/{!Lookup.Product__c}" target="_blank">View</apex:outputlink>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                
+                     <apex:outputField value="{!product.Text_Type__c}"/>
+                     
+                     <apex:pageBlockSectionItem >
+                        <!-- <apex:outputLabel value="Delivered ISBN"/>
+                        <apex:outputText value=" (Previously Ordered)" style="font-style:italic; color:red;" rendered="{!isDeliveredPreviouslyOrdered}" />
+                        <apex:outputField value="{!product.ProductCode}"/> -->
+                        <apex:outputLabel value="Delivered ISBN"/>
+                        <apex:outputPanel >
+                            <apex:outputField value="{!product.ProductCode}"/>
+                            <apex:outputText value=" (Previously Ordered)" style="font-style:italic; color:red;" rendered="{!isDeliveredPreviouslyOrdered}" />
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+                
+                   <apex:outputField value="{!product.Business_Division__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            
+            <apex:pageBlock id="SectiontblOpps" >
+                <apex:pageMessage summary="{!errorMessage}" severity="error" strength="2" rendered="{!showErrorMessage}" escape="false" id="pmErrors"/>
+                <strong>Select an Opportunity</strong>
+                <center>
+                    <apex:commandButton value="Previous" action="{!previous}" rerender="frm" status="sts" /> &nbsp;
+                    <apex:commandButton value="Cancel" action="{!cancel}" /> &nbsp;
+                    <apex:commandButton value="Finish" action="{!finish}" oncomplete="hideUserDropdown('oppOwner','oppOwner_Me')" rerender="frm" status="sts"  />
+                </center>
+                Show all Opportunities for this Account
+                <apex:inputCheckbox id="oIC1" value="{!showExistingContactRoles}" onclick="manageChecksJS1()"/> <br/>
+                Hide Closed Opportunities
+                <apex:inputCheckbox id="oIC2" value="{!hideClosedOpportunities}" onclick="manageChecksJS1()"/> <br/>
+                Show All Record Types
+                <apex:inputCheckbox id="oIC3" value="{!showAllRecordTypes}" onclick="manageChecksJS1()"/> <br/>
+                <div id="pagenation" style="float: right;">
+                    <span > Showing Page # {!IF(totalPages ==0,0,pageNumber)} of {!totalPages}  </span>
+                    {!IF(DisablePrevious==false,' | ','')}<apex:commandLink value="Previous" action="{!PreviousOpp}" title="Previous" rerender="SectiontblOpps" status="sts"  rendered="{!!DisablePrevious}" />
+                    {!IF(DisableNext ==false,' | ','')} <apex:commandLink value="Next" title="Next" action="{!NextOpp}" rerender="SectiontblOpps" status="sts"  rendered="{!!DisableNext}" />
+                </div>
+                <apex:variable var="i" value="{!0}"/>
+                <apex:inputHidden id="OpporIndexPoint" value="{!OpporIndexPoint}" />
+                <apex:pageBlockTable value="{!owList}" var="owObj" id="tblOpps">
+                
+                    <apex:column width="20">                        
+                        <apex:inputCheckbox id="chkOpp" value="{!owObj.checked}" onclick="setIndex('{!i}');uncheckOthers(this,'tblOpps','chkOpp');"  rendered="{!!owObj.isOtherRT}" />  
+                       <apex:variable var="i" value="{!i+1}"/> 
+                    </apex:column>
+                    
+                    <apex:column headerValue="Opportunity">
+                        
+                        <apex:outputPanel rendered="{!owObj.isNewCreation}">
+                            Create new opportunity
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!!owObj.isNewCreation}">
+                            <a href="/{!owObj.oObj.id}" target="_Blank">
+                                {!owObj.oObj.Name}  
+                            </a>
+                        </apex:outputPanel>
+                        <!--Start Sort Functionality -->
+                        
+                           
+                            <apex:facet name="header">
+                            <apex:commandLink action="{!searchOpportunities}" value="Opportunity{!IF(sortExpression=='Name',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                             <apex:param value="Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                               </apex:commandLink>
+                             </apex:facet>
+                        
+                        <!--End Sort Functionality -->
+                    </apex:column>
+                    
+                    <apex:column headerValue="Course Start">
+                       <!-- "Year Month Date Day Hour:Minute -->
+                        <apex:outputtext value="{0, date, yyyy MMM dd}">
+                            <apex:param value="{!owObj.oObj.Course_Start_Date__c}"></apex:param>
+                        </apex:outputtext>
+                        <!--Start Sort Functionality -->
+                        
+                           
+                            <apex:facet name="header">
+                            <apex:commandLink action="{!searchOpportunities}" value="Course Start{!IF(sortExpression=='Course_Start_Date__c',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                             <apex:param value="Course_Start_Date__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                               </apex:commandLink>
+                             </apex:facet>
+                        
+                        <!--End Sort Functionality -->
+                       
+                       
+                    </apex:column>
+                    
+                    <apex:column headerValue="No. of Students">
+                        {!owObj.oObj.Number_of_Students__c}   
+                        <!--Start Sort Functionality -->
+                        <apex:facet name="header">
+                            <apex:commandLink action="{!searchOpportunities}" value="No. of Students{!IF(sortExpression=='Number_of_Students__c',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                             <apex:param value="Number_of_Students__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                               </apex:commandLink>
+                        </apex:facet>
+                        <!--End Sort Functionality -->
+                    </apex:column>
+                    
+                    <apex:column headerValue="Products">
+                        <apex:outputPanel rendered="{!!owObj.isNewCreation}">
+                             
+                            <apex:commandLink id="productPopup" onclick="productWindow('{!owObj.oObj.Id}')"  value="Click to View"  reRender="frm"/> 
+                        </apex:outputPanel>
+                        
+                        
+                    </apex:column>
+                    
+                    <apex:column headerValue="Currency">
+                        <!--Start Sort Functionality -->
+                        <apex:facet name="header">
+                            <apex:commandLink action="{!searchOpportunities}" value="CurrencyIsoCode{!IF(sortExpression=='CurrencyIsoCode',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                             <apex:param value="CurrencyIsoCode" name="column" assignTo="{!sortExpression}" ></apex:param>
+                               </apex:commandLink>
+                        </apex:facet>
+                        <!--End Sort Functionality -->
+                        {!owObj.oObj.CurrencyIsoCode}   
+                    </apex:column>
+                    
+                    <apex:column headerValue="Amount">
+                        <!--Start Sort Functionality -->
+                        <apex:facet name="header">
+                            <apex:commandLink action="{!searchOpportunities}" value="Amount{!IF(sortExpression=='Amount',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                             <apex:param value="Amount" name="column" assignTo="{!sortExpression}" ></apex:param>
+                               </apex:commandLink>
+                        </apex:facet>
+                        <!--End Sort Functionality -->
+                        {!owObj.oObj.Amount}   
+                    </apex:column>
+                    
+                    <apex:column headerValue="Stage">
+                        <!--Start Sort Functionality -->
+                        <apex:facet name="header">
+                            <apex:commandLink action="{!searchOpportunities}" value="Stage{!IF(sortExpression=='StageName',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                             <apex:param value="StageName" name="column" assignTo="{!sortExpression}" ></apex:param>
+                               </apex:commandLink>
+                        </apex:facet>
+                        <!--End Sort Functionality -->
+                        {!owObj.oObj.StageName}   
+                    </apex:column>
+                    
+                    <apex:column headerValue="Close Date">
+                        <!--Start Sort Functionality -->
+                        <apex:facet name="header">
+                            <apex:commandLink action="{!searchOpportunities}" value="Close Date{!IF(sortExpression=='CloseDate',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                             <apex:param value="CloseDate" name="column" assignTo="{!sortExpression}" ></apex:param>
+                               </apex:commandLink>
+                        </apex:facet>
+                        <!--End Sort Functionality -->
+                        <apex:outputtext value="{0, date, yyyy MMM dd}">
+                            <apex:param value="{!owObj.oObj.CloseDate}"></apex:param>
+                        </apex:outputtext>
+                         
+                    </apex:column>
+                    
+                    <apex:column headerValue="Owner">
+                        <!--Start Sort Functionality -->
+                        <apex:facet name="header">
+                            <apex:commandLink action="{!searchOpportunities}" value="Owner{!IF(sortExpression=='Owner.Name',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                             <apex:param value="Owner.Name" name="column" assignTo="{!sortExpression}" ></apex:param>
+                               </apex:commandLink>
+                        </apex:facet>
+                        <!--End Sort Functionality -->
+                        
+                        {!owObj.oObj.Owner.Name}   
+                    </apex:column>
+                    
+                    <apex:column headerValue="Closed" rendered="{!!hideClosedOpportunities}">
+                       <apex:outputPanel rendered="{!!owObj.isNewCreation }">
+                            <apex:outputPanel rendered="{!IF(owObj.oObj.StageName =='Closed Won' || owObj.oObj.StageName =='Closed Lost',true,false)}">Yes</apex:outputPanel>
+                            <apex:outputPanel rendered="{!IF(owObj.oObj.StageName =='Closed Won' || owObj.oObj.StageName =='Closed Lost',false,true)}">No</apex:outputPanel>  
+                       </apex:outputPanel>
+                       
+                       
+                    </apex:column>
+                    
+                    <apex:column headerValue="Record Type">
+                        {!owObj.oObj.RecordType.Name}   
+                    </apex:column>
+                    
+                </apex:pageBlockTable> 
+                
+                
+                  
+            </apex:pageBlock>
+        </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:outputPanel id="popup">
+            <apex:outputPanel styleClass="customPopup" layout="block" rendered="{!displayPopUp}">
+                <div style="color: red">Duplicate Order</div>
+                <br/>
+                <apex:outputText escape="false" value="{!popupMessage}" />
+                <br/>
+                <br/>
+                <apex:commandButton value="Cancel" action="{!closePopup_Cancel}" onclick="document.getElementById('LeadConversion:frm:popup').style.display = 'none';" rerender="frm" status="sts"/>
+                <apex:commandButton value="Continue" action="{!closePopup_Continue}" onclick="document.getElementById('LeadConversion:frm:popup').style.display = 'none';" rerender="frm" status="sts"/>
+            </apex:outputPanel>
+        </apex:outputPanel>
+        <apex:outputPanel id="popupWithOutProduct">
+        <apex:outputPanel rendered="{!isCreateWithoutProduct}" >
+            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.75; z-index: 999; background-color: black;">
+                 &nbsp;
+            </div>
+            </apex:outputPanel>
+            <apex:outputPanel styleClass="customPopup" layout="block" rendered="{!isCreateWithoutProduct}" >
+                 
+                <div style="color: red">Product not selected</div> 
+                <br/>
+                <!--<apex:outputText escape="false" value="{!popupMessage}" /> -->
+                You have not selected a product. Are you sure you want to continue?
+                <br/>
+                <br/>
+                <apex:commandButton value="Cancel" action="{!closedPopup_ProductCancel}" onclick="document.getElementById('LeadConversion:frm:popupWithOutProduct').style.display = 'none';" rerender="popupWithOutProduct" status="sts" />
+                <apex:commandButton value="Continue" action="{!closedPopup_ProductContinue}" onclick="document.getElementById('LeadConversion:frm:popupWithOutProduct').style.display = 'none';" rerender="frm" status="sts" />
+            </apex:outputPanel>
+        </apex:outputPanel>
+            <apex:actionFunction name="searchByDomainAF" action="{!searchByDomain}" reRender="frm" status="sts" />
+            <apex:actionFunction name="manageChecksAF"  reRender="frm" status="sts" />
+             <apex:actionFunction name="manageChecksAF1" action="{!manageChecks1}" reRender="SectiontblOpps" status="sts" />
+            <apex:actionFunction name="getDepartmentAF" action="{!getDepartmentDropDown}" reRender="frm" status="sts">
+                <apex:param name="is" assignTo="{!wrapperIndex}" value="" />
+                <apex:param name="cId" assignTo="{!campusID}" value="" />
+            </apex:actionFunction>
+            
+            <apex:actionFunction name="campusForLoolupAF" action="{!getCampusDropDown}" reRender="frm" status="sts">
+                <apex:param name="iss" assignTo="{!wrapperIndex}" value="" />
+            </apex:actionFunction>
+            <apex:actionFunction name="selectOppRTAF" action="{!createoppRTToVFSectionMap}" reRender="frm,oOP" status="sts"/>
+            
+             <apex:actionFunction name="updateOptionsAF" action="{!updateOptions}" reRender="frm" status="sts">
+                <apex:param name="cName" assignTo="{!updateOptionsCName}" value="" />
+                <apex:param name="cIndex" assignTo="{!updateOptionsCIndex}" value="" />
+                <apex:param name="cIsCampus" assignTo="{!updateOptionsCIsCampus}" value="" />
+             </apex:actionFunction>
+            
+             <!-- <apex:actionStatus id="sts" stopText="">
+                    <apex:facet name="start">
+                        <div>
+                            <div class="popupBackground" />
+                            <div class="PopupPanel">
+                                <table border="0" width="100%" height="100%">
+                                    <tr>
+                                        <td align="center"><b>Please Wait Loading</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center"><img src="/img/loading.gif"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </apex:facet>
+            </apex:actionStatus> -->
+            
+            <apex:actionStatus id="sts">
+                <apex:facet name="start">
+                    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.75; z-index: 1000; background-color: black;">
+                        &nbsp;
+                    </div>
+                    <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; z-index: 1001; margin: 30% 50%">
+                        <font color="white"> Please Wait Loading </font> <br />
+                        <img src="/img/loading.gif"/>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>
+        
+    </apex:form>
+    
+    <style type="text/css"> 
+        .customBtn {
+            border: 0 !important;
+            background: none !important;
+        }
+        
+        .customBtn:hover {
+            border: inset 1px silver !important;
+            background: white !important;
+            padding: 2px !important;
+        }
+        .colWidth{width:12%;}
+        .columnMw150{
+            min-width: 150px!important;
+        }
+    </style>
+    <style type="text/css">
+        .redVerticalLine {
+            border-left: solid #BE0005;
+            padding: 4px;
+        }
+        .blueVerticalLine {
+            border-left: solid #1100FF;
+            padding: 4px;
+        }
+        .blueMarker
+        {   
+            border-left: solid #1100FF;
+            height: 16px;
+        }
+        .redMarker
+        {   
+            border-left: solid #BE0005;
+            height: 16px;
+        }
+    </style>
+    <style type="text/css">
+        .customPopup{
+            background-color: white;
+            border-style: solid;
+            border-width: 2px;
+            left: 500px;
+            padding:10px;
+            position: absolute;
+            z-index: 9999;
+            width: 460px;
+            top:100px;
+        }
+        
+    </style>
+    <script>
+         var j$ = jQuery.noConflict();
+            
+            var outputFieldId;
+            
+            j$(document).ready(function(){
+                hideUserDropdown('oppOwner','oppOwner_Me'); //also called after hitting Next button
+            });
+            
+           function hideUserDropdown(lookupName, meName) {
+                j$('select[id*='+lookupName+'_mlktp]').css('display','none');
+                if (meName != null && meName != '') {              
+                    var lnkMe = j$('a[id*='+meName+']');
+                    if (lnkMe != null)
+                        j$('a[id*='+lookupName+'_lkwgt]').after(lnkMe);
+                }             
+            }
+        
+        function setIndex(ListIndexPoint){
+            document.getElementById("LeadConversion:frm:SectiontblOpps:OpporIndexPoint").value = ListIndexPoint;
+            console.log('ListIndexPoint='+ListIndexPoint);
+            
+        }
+        
+        function uncheckOthers(checkbox, tableName, checkboxName){
+            console.log('checkbox='+checkbox.checked);
+            console.log('tableName='+tableName);
+            console.log('checkboxName='+checkboxName);
+            if (checkbox.checked) {
+                 var len = checkbox.id.indexOf(":"+checkboxName) - checkbox.id.indexOf(tableName+":") - (tableName.length + 1);
+                 var row = checkbox.id.substr(checkbox.id.indexOf(tableName+":")+(tableName.length + 1),len);
+                 
+                 j$("input:visible[id*="+checkboxName+"]").each(function() {
+                     j$(this).attr("checked", false);
+                 });
+                 
+                 j$("input:visible[id*="+tableName+":" + row + ":"+checkboxName+"]").each(function() {
+                     j$(this).attr("checked", true);
+                 });
+            }
+        }
+        
+        function searchByDomainJS(){
+            searchByDomainAF();
+        }
+        
+        function manageChecksJS(){
+            manageChecksAF();
+        }
+        function manageChecksJS1(){
+            //alert('manageChecksAF1');
+            manageChecksAF1();
+        }
+        
+        function createCampusJS(){
+            
+        }
+        
+        function createDeptJS(){
+            
+        }
+        
+        function getDepartmentJS(index, campusId){
+           // alert('ndex=='+index);
+            //alert('campusId=='+campusId);
+            getDepartmentAF(index, campusId);
+        }
+        
+        function campusForLoolupJS(index){
+        //alert('pppppppppppp');
+            campusForLoolupAF(index);
+        }
+    </script>
+    <script type="text/javascript">
+    
+       function getInputId(){
+          return document.getElementById('{!$Component.itId}').Id;
+       }
+       var df = 'j_id0:frm:pbLead:itId';
+       
+       function productWindow(a){
+            var width = 700;
+            var height = 500;
+            var left = (screen.width - width)/2;
+            var top = (screen.height - height)/2;
+            var params = 'width='+ width +', height='+ height+', top='+ top +', left='+ left+ ', resizable=no';
+            //alert('New window1'+a+b+c);
+            //var newwindow = window.open('/apex/CreateCampus','Create Campus/Department',params); 
+            var newwindow = window.open('/apex/Custom_Lead_Conversion_olis?id='+a,'Product Information',params); 
+            newwindow.focus();
+        }
+        
+        function popupwindow(a,b,c,d,e){
+            var width = 500;
+            var height = 500;
+            var left = (screen.width - width)/2;
+            var top = (screen.height - height)/2;
+            var params = 'width='+ width +', height='+ height+', top='+ top +', left='+ left+ ', resizable=no';
+            //alert('New window1'+a+b+c);
+            //var newwindow = window.open('/apex/CreateCampus','Create Campus/Department',params); 
+            var newwindow = window.open('/apex/CreateCampus?accountId='+a+'&accountName='+b+'&campusId='+c+'&leadId='+d+'&isCampus='+e,'Create Campus/Department',params); 
+            newwindow.focus();            
+            
+        }
+        
+        function popupwindow1(a,b,c,d,e,f){
+            var width = 500;
+            var height = 500;
+            var left = (screen.width - width)/2;
+            var top = (screen.height - height)/2;
+            b = b.replace("`","'");
+            var params = 'width='+ width +', height='+ height+', top='+ top +', left='+ left+ ', resizable=no';
+         //   alert('New window1'+a+b+c);
+            //var newwindow = window.open('/apex/CreateCampus','Create Campus/Department',params); 
+            var newwindow = window.open('/apex/CreateCampus?accountId='+a+'&accountName='+b+'&campusId='+c+'&leadId='+d+'&isCampus='+e+'&index='+f,'Create Campus/Department',params); 
+            newwindow.focus();            
+            
+        }
+        
+        
+        function selectOppRTJS(sRT){
+            //alert('method called '+sRT);
+            selectOppRTAF();
+            //alert('method called1 '+sRT);
+        }
+        
+        function updateSelectList(abc,index, isCampus){
+            //alert('name=='+abc+'    index=='+index+'     isCampus=='+isCampus);
+            updateOptionsAF(abc, index, isCampus);
+            
+        }
+        
+        
+    </script>
+      
+      
+          
+</apex:page>

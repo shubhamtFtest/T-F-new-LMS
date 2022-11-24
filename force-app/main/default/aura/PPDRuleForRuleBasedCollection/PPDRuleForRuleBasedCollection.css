@@ -1,0 +1,13 @@
+.THIS .field{
+  padding-left: 5px;
+}
+
+.THIS .label{
+    /*font-weight: bold;*/
+    color: grey;
+    padding-left: 5px;
+}
+
+.THIS .align {
+    margin:5px;
+}

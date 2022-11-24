@@ -1,0 +1,103 @@
+.THIS .heading{font-family: bold;font-size: x-large;}
+.THIS .searchButton{margin-top: 25px;}
+.THIS .logoutButton{margin-top: 6px;}
+.THIS .userName{    color: #2574a9;	margin-top: 13px;}
+
+.THIS .slds-line-height_reset th span a {width: 100% !important;}
+.THIS .slds-table{width: 100% !important;table-layout: auto !important;}
+
+.THIS .help-position{position: absolute;top: 0px;}
+.THIS .pending-request .slds-table th:nth-child(1) {width: 4% !important;}
+.THIS .pending-request .slds-table th:nth-child(2) {width: 7% !important;}
+.THIS .pending-request .slds-table th:nth-child(3) {width: 22% !important;}
+.THIS .pending-request .slds-table th:nth-child(4) {width: 22% !important;}
+.THIS .pending-request .slds-table th:nth-child(5) {width: 22% !important;}
+.THIS .pending-request .slds-table th:nth-child(6) {width: 22% !important;}
+
+.THIS .pending-request .slds-table td:nth-child(1) {width: 4% !important;}
+.THIS .pending-request .slds-table td:nth-child(2) {width: 7% !important;}
+.THIS .pending-request .slds-table td:nth-child(3) {width: 22% !important;}
+.THIS .pending-request .slds-table td:nth-child(4) {width: 22% !important;}
+.THIS .pending-request .slds-table td:nth-child(5) {width: 22% !important;}
+.THIS .pending-request .slds-table td:nth-child(6) {width: 22% !important;}
+.THIS .slds-cell-fixed{width: 300px !important;}/*
+.THIS .pending-request .slds-table .slds-line-height_reset th .slds-is-sortable span:nth-child(3) {width: 290px !important;}
+.THIS .pending-request .slds-table .slds-line-height_reset th .slds-is-sortable span:nth-child(4) {width: 290px !important;}
+.THIS .pending-request .slds-table .slds-line-height_reset th .slds-is-sortable span:nth-child(5) {width: 290px !important;}
+.THIS .pending-request .slds-table .slds-line-height_reset th .slds-is-sortable span:nth-child(6) {width: 290px !important;}
+*/
+/*.THIS .slds-button_icon-bare{color: transparent;}*/
+.THIS .slds-icon_small{
+    margin-top: 4px;
+    width: 1.5rem;
+    height: 1.5rem;
+    line-height: 1;
+}
+.THIS .remoteAccesInput{margin-left: 10px;}
+.THIS .tableHeader{font-size: .75rem; color: #696969;}
+.THIS .asterisk {
+    color: rgb(194, 57, 52);
+    max-width: fit-content;
+    padding-right: inherit;
+}
+
+.THIS .slds-tabs_scoped__nav {
+    background-color: rgb(255, 255, 255);
+    border-bottom: 0px solid #d4d4d4 !important;
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 0px;
+}
+.THIS .slds-is-active .slds-tabs_scoped__link{
+    background-color: rgba(0,112,210,0.1);color: rgb(8, 7, 7);font-weight: 700;
+    border-left: 0px solid transparent;border-right: 0px solid transparent;
+}
+.THIS .slds-is-active .slds-tabs_scoped__link:before {
+    content: '';
+    height: 3px;
+    display: block;
+    background: rgba(0, 112, 210, 1);
+        background-color: rgb(0, 112, 210);
+    position: absolute;
+    top: 0;
+    left: -1px;
+    right: -1px;
+    animation: navBounceIn .15s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
+.THIS .slds-tabs_scoped__content{
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #d4d4d4;
+    border-top: 1px solid #d4d4d4;
+    border-radius: 0 0 .25rem .25rem;
+    padding: 1rem;
+}
+.THIS .slds-tabs_scoped__item:first-child .slds-tabs_scoped__link{
+    border-left: 0;
+    border-radius: 0;
+}
+.THIS .slds-tabs_scoped__nav li{font-size: .8125rem;}
+.THIS .slds-is-active .slds-tabs_scoped__link:focus{text-decoration: none;}
+.THIS .slds-textarea {
+    height:150px !important;
+}
+
+
+/*
+.THIS .create-account .slds-tabs_scoped__nav {
+    background-color: rgb(250, 250, 249);
+    border: 1px solid #d4d4d4;
+    border-bottom: 1px solid #d4d4d4 !important;
+    border-radius: .25rem .25rem 0 0;
+}
+.THIS .create-account .slds-is-active .slds-tabs_scoped__link{background-color: rgb(255, 255, 255);color: #2574a9;}
+.THIS .create-account .slds-tabs_scoped__content{
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #d4d4d4;
+    border-radius: 0 0 .25rem .25rem;
+    border-top: 0px solid #d4d4d4 !important;
+    padding: 1rem;
+}
+.THIS .create-account .slds-tabs_scoped__item:first-child .slds-tabs_scoped__link{
+    border-left: 0;
+    border-radius: .25rem 0 0 0;
+}
+.THIS .create-account .slds-tabs_scoped__nav li{font-size: .8125rem;}*/

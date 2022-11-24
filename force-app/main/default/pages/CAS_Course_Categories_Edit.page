@@ -1,0 +1,117 @@
+<!-- 
+ Created by Jeff Douglas
+ Modified by Jeff Lup - 2015.03.26 - CHG0063907 - Added js so SF1 Save button calls custom Save
+ Modified by Jeff Lup - 2015.11.09 - CHG0069310 - Lightning Look & Feel 
+ -->
+
+<apex:page standardController="Opportunity" extensions="CASOpportunityController">
+    
+<head>
+  <script type="text/javascript" language="javascript">    
+    function isLightningExperienceOrSalesforce1() {
+        return((typeof sforce != 'undefined') && sforce && (!!sforce.one));
+    }
+    if( isLightningExperienceOrSalesforce1() )
+        //window.location.href = "/apex/cas_course_categories?id={!Opportunity.Id}";
+        sforce.one.navigateToURL("/apex/cas_course_categories?id={!Opportunity.Id}");
+  </script>    
+    
+</head>     
+    
+    <apex:sectionHeader title="Opportunity" subtitle="{!opportunity.name}"/>
+    <apex:form >
+    
+    <apex:actionFunction name="apexSave" action="{!save}" />
+     
+    <script type='text/javascript' src='/canvas/sdk/js/publisher.js'></script>
+    <script> 
+        Sfdc.canvas.publisher.subscribe({name: "publisher.showPanel",
+            onData:function(e) {
+                Sfdc.canvas.publisher.publish({name:"publisher.setValidForSubmit", payload:"true"});
+        }});
+        Sfdc.canvas.publisher.subscribe({ name: "publisher.post",
+            onData: function(e) {
+                apexSave();
+                Sfdc.canvas.publisher.publish({ name: "publisher.close",
+                    payload:{ refresh:"true" }});
+        }}); 
+    </script>
+     
+     <apex:pageBlock title="Opportunity" mode="edit">
+     
+         <apex:outputText value="{!opportunity.CAS_Course_Cat1__c}" rendered="false"/>
+         <apex:outputText value="{!opportunity.CAS_Course_Cat2__c}" rendered="false"/>
+         <apex:outputText value="{!opportunity.CAS_Course_Cat3__c}" rendered="false"/>
+     
+          <apex:pageBlockButtons location="both">
+               <apex:commandButton value="Save" action="{!save}" />     
+          </apex:pageBlockButtons>    
+          <apex:pageMessages />
+          
+          <apex:pageBlockSection title="Opportunity Information" columns="2">
+          
+               <apex:outputField title="Opportunity Name" value="{!opportunity.Name}"/>
+               <apex:outputField title="Opportunity Owner" value="{!opportunity.OwnerId}"/>
+               
+               <apex:outputField title="Account Name" value="{!opportunity.AccountId}"/>
+               <apex:outputField title="Close Date" value="{!opportunity.CloseDate}"/>
+               
+               <apex:outputField title="Lead Source" value="{!opportunity.LeadSource}"/>
+               <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Amount"/>
+                    <apex:outputText value="{!opportunity.CurrencyIsoCode} {!opportunity.Amount}"/>
+               </apex:pageBlockSectionItem>               
+               
+               <apex:outputField title="Stage" value="{!opportunity.StageName}"/>
+               
+               <apex:outputField title="Institution Course Code" value="{!opportunity.Institution_Course_Code__c}"/>            
+               <apex:outputField title="Course Start Date" value="{!opportunity.Course_Start_Date__c}"/> 
+               
+               <apex:outputField title="Duration" value="{!opportunity.Duration__c}"/>               
+               <apex:outputField title="Qualification" value="{!opportunity.Qualification__c}"/>
+               
+               <apex:outputField title="Course Type" value="{!opportunity.Course_Type__c}"/>
+               <apex:outputField title="Year of Study" value="{!opportunity.Year_of_Study__c}"/>
+               
+               <apex:outputField title="Course Structure" value="{!opportunity.Course_Structure__c}"/>
+               <apex:outputField title="Number of Students" value="{!opportunity.Number_of_Students__c}"/>
+               
+               <apex:pageBlockSectionItem />
+               <apex:outputField title="Type" value="{!opportunity.Type}"/>
+               
+          </apex:pageBlockSection>          
+          
+          <apex:pageBlockSection title="Course Categories" columns="1" id="blockSection">
+               
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Course Category 1" for="cbxlevel1"/>
+                    <apex:outputPanel styleClass="requiredInput" layout="block">
+                    <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                    <apex:selectList value="{!selectedLevel1}" id="cbxlevel1" size="1" required="true">
+                        <apex:selectOptions value="{!level1items}"/> 
+                        <apex:actionSupport event="onchange" rerender="blockSection" action="{!resetLevel2}"/>
+                    </apex:selectList>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Course Category 2" for="cbxlevel2"/>
+                    <apex:selectList value="{!selectedLevel2}" id="cbxlevel2" size="1">
+                        <apex:selectOptions value="{!level2items}"/>
+                        <apex:actionSupport event="onchange" rerender="cbxlevel3"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+               
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Course Category 3" for="cbxlevel3"/>
+                    <apex:selectList value="{!selectedLevel3}" id="cbxlevel3" size="1">
+                        <apex:selectOptions value="{!level3items}"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+               
+          </apex:pageBlockSection>
+          
+     </apex:pageBlock>
+     </apex:form>    
+     
+</apex:page>

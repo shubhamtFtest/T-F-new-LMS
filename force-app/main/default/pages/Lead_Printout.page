@@ -1,0 +1,194 @@
+<!--Updated by Ashish purwar on 27/04/2018 for DF-688 CHG0043615-->
+<apex:page standardController="Lead" recordSetVar="Leads"  extensions="LeadPrintoutController" renderAs="PDF" ><!--DF-688 CHG0043615-->
+    <!--<apex:page Controller="LeadPrintoutController" renderAs="PDF" action="{!InitialCheck}">--><!--DF-688 CHG0043615-->
+    <head>
+        <style type="text/css">
+            body { font-family:Arial Unicode MS;}  
+            .pageBreak { page-break-after: always; }
+            .pageHeader { font-size:18px; text-decoration:underline; }
+            .sectionHeader { font-size:12px; }
+            .label { width:17%; font-size:9px; text-align:right; vertical-align:top; font-weight:bold; }
+            .data { width:33%; font-size:10px; }
+            .data_1col { width:83%; font-size:10px; }
+        </style>
+    </head>
+    <body>
+        <apex:outputpanel rendered="{!If(LeadWrappers.size >0 ,false,true) }">
+        	<p>
+                No Leads Selected
+            </p>
+        </apex:outputpanel>
+        <apex:outputpanel rendered="{!If(LeadWrappers.size >0 ,true,false) }">
+            <apex:repeat value="{!LeadWrappers}" var="w">
+                <div class="pageHeader">{!w.lead.Name}</div><br/>
+                <div class="sectionHeader">Lead Information</div>
+                <table width="100%" border="0">
+                    <tr>
+                        <td class="label">Company&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Company}</td>
+                        <td class="label">Owner&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Owner.Name}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Name&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Name}</td>
+                        <td class="label">Email&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Email}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Department&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Department__C}</td>
+                        <td class="label">Lead Status&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Status}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Website&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Website}</td>
+                        <td class="label">Phone&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Phone}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Industry&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Industry}</td>
+                        <td class="label">Lead Source&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.LeadSource}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Sub Industry&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Sub_Industry__c}</td>
+                        <td class="label">Mobile&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.MobilePhone}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Lead Ranking&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Lead_Ranking__c}</td>
+                        <td class="label">Functional Role&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Functional_Role__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Decision Maker Role&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Decision_Maker_Role__c}</td>
+                        <td class="label">Bookstore Name&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Bookstore_Name__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Decision Date&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Decision_Date__c}</td>
+                        <td class="label">Bookstore Phone Number&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Bookstore_Phone_Number__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Desk Copies Needed&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Desk_Copies_Needed__c}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+                <br/>
+                
+                <div class="sectionHeader">Address Information</div>
+                <table width="100%" border="0">
+                    <tr>
+                        <td class="label">Address&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Street}<br/>{!w.lead.City},{!w.lead.State} {!w.lead.PostalCode}<br/>{!w.lead.Country}</td>
+                        <td class="label">Other Street&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Other_Street__c}<br/>{!w.lead.Other_City__c},{!w.lead.Other_State_Province__c} {!w.lead.Other_Postal_Code__c}<br/>{!w.lead.Other_Country__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Locale&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Locale__c}</td>
+                        <td class="label">Sales Region&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Sales_Region__c}</td>
+                    </tr>
+                </table>
+                <br/>
+                
+                <div class="sectionHeader">Lead Request Information</div>
+                <table width="100%" border="0">
+                    <tr>
+                        <td class="label">Course Name&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Course_Name__c}</td>
+                        <td class="label">Qualification&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Qualification__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Institution Course Code&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Institution_Course_Code__c}</td>
+                        <td class="label">Year of Study&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Year_of_Study__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Anticipated Enrollment&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Anticipated_Enrollment__c}</td>
+                        <td class="label">Course Start Date &nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Course_Start_Date__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Book Title Requested&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Book_Title_Requested__c}</td>
+                        <td class="label">Course Frequency&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Course_Frequency__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">ISBN&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.ISBN__c}</td>
+                        <td class="label">Current Text&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Current_Text__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Book Requested Type&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Book_Requested_Type__c}</td>
+                        <td class="label">Order Type&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Order_Type__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Author&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Author__c}</td>
+                        <td class="label">Website Source&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Website_Source__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Publisher&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Publisher__c}</td>
+                        <td class="label">Promo Code&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Promo_Code_C__c}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Delivery Instructions&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.Delivery_Instructions__c}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+                <br/>
+                
+                <div class="sectionHeader">Description Information</div>
+                <table width="100%" border="0">
+                    <tr>
+                        <td class="label">Description&nbsp;&nbsp;</td>
+                        <td class="data_1col">{!w.lead.Description}</td>
+                    </tr>
+                </table>
+                <br/>
+                
+                <div class="sectionHeader">System Information</div>
+                <table width="100%" border="0">
+                    <tr>
+                        <td class="label">Created By&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.CreatedBy.Name}, {!w.lead.CreatedDate}</td>
+                        <td class="label">Last Modified By&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.LastModifiedBy.Name}, {!w.lead.LastModifiedDate}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Lead RecordType&nbsp;&nbsp;</td>
+                        <td class="data">{!w.lead.RecordType.Name}</td>
+                        <td class="label"><!--Division&nbsp;&nbsp;--></td>
+                        <td class="data"><!--{!w.divisionName}--></td>
+                    </tr>
+                </table>
+                
+                <div class="{!w.conditionalPageBreak}"></div>
+            </apex:repeat>
+        </apex:outputpanel>
+    </body> 
+</apex:page>

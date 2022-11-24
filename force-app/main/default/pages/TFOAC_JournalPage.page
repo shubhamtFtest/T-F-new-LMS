@@ -1,0 +1,222 @@
+<apex:page standardController="TFOAC_Journal__c" extensions="TFOAC_JournalController"> 
+    <style>
+        div.bPageBlock.brandSecondaryBrd.apexDefaultPageBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }
+    </style>
+    <chatter:feed entityId="{!productToCreate.id}" />
+    <apex:form >
+    	
+        <div id="pageContent">
+            
+            <apex:outputPanel id="ProductsDetails">
+                <apex:pageMessage rendered="{!NOT(hasEditRights)}" severity="Info" strength="3" summary="Host Area for the User must match the Host Area of the Journal in order to be able to make an edit" />               
+                <apex:pageBlock id="journalDetailsView" mode="view">
+					<apex:pageBlockButtons location="Top">
+
+	                    <apex:commandButton rendered="{!hasEditRights}" value="Edit" action="{!edit}"/>
+	                    <apex:commandButton rendered="{!hasEditRights}" value="Delete" action="{!delete}"/>
+	                    <apex:commandButton rendered="{!hasEditRights}" action="{!URLFOR($Action.TFOAC_Journal__c.Share,productToCreate.Id)}" value="Share"/>
+	                   
+	                </apex:pageBlockButtons>
+	                <apex:pageBlockSection columns="2" title="Journal Information">
+	                    <apex:outputField label="Opportunity Name" value="{!productToCreate.OACOpportunity__c}" />
+	                    <!--<apex:pageBlockSectionItem >
+	                    	<apex:outputLabel for="ownerId" value="Owner"/>
+	                    	<apex:outputPanel >
+	                    		<apex:outputField id="ownerId" value="{!productToCreate.OwnerId}" />
+	                    		<apex:outputPanel rendered="{!hasEditRights}">
+		                    		&nbsp;
+		                    		<a href="{!'/'+productToCreate.id+'/a?retURL=%2F'+productToCreate.id}">[Change]</a>
+	                    		</apex:outputPanel>		
+	                    	</apex:outputPanel>
+	                    </apex:pageBlockSectionItem>-->
+	                     <apex:pageBlockSectionItem >
+                            <apex:outputLabel for="bidLead" value="Bid Lead"/> 
+                            <apex:outputField id="bidLead" value="{!productToCreate.Bid_Lead__c}" /> 
+                        </apex:pageBlockSectionItem>
+	                </apex:pageBlockSection>
+	                <apex:pageBlockSection columns="1">   
+	                    <apex:outputField value="{!productToCreate.Name}"/>
+	                </apex:pageBlockSection>    
+	                   
+	                    <apex:outputPanel layout="block" id="journalAcronym">
+	                        <apex:pageBlockSection columns="1">
+	                                <apex:outputField rendered="{!AND(productToCreate.AcqType__c != 'Digital Content',OR(productToCreate.Status__c == 'Contract Signed',productToCreate.Status__c == 'T&F Published'))}"  value="{!productToCreate.JournalAcronym__c}"/>
+	                        </apex:pageBlockSection>
+	                    </apex:outputPanel>
+	                <apex:pageBlockSection columns="1" >
+	                    <apex:pageBlockSectionItem helpText="{!$ObjectType.TFOAC_Journal__c.fields.AcqType__c.inlineHelpText}">
+	                        <apex:outputLabel value="Contract Type" for="acqType"/>
+	                        <apex:outputField id="acqType"  value="{!productToCreate.AcqType__c}"/>	
+	                    </apex:pageBlockSectionItem>
+	                        
+	                    <apex:outputField rendered="{!AND(OR(productToCreate.AcqType__c == 'Copyright Purchase',productToCreate.AcqType__c == 'Publish with Society - Copyright buy out'),NOT(ISBLANK(productToCreate.AcqType__c)))}" value="{!productToCreate.PurchaseType__c}"/>
+	                    
+	                    <apex:pageBlockSectionItem >
+	                        <apex:outputLabel value="Status" for="journalStatus"/>
+	                        <apex:outputField id="journalStatus"  value="{!productToCreate.Status__c}"/>		
+	                    </apex:pageBlockSectionItem>
+	                    <apex:outputField id="thisBlock" value="{!productToCreate.SubStatus__c}"/>
+	                    <apex:outputField value="{!productToCreate.Status_Weight__c}"/>
+	                    
+	                   
+	                </apex:pageBlockSection>
+	                <apex:outputPanel id="divisionArea">
+	                    <apex:pageBlockSection rendered="{!productToCreate.AcqType__c != 'Digital Content'}"  columns="1"> 
+	                        <apex:pageBlockSectionItem id="divisionItem">
+	                            <apex:outputLabel value="Division" for="division"/>
+	                            <apex:outputField id="division"  value="{!productToCreate.DivisionCode__c}"/>	
+	                        </apex:pageBlockSectionItem>
+	                        <apex:inputHidden id="availableHostAreas" value="{!userAvailableHostAreas}"/>
+	                        <apex:outputField id="hostGroupPicklist" value="{!productToCreate.Host_AreaCode__c}"/>
+	                        <apex:outputField value="{!productToCreate.SegmentCode__c}"/>
+	                        <apex:outputField value="{!productToCreate.SectorCode__c}"/>
+	                        <apex:outputField value="{!productToCreate.Subject_AreaCode__c}"/>
+	                    </apex:pageBlockSection>    
+	                </apex:outputPanel>     
+	                <apex:pageBlockSection columns="1"> 
+	                    <apex:outputField value="{!productToCreate.LaunchYear__c}"/>
+	                    <apex:outputField value="{!productToCreate.Media__c}"/>
+	                </apex:pageBlockSection>
+	                <apex:outputPanel id="issnArea">
+	                    <apex:pageBlockSection rendered="{!productToCreate.AcqType__c != 'Digital Content'}" columns="1"> 
+	                        <apex:outputField rendered="{!OR(productToCreate.Media__c == 'Online', productToCreate.Media__c == 'Print & online')}" value="{!productToCreate.OnlineISSN__c}"/>
+	                        <apex:outputField rendered="{!OR(productToCreate.Media__c == 'Print', productToCreate.Media__c == 'Print & online')}" value="{!productToCreate.PrintISSN__c}"/>
+	                    </apex:pageBlockSection>    
+	                </apex:outputPanel>    
+	                
+	                <apex:outputPanel layout="block" id="currentPublisher">
+	                    <apex:pageBlockSection columns="1">
+	                        <apex:outputField rendered="{!AND(productToCreate.AcqType__c != 'New Launch',productToCreate.AcqType__c != 'New Launch - with Society')}" value="{!productToCreate.CurrentPublisher__c}"/>
+	                    </apex:pageBlockSection>
+	                </apex:outputPanel>  
+	                <apex:pageBlockSection columns="1">
+	                    <apex:outputField value="{!productToCreate.ContractExpires__c}"/>
+	                </apex:pageBlockSection>
+	                <apex:outputPanel id="nonDigitalContentArea">
+	                    <apex:pageBlockSection rendered="{!productToCreate.AcqType__c != 'Digital Content'}" columns="1">
+	                        <apex:outputField rendered="{!AND(productToCreate.AcqType__c != 'New Launch',productToCreate.AcqType__c != 'New Launch - with Society')}" value="{!productToCreate.YearFirstPublished__c}"/>
+	                        <apex:outputField value="{!productToCreate.JCRCovered__c}"/>
+	                        <apex:outputField value="{!productToCreate.Country__c}"/>
+	                        <apex:outputField value="{!productToCreate.Current_Open_Acess__c}"/>
+	                        <apex:outputField value="{!productToCreate.Open_Access_T_F_Year_1__c}"/>
+	                        <apex:outputField value="{!productToCreate.ProductProfile__c}"/>
+	                        <apex:outputField label="Currency" value="{!productToCreate.CurrencyIsoCode}"/>
+	                        
+	                    </apex:pageBlockSection>
+	                    <!--    
+	                        <apex:pageBlockSectionItem >
+	                            <apex:outputLabel value="Open access" for="openAccess"/>
+	                            <apex:outputField id="openAccess"  value="{!productToCreate.OpenAccess__c}"/>
+	                        </apex:pageBlockSectionItem>
+	                    
+	                    </apex:pageBlockSection> 
+	                    <apex:outputPanel layout="block" id="openAccessSection">
+	                    <apex:pageBlockSection rendered="{!AND(productToCreate.AcqType__c != 'Digital Content',OR(productToCreate.OpenAccess__c == 'Fully open',productToCreate.OpenAccess__c == 'Hybrid'))}" columns="1">
+	                        <apex:outputField rendered="{!productToCreate.OpenAccess__c == 'Hybrid'}" value="{!productToCreate.AvgOAArticlePublishedPerAnnum__c}"/>
+	                        <apex:outputField rendered="{!productToCreate.OpenAccess__c == 'Fully open'}" value="{!productToCreate.SeedFunded__c}"/>
+	                        <apex:outputField rendered="{!productToCreate.OpenAccess__c == 'Fully open'}" value="{!productToCreate.SeedFundingDetails__c}"/>
+	                        
+	                        <apex:pageBlockSectionItem >
+	                            <apex:outputLabel value="Current APC model" for="currentACPModelField"/>
+	                            <apex:outputField id="currentACPModelField"  value="{!productToCreate.CurrentAPCModel__c}"/>
+	                        </apex:pageBlockSectionItem>
+	                        
+	                        
+	                            
+	                          
+	                    </apex:pageBlockSection>   
+	                        <apex:outputPanel layout="block" id="currentAPCModelOther">
+	                            <apex:pageBlockSection columns="1" rendered="{!AND(OR(productToCreate.OpenAccess__c == 'Fully open',productToCreate.OpenAccess__c == 'Hybrid'),productToCreate.CurrentAPCModel__c == 'Other')}">
+	                                <apex:outputField value="{!productToCreate.CurrentAPCModelOther__c}"/>
+	                            </apex:pageBlockSection>
+	                        </apex:outputPanel>    
+	                        
+	                    <apex:pageBlockSection rendered="{!OR(productToCreate.OpenAccess__c == 'Fully open',productToCreate.OpenAccess__c == 'Hybrid')}" columns="1">
+	                        <apex:outputField rendered="{!productToCreate.OpenAccess__c == 'Hybrid'}" value="{!productToCreate.EstimatedAPCOARevenue__c}"/>
+	                        
+	                        <apex:outputField value="{!productToCreate.FundingEnvironment__c}"/>
+	                        <apex:outputField rendered="{!productToCreate.OpenAccess__c == 'Fully open'}" value="{!productToCreate.AcceptanceRate__c}"/>
+	                        
+	                        <apex:outputField value="{!productToCreate.ProductProfile__c}"/>
+	                        <apex:outputField rendered="{!productToCreate.OpenAccess__c == 'Fully open'}" value="{!productToCreate.IsTheArchiveOA__c}"/>
+	                    </apex:pageBlockSection>
+	                </apex:outputPanel>
+	                !-->        
+	                </apex:outputPanel>    
+	                
+	                <apex:pageBlockSection columns="2" title="Financial Information">
+	                    <apex:pageBlockSectionItem helpText="{!$ObjectType.TFOAC_Journal__c.fields.Purchase_price__c.inlineHelpText}">
+                            <apex:outputLabel value="{!$ObjectType.TFOAC_Journal__c.fields.Purchase_price__c.label}" for="Purchase_price__c"/>
+                            <apex:outputText id="Purchase_price__c" value="{0, number, .00}">
+								<apex:param value="{!productToCreate.Purchase_price__c}" />
+	                    	</apex:outputText>
+                        </apex:pageBlockSectionItem>
+
+                        <apex:pageBlockSectionItem helpText="{!$ObjectType.TFOAC_Journal__c.fields.CurrentAnnualTurnover__c.inlineHelpText}">
+                            <apex:outputLabel value="{!$ObjectType.TFOAC_Journal__c.fields.CurrentAnnualTurnover__c.label}" for="Purchase_price__c"/>
+                            <apex:outputText id="CurrentAnnualTurnover__c" value="{0, number, .00}">
+								<apex:param value="{!productToCreate.CurrentAnnualTurnover__c}" />
+	                    	</apex:outputText>
+                        </apex:pageBlockSectionItem>
+
+	                    <!--
+	                    <apex:outputText label="Current annual turnover" value="{0, number, .00}">
+							<apex:param value="{!productToCreate.CurrentAnnualTurnover__c}" />
+	                    </apex:outputText>-->
+
+	                    <apex:pageBlockSectionItem helpText="{!$ObjectType.TFOAC_Journal__c.fields.EstimatedGrossMarginYear1__c.inlineHelpText}">
+                            <apex:outputLabel value="{!$ObjectType.TFOAC_Journal__c.fields.EstimatedGrossMarginYear1__c.label}" for="EstimatedGrossMarginYear1__c"/>
+                            <apex:outputText id="EstimatedGrossMarginYear1__c" value="{0, number, .00}">
+								<apex:param value="{!productToCreate.EstimatedGrossMarginYear1__c}" />
+	                    	</apex:outputText>
+                        </apex:pageBlockSectionItem>
+                        <!--
+	                    <apex:outputText label="Est. gross margin year 1 (%)" value="{0, number, .00}">
+							<apex:param value="{!productToCreate.EstimatedGrossMarginYear1__c}" />
+	                    </apex:outputText>-->
+
+	                    <apex:pageBlockSectionItem helpText="{!$ObjectType.TFOAC_Journal__c.fields.EstimatedYear1Turnover__c.inlineHelpText}">
+                            <apex:outputLabel value="{!$ObjectType.TFOAC_Journal__c.fields.EstimatedYear1Turnover__c.label}" for="EstimatedYear1Turnover__c"/>
+                            <apex:outputText id="EstimatedYear1Turnover__c" value="{0, number, .00}">
+								<apex:param value="{!productToCreate.EstimatedYear1Turnover__c}" />
+	                    	</apex:outputText>
+                        </apex:pageBlockSectionItem>
+
+                        <!--
+	                    <apex:outputText label="Est. year 1 turnover" value="{0, number, .00}">
+							<apex:param value="{!productToCreate.EstimatedYear1Turnover__c}" />
+	                    </apex:outputText>-->
+	                     <apex:pageBlockSectionItem helpText="{!$ObjectType.TFOAC_Journal__c.fields.SignOnFee__c.inlineHelpText}">
+                            <apex:outputLabel value="{!$ObjectType.TFOAC_Journal__c.fields.SignOnFee__c.label}" for="SignOnFee__c"/>
+                            <apex:outputText id="SignOnFee__c" value="{0, number, .00}">
+								<apex:param value="{!productToCreate.SignOnFee__c}" />
+	                    	</apex:outputText>
+                        </apex:pageBlockSectionItem>
+                        <!--
+	                    <apex:outputText label="Sign on fee" value="{0, number, .00}">
+	                    	<apex:param value="{!productToCreate.SignOnFee__c}" />
+	                    </apex:outputText>-->
+	                    <apex:pageBlockSectionItem helpText="{!$ObjectType.TFOAC_Journal__c.fields.WeightedTurnoverYear1__c.inlineHelpText}">
+                            <apex:outputLabel value="{!$ObjectType.TFOAC_Journal__c.fields.WeightedTurnoverYear1__c.label}" for="WeightedTurnoverYear1__c"/>
+                            <apex:outputText id="WeightedTurnoverYear1__c" value="{0, number, .00}">
+								<apex:param value="{!productToCreate.WeightedTurnoverYear1__c}" />
+	                    	</apex:outputText>
+                        </apex:pageBlockSectionItem>
+                        <!--
+	                    <apex:outputText label="Weighted Turnover Year 1" value="{0, number, .00}">
+	                      <apex:param value="{!productToCreate.WeightedTurnoverYear1__c}" />
+	                    </apex:outputText>-->
+	                    
+	                </apex:pageBlockSection>
+                
+            	</apex:pageBlock>
+            </apex:outputPanel>    
+        </div>    
+    </apex:form>
+    <apex:relatedList subject="{!productToCreate.Id}" list="Relationships__r"/>
+   
+
+</apex:page>

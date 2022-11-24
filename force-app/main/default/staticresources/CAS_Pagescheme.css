@@ -1,0 +1,157 @@
+/*---	
+	
+	Copyright (c) 2004 Taylor & Francis Group.
+	XHTML CSS Selectors 	
+	
+	****** Revision:		1.0
+	****** Date:			08/03/04
+	****** Author:			Phil Wright
+
+	This Cascading Style Sheet defines the  page look and feel.
+
+	*******************************************
+	
+			1. BODY
+			2. HEADER BANNER
+			3. PAGE HEADINGS
+			4. WINDOW SHADING (line across top of browser window)
+			5. PAGE COLOURS
+			6. HTML FORM SETTINGS
+			7. LEFT NAV BAR ONMOUSEOUT / OVER
+
+	*******************************************
+	
+---*/
+
+/* --- BODY --- */
+
+body
+	{
+	background-color: #ffffff;
+	margin-top:0px;
+	margin-left:0px;
+	margin-right:0px;
+	margin-bottom:0px;
+	background-image:  url(http://www.taylorandfrancis.com/common/images/loadingBg.gif); 
+	background-repeat: no-repeat;
+	}
+	
+/* --- HEADER BANNER --- */
+	
+.header-bg
+	{
+	background-image: url("http://www.taylorandfrancis.com/images/header_bg.jpg");
+	background-repeat: no-repeat;
+	background-color : #94BCE5;
+	}
+
+/* --- PAGE HEADINGS --- */
+
+.pageHeading
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight :bold;
+	color : #003366;
+	}
+
+h1
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :13pt;
+	font-style : normal;
+	font-weight :normal;
+	color : #003366;
+	}
+
+h2
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :11pt;
+	font-style : normal;
+	font-weight :normal;
+	color : #003366;
+	}
+
+h3
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight :normal;
+	color : #003366;
+	}
+
+h4
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight :normal;
+	color : #4192D3;
+	}
+
+/* --- PAGE COLOURS --- */
+
+.breadcrumb-bg-light
+	{ 
+ 	background-color: #D8D5CD;
+	}
+	
+.breadcrumb-bg-dark
+	{ 
+ 	background-color: #aaaaaa;
+	}
+
+.breadcrumb-normal
+	{ 
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight :normal;
+	text-decoration:none;
+	color : #007FBE;
+	}
+
+.breadcrumb-normal:hover
+	{ 
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight :normal;
+	text-decoration:underline;
+	color : #007FBE;
+	}
+
+/* --- HTML FORM SETTINGS --- */
+
+select 
+	{
+ 	font-family: Arial, Helvetica, sans-serif;
+ 	font-size: 11px;
+ 	background-color: #ffffff; 
+ 	}
+ 
+input
+ 	{
+ 	font-family: Arial, Helvetica, sans-serif;
+ 	font-size: 11px;
+ 	}
+ 
+/* --- LEFT NAV BAR ONMOUSEOVER / OUT  --- */
+
+td.leftnavbgover
+	{
+ 	background-color: #EBF1FA;
+	}
+
+td.leftnavbgout
+	{
+ 	background-color: #ffffff;
+	}
+	
+	td.displayOfferCells
+	{
+ 	background-color: #EEF5FB;
+	}

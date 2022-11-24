@@ -1,0 +1,70 @@
+<!--
+Created by Hailey Niemand 2014.07.22 - CHG0059921
+Modified by Jeff Lup - 2016.03.28 - CHG0072245 - Errors on New Opportunity in Lightning
+-->
+
+<apex:page standardController="Opportunity" extensions="TFOpportunityFreeTrialsController" standardStylesheets="true" lightningStylesheets="true">
+
+    <style>
+        div.bPageBlock.brandSecondaryBrd.apexDefaultPageBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }
+    </style>
+    
+    <apex:form >
+        <apex:pageBlock mode="view" rendered="{!Opportunity.Id == null}"> <!-- CHG0072245 -->
+            You may add free trials after first saving the opportunity.
+        </apex:pageBlock>
+        <apex:pageBlock title="Hidden Fields" rendered="false">
+            <apex:outputField value="{!Opportunity.Trial_Initiated_Date__c}"/>
+            <apex:outputField value="{!Opportunity.Second_Trial_Initiated_Date__c}"/>
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{!AND(NOT(isEditMode),NOT(Opportunity.Id == null))}" mode="view"> <!-- CHG0072245 -->
+            <apex:pageMessages />
+                <apex:pageMessage summary="{!errorMessage}" severity="error" strength="2" rendered="{!showErrorMessage}" escape="false" id="pmErrors"/>
+            
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton action="{!doEdit}" value="Edit"/>
+                <apex:commandButton action="{!initiateFirstTrial}" value="Initiate Free Trial" rendered="{!firstTrial}"/>
+                <apex:commandButton action="{!initiateSecondTrial}" value="Initiate Second Trial" rendered="{!secondTrial}"/>
+            </apex:pageBlockButtons>
+            <apex:outputpanel style="overflow:auto;height:225px;" layout="block">
+                <apex:pageBlockSection columns="2">
+                    <apex:outputField value="{!Opportunity.Trial_ID__c}"/>
+                    <apex:outputField value="{!Opportunity.Second_Trial_ID__c}"/>
+                    <apex:outputField value="{!Opportunity.Trial_Start__c}"/>
+                    <apex:outputField value="{!Opportunity.Second_Trial_Start__c}"/>
+                    <apex:outputField value="{!Opportunity.Trial_End__c}"/>
+                    <apex:outputField value="{!Opportunity.Second_Trial_End__c}"/>
+                </apex:pageBlockSection>     
+            </apex:outputpanel>    
+        </apex:pageBlock>
+        
+ <!--Edit Mode-->       
+        <apex:pageBlock rendered="{!isEditMode}" mode="view">
+            <apex:pageMessages />
+                <apex:pageMessage summary="{!errorMessage}" severity="error" strength="2" rendered="{!showErrorMessage}" escape="false" id="pmErrors"/>
+            
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton action="{!doSave}" value="Save"/>
+                <apex:commandButton action="{!doCancel}" value="Cancel"/>
+            </apex:pageBlockButtons>
+            
+            <apex:outputpanel style="overflow:auto;height:225px;" layout="block">
+                <apex:pageBlockSection columns="2">
+                    <apex:inputField value="{!Opportunity.Trial_Start__c}"/>
+                    <apex:inputField value="{!Opportunity.Second_Trial_Start__c}"/>
+                    <apex:inputField value="{!Opportunity.Trial_End__c}"/>
+                    <apex:inputField value="{!Opportunity.Second_Trial_End__c}"/>
+                    
+                </apex:pageBlockSection>    
+            </apex:outputpanel>         
+        </apex:pageBlock>
+        
+        <script language="javascript">
+            function setFocusOnLoad() {} /*removes focus on date control opening calendar*/
+        </script>
+        
+    </apex:form>
+</apex:page>

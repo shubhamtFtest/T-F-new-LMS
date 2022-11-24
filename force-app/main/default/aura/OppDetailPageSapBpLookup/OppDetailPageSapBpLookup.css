@@ -1,0 +1,19 @@
+.THIS {
+    background-color: white; 
+  }
+.THIS .leftPaddingClass {
+    padding-left: 0.2rem;
+}
+.THIS .pillSize{
+ width:100%;
+}
+
+.THIS .slds-modal__container{
+    max-width: 70rem !important;
+    width:80% !important;
+}
+.THIS .slds-form-element_horizontal .slds-form-element__control{
+        padding: 0;
+    margin-bottom: 0;
+    clear:left;
+ }

@@ -1,0 +1,139 @@
+<!--
+    * Created by - Sourabh Soyal
+    * Create on - 9 oct 2020
+    * Description - This is Lightning Web Component
+      to search the duplicate account
+    * Controller class - MergeAccountController
+
+    * Modified By - Sourabh
+    * Modified on - 7 May 2021
+-->
+
+<template>
+
+    <div class="container">
+        <!--Find Account-->
+
+        <lightning-card>
+            <h3 slot="title">
+                <lightning-icon icon-name="standard:account" alternative-text="Account" size="small"></lightning-icon>
+                &nbsp; Account Merge
+            </h3>
+            
+            <template if:false={mergeVisible}>
+            <div class="info-container slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                <lightning-icon icon-name="utility:warning" alternative-text="Warning" size=" x-small"></lightning-icon>
+                <h2> &nbsp; Once these Accounts merge, they cannot be undone. Please select the merge button to complete the Account merge.</h2>
+            </div>
+            </template>
+            <div class="container-item">
+                <lightning-layout>
+                    <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6"
+                        padding="around-small" class="layout-item">
+                        <lightning-layout multiple-rows="true">
+                            <lightning-layout-item size="12" padding="around-small" class="layout-item">
+
+                                <lightning-record-edit-form object-api-name="Contact" id="createContactForm">
+                                    <label for="AccountId">Winning Account</label>
+                                    <lightning-input-field data-name="winning" value={accId1} field-name="AccountId"
+                                        variant="label-hidden" data-accwin onchange={handleSelect} disabled={disabled}
+                                        required="true">
+                                    </lightning-input-field>
+                                </lightning-record-edit-form>
+
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" padding="around-small">
+                                <!--lightning datatable-->
+                                <template if:false={noDataFoundWinning}>
+                                    <lightning-datatable if:true={showMe} key-field="Id" row-number-offset={rowOffset}
+                                        data={winningSearchData} onrowaction={rowActionHandler}
+                                        hide-checkbox-column="true" columns={columns}>
+                                    </lightning-datatable>
+                                </template>
+                                <!--noDataFound true -->
+                                <!--template if:true={noDataFoundWinning}>
+                                    <div
+                                        class="slds-text-align_center slds-box slds-box_small  slds-m-left_large slds-m-right_large    ">
+                                        <lightning-icon icon-name="utility:info" alternative-text="Utility image"
+                                            size="medium">
+                                        </lightning-icon>
+                                        <span class="slds-m-left_small">No Account found</span>
+                                    </div>
+                                </template-->
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="12" small-device-size="6" medium-device-size="6" large-device-size="6"
+                        padding="around-small" class="layout-item">
+                        <lightning-layout multiple-rows="true">
+                            <lightning-layout-item size="12" padding="around-small" class="layout-item">
+
+                                <lightning-record-edit-form object-api-name="Contact" id="createContactForm1">
+                                    <label for="AccountId">Losing Account</label>
+                                    <lightning-input-field data-name="losing" value={accId2} field-name="AccountId"
+                                        variant="label-hidden" data-acclose onchange={handleSelect} disabled={disabled}
+                                        required="true">
+                                    </lightning-input-field>
+                                </lightning-record-edit-form>
+
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" padding="around-small">
+                                <!--lightning datatable-->
+                                <template if:false={noDataFoundLosing}>
+                                    <lightning-datatable if:true={showMe} key-field="Id" row-number-offset={rowOffset}
+                                        data={losingSearchData} onrowaction={rowActionHandler}
+                                        hide-checkbox-column="true" columns={columns}>
+                                    </lightning-datatable>
+                                </template>
+
+                                <!--noDataFound true -->
+                                <!--template if:true={noDataFoundLosing}>
+                                    <div
+                                        class="slds-text-align_center slds-box slds-box_small  slds-m-left_large slds-m-right_large    ">
+                                        <lightning-icon icon-name="utility:info" alternative-text="Utility image"
+                                            size="medium">
+                                        </lightning-icon>
+                                        <span class="slds-m-left_small">No Account found</span>
+                                    </div>
+                                </template-->
+                            </lightning-layout-item>
+                        </lightning-layout>
+                    </lightning-layout-item>
+
+                </lightning-layout>
+            </div>
+            <div class="icon-contain" if:true={losingSearchData}>
+                <lightning-icon if:true={showMe} variant="warning" icon-name="utility:change_record_type" alternative-text="Swap Data"
+                    size="small" title="Swap Row" onclick={swapRow}>
+                </lightning-icon>
+            </div>
+            <lightning-layout>
+                <div class="slds-align_absolute-center">
+                    <template if:true={mergeVisible}>
+                        <lightning-button variant="brand-outline" label="Validate Merge" onclick={handleSearchedData}>
+                        </lightning-button>
+                    </template>
+                    <template if:false={mergeVisible}>
+                        <lightning-button variant="brand" label="Confirm Merge" onclick={handleSubmit}
+                            disabled={confirmMerge}>
+                        </lightning-button>
+                        <lightning-button variant="brand-outline" label="Reset" onclick={handleReset}
+                            disabled={confirmMerge} class="slds-m-left_small">
+                        </lightning-button>
+                    </template>
+                </div>
+            </lightning-layout>
+        </lightning-card>
+
+
+
+        <div class="loader" if:true={loading}>
+            <!--p>Loading...</p-->
+            <lightning-spinner alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+
+    </div>
+
+
+</template>

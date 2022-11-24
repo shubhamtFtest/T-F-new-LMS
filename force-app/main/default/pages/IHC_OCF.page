@@ -1,0 +1,279 @@
+<!--
+    Modified by Jeff Lup - 2015.02.23 - CHG0064313 - T&Cs & OCF rework for BI
+	Modified by Matthew Smith - 2021.01.14 - 01765787 - Making the PDF dynamic so it supports more than one URL for T&Cs
+-->
+
+<apex:page action="{!populateOppAddress}" applyHtmlTag="false" showHeader="false" title="Order Confirmation Form" standardController="Opportunity" extensions="IHC_OCF_Controller" renderAs="{!isPDF}" >
+    <head>
+        <style type="text/css">
+            .pdfBody { font-size:9px; }
+            .nonPdfBody { font-size:12px; }
+            .pageBreak { page-break-after: always; }
+            .sectionHeader { font-weight:bold; font-size:10px; border-bottom:solid 1px; }
+            .line { background-image: url(/s.gif); background-color:black; height:1px; margin:5px 0px; }
+            table, th, td, tr { vertical-align: text-top; }
+            .dtOddRow { background-color:#F5F5F5}
+            .dtEvenRow { background-color:White}
+            .isHidden { display:none; }
+        </style>
+    </head>
+    
+    <apex:pageBlock title="Hidden Fields" rendered="false">
+        <apex:outputField value="{!Opportunity.Owner.Legal_Entity__c}" />
+        <apex:outputField value="{!Opportunity.AccountId}" />
+    </apex:pageBlock>
+    
+    <body class="nonPdfBody">
+    <apex:pageMessages id="pgMessages" />
+    <apex:outputPanel rendered="{!!showReport}">
+        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <apex:outputLink value="/{!Opportunity.Id}" id="theLink">Click Here</apex:outputLink> to return to the Opportunity.
+    </apex:outputPanel>
+    </body>
+
+    <body class="pdfBody">
+    
+    <apex:pageBlock title="" rendered="{!showReport}">
+    
+        <table width="100%" >
+            <tr>
+                <td width="35%" style="text-align:left; vertical-align:middle">
+                    <b>Email back the entire signed agreement to</b><br/>
+                    {!Opportunity.Owner.Name} at {!Opportunity.Owner.Email}
+                </td>
+                <td width="30%" style="text-align:center; vertical-align:middle">
+                    <apex:image id="logo" value="/servlet/servlet.FileDownload?file=0150Y000001Wiw0" width="150px"/>
+                </td>
+                <td width="35%" style="text-align:right; vertical-align:middle">
+                    Order Confirmation Form<br/>
+                    {!ocfDate}
+                </td>
+            </tr>
+        </table>
+
+        <br/>
+        
+        <table width="100%">
+            <tr style="vertical-align: text-top;">
+                <td width="50%">
+                    <table width="100%">
+                        <tr>
+                            <td colspan="2" class="sectionHeader">BILLING ADDRESS</td>
+                        </tr>
+                        <tr>
+                            <td width="25%">Contact</td>
+                            <td width="75%">{!billingContact}</td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>{!billingEmail}</td>
+                        </tr>
+                        <tr>
+                            <td>Business Name</td>
+                            <td>{!billingBusinessName}</td>
+                        </tr>
+                        <tr>
+                            <td>Address</td>
+                            <td><apex:outputText escape="false" value="{!billingAddress}"/></td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="50%">
+                    <table width="100%">
+                        <tr>
+                            <td colspan="2" class="sectionHeader">DELIVERY ADDRESS</td>
+                        </tr>
+                        <tr>
+                            <td width="25%">Contact</td>
+                            <td width="75%">{!deliveryContact}</td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>{!deliveryEmail}</td>
+                        </tr>
+                        <tr>
+                            <td>Business Name</td>
+                            <td>{!deliveryBusinessName}</td>
+                        </tr>
+                        <tr>
+                            <td>Address</td>
+                            <td><apex:outputText escape="false" value="{!deliveryAddress}"/></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <br/>
+        
+        <table width="100%">
+            <tr style="vertical-align: text-top">
+                <td class="sectionHeader">MANDATORY INFORMATION</td>
+            </tr>
+            <tr>
+                <td width="100%">
+                    <table width="100%">
+                        <tr>
+                            <td width="50%">
+                                Purchase Order Number:&nbsp;&nbsp;<apex:outputText escape="false" value="{!Opportunity.Client_PO_No__c}"/><br/>
+                                <i>(If not required please state 'N/A')</i>
+                            </td>
+                            <td width="50%">
+                                Tax Registration Number(s):&nbsp;&nbsp;<apex:outputText escape="false" value="{!taxCodes}"/><br/>
+                                <i>{!taxWarning}</i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="50%">
+                                Payment Terms:&nbsp;&nbsp;<apex:outputText escape="false" value="{!Opportunity.Payment_Terms__c}"/><br/>
+                            </td>
+                            <td width="50%">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <br/>
+        
+        <div class="sectionHeader">LICENSED PRODUCT(S)</div>
+        
+        <apex:outputText value="{!productDetails}" escape="false"/> <!-- CHG0064313 -->
+        
+        <br/>
+        
+        <apex:dataTable value="{!products}" var="p" width="100%" columns="3" columnsWidth="60%,32%,8%"  cellpadding="2" cellspacing="0" rowClasses="dtOddRow,dtEvenRow">
+            <apex:column style="vertical-align:top">
+                <apex:facet name="header"><div style="text-align:left;font-weight:bold">Product</div></apex:facet>
+                <apex:outputText value="{!p.productName}" escape="false"/>
+            </apex:column>
+            <apex:column style="vertical-align:top;" >
+                <apex:facet name="header"><div style="text-align:left;font-weight:bold">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Costs</div></apex:facet>
+                <apex:outputText value="{!p.extraInfo}" escape="false" />
+            </apex:column>
+            <apex:column style="vertical-align:top; text-align:right;" >
+                <apex:facet name="header"><div style="text-align:right;font-weight:bold">Total Cost</div></apex:facet>
+                <apex:outputText value="{!p.totalCost}" />&nbsp;&nbsp;&nbsp;
+            </apex:column>
+        </apex:dataTable>
+        <table width="100%" >
+            <tr>
+                <td></td>
+                <td width="100"><apex:outputPanel layout="block" styleClass="line"/></td>
+                <td width="2"></td>
+            </tr>
+            <tr>
+                <td style="text-align:right;">Fees ({!Opportunity.CurrencyIsoCode}):&nbsp;&nbsp;</td>
+                <td width="100" style="text-align:right;">{!productCostTotal}</td>
+                <td width="2"></td>
+            </tr>
+        </table>
+        
+        <br/>
+
+        <table width="100%"> <!-- In a table for better spacing -->
+            <tr>
+                <td>Where applicable, sales tax or VAT will be charged on the products and/or services detailed above.</td>
+            </tr>
+            <tr>
+                <td>{!otherInfo}</td>
+            </tr>
+            <tr>
+                <td>{!accessRun}</td>
+            </tr>
+            <tr>
+                <td><div class="{!showIfJapan}">Regarding Taylor &amp; Francis online products (Journals/eBooks, etc), orders after October 1st 2015 will be subject to the reverse charge as per Japanese Consumption Tax Law.</div></td>
+            </tr>
+            <tr>
+                <td><!--{!deliveryMethod}--></td>
+            </tr>
+            <!--
+            <tr>
+                <td>Special Terms: {!specialTerms}</td>
+            </tr>
+            -->
+        </table>
+        
+        <br/>
+
+     
+          <table width="100%">
+            <tr>
+                <td colspan="2" class="sectionHeader">PAYMENT DETAILS</td>
+            </tr>
+            <tr>
+                <td width="60%">&nbsp;Following is the agreed upon billing schedule for remitting payment:</td>
+            </tr>
+            <tr>
+                <td>
+                    <apex:dataTable value="{!bills}" var="b" width="100%" columns="4" columnsWidth="20%,30%,40%,40%" cellpadding="0" cellspacing="0">
+                        <apex:column style="vertical-align:top">
+                        <span id="theText" >&nbsp;&nbsp;Bill Date:&nbsp;</span>
+                            <apex:outputText title="BillDate" value="{!b.billDate}"/>
+                        </apex:column>
+                        <apex:column style="vertical-align:top">
+                        <span id="theText" >&nbsp;&nbsp;Amount:&nbsp;</span>
+                            <apex:outputText title="BillDate" value="{!b.amount}"/>
+                        </apex:column>
+                        <apex:column style="vertical-align:top">
+                        <span id="theText" >&nbsp;Payment Terms:&nbsp;</span>
+                            <apex:outputText title="BillDate" value="{!b.paymentTerms}"/>
+                        </apex:column>
+                        <apex:column style="vertical-align:top">
+                        <span id="theText" >&nbsp;Issue:&nbsp;</span>
+                            <apex:outputText title="BillDate" value="{!b.Issue}"/>
+                        </apex:column>
+                    </apex:dataTable>
+                </td>
+            </tr>
+        </table>
+        
+        <br/>
+     
+        <table width="100%" >
+            <tr>
+                <td colspan="4" class="sectionHeader">CUSTOMER CONFIRMATION</td>
+            </tr>
+            <tr>
+                <td width="6%" style="text-align:right;"><br/><br/>Signature:</td>
+                <td width="44%" style="border-bottom:solid .5px;"></td>
+                <td width="6%" style="text-align:right;"><br/><br/>Date:</td>
+                <td width="44%" style="border-bottom:solid .5px;"></td>
+            </tr>
+            <tr>
+                <td width="6%" style="text-align:right;"><br/><br/>Job Title:</td>
+                <td width="44%" style="border-bottom:solid .5px;"></td>
+            </tr>
+        </table>
+        <br/>
+        <apex:outputPanel >
+            Please sign to confirm your acceptance of this order confirmation form, and that you have read and understood, and agree to be bound by the terms and conditions found here:
+            <b><apex:outputLink value="{!tfSetting.T_C_URL__c}" rendered="{!OLISalesType == 'Advertising Sales'}"> {!tfSetting.T_C_URL__c} </apex:outputLink></b> <!-- This URL is for Advertising Sales -->
+            <b><apex:outputLink value="{!tfSetting.T_C_URL_2__c}" rendered="{!OLISalesType == 'Commercial Permissions'}"> {!tfSetting.T_C_URL_2__c} </apex:outputLink></b> <!-- This URL is for Commerical Permissions -->
+            <b><apex:outputLink value="{!tfSetting.T_C_URL_3__c}" rendered="{!AND(OLISalesType != 'Commercial Permissions', OLISalesType != 'Advertising Sales')}"> {!tfSetting.T_C_URL_3__c} </apex:outputLink></b> <!-- This URL is the default if it doesn't meet the above URLs -->
+            <!-- <b><a href="{!tfSetting.T_C_URL__c}">{!tfSetting.T_C_URL__c}</a></b> // only need to use this if we don't need to display more than one link-->
+            ('Terms and Conditions'). This order confirmation form and the terms together constitute the agreement between {!deliveryBusinessName} (the 'Customer') and {!tfSetting.Company_Name__c} (the 'Licensor').
+        </apex:outputPanel>
+                
+        <br/><br/>
+        <table width="100%" >
+            <tr>
+                <td width="50%">
+                    {!tfSetting.Company_Name__c}<br/>
+                    <apex:outputText value="{!companyAddress}" escape="false" />
+                </td>
+                <td width="50%">
+                    For all Queries regarding this order, contact<br/>
+                    Account Manager: {!Opportunity.Owner.Name}<br/>
+                    {!companyPhone}<br/>
+                    {!Opportunity.Owner.Email}<br/>
+                    {!tfSetting.Company_Website_URL__c}<br/>
+                </td>
+            </tr>
+        </table>
+    </apex:pageBlock>
+        
+    </body>
+</apex:page>

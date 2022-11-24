@@ -1,0 +1,5 @@
+<apex:page controller="TF_AG_ProductSearchCtr" contentType="application/vnd.ms-excel#TaylorAndFrancis_ISBNS_{!fileName}.csv" readOnly="true">ISBN,Title,Author,US Publication Date,Edition Number,Books Medium,Status,Imprint,List Price,{!IF((userId == null),'',"Discount Percentage,US Discount")}
+<apex:repeat value="{!productWrapperList}" var="product">   
+{!product.pricebookCSV.Product2.ISBN__c},"{!product.pricebookCSV.Product2.Name}","{!product.pricebookCSV.Product2.Lead_Author_Editor__c}","{!product.pricebookCSV.Product2.US_Publication_Date__c}","{!product.pricebookCSV.Product2.Edition_Number__c}","{!product.pricebookCSV.Product2.Version_Type__c}","{!product.pricebookCSV.Product2.US_Inventory_Status__c}","{!product.pricebookCSV.Product2.Imprint__c}","{!product.pricebookCSV.unitprice}","{!If((userId == null),'',If((product.discountCSV = 0),'0%',product.discountPercentCSV+"%"))}","{!If((userId == null),'',IF((product.discountCSV == 0),product.pricebookCSV.unitprice,product.discountCSV))}"
+   </apex:repeat>
+</apex:page>

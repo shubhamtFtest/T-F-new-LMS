@@ -1,0 +1,69 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" controller="TF_AG_ProductSearchCtr">
+    <!--<aura:attribute name="optionsList" type="List" default="[]"/>-->
+    <aura:attribute name="backToProductDetail" type="List"/>
+    <aura:attribute name="valuesList" type="List" default="[]"/>
+    <aura:attribute name="checkedValuesListBox" type="List" default="[]" />
+    <aura:attribute name="SubjectListReturnList" type="List" default="[]"/>
+    <aura:attribute name="disableSearch" type="Boolean" default="false"/>
+    <aura:attribute name="lstSubjectList" type="Object[]" />
+    <aura:attribute name="lstAllSubjectList" type="Object[]"/>
+    <aura:attribute name="selectedSubjectListValues" type="List" default="[]" />
+    <aura:attribute name="lstFilterResultSubjectList" type="Object[]" />
+    <aura:registerEvent name="appListEvent" type="c:TF_AG_SendSelectListValueEvt"/>
+    <aura:attribute name="term" type="String" default=""/>
+    <aura:attribute name="countSelected" type="Integer" default="0" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="flag" type="Boolean" default="false" />
+    <aura:attribute name="isViewSelected" type="Boolean" default="false" />
+    <div class="c-container">
+        <p>SUBJECT LIST</p>
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="9" padding="around-small">
+                <div class="slds-form-element" onkeypress="{!c.filterSubjectCodeEnter}">
+                    <lightning:input type="text" value="{!v.term}" label="Filter" variant="label-hidden" placeholder="Filter Subject Lists"/>
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <lightning:button variant="brand" label="Filter Lists" title="Brand action" onclick="{!c.searchSubjectLists}" disabled="{!v.disableSearch}"/>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div class="slds-form-element">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12"  smallDeviceSize="6" mediumDeviceSize="3" largeDeviceSize="3" padding="around-small">
+                <lightning:button variant="base" label="Check All" title="Check All" onclick="{!c.checkAllSubjectList}"/>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="3" largeDeviceSize="3" padding="around-small">
+                <lightning:button variant="base" label="Un-Check All" title="Un-Check All" onclick="{!c.unCheckAllSubjectList}"/>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="3" largeDeviceSize="3" padding="around-small" class="viewSelected">
+                <lightning:input type="checkbox" label="View Selected" name="input1" onchange="{!c.viewSelectedLists}" />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="3" largeDeviceSize="3" padding="around-medium" class="countSelected">
+                Selected Items:  {!v.countSelected}
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div class="subjectList">
+        <aura:iteration items="{!v.lstSubjectList}" var="code">
+            <aura:if isTrue="{!v.isViewSelected}">
+                <aura:if isTrue="{!code.isSelected}">
+                    <lightning:input type="checkbox" label="{!code.value}" name="input2" checked="{!code.isSelected}" required="false" onchange="{!c.displayCount}"/>
+                </aura:if>
+                <aura:set attribute="else">
+                    <lightning:input type="checkbox" label="{!code.value}" name="input2" checked="{!code.isSelected}" required="false" onchange="{!c.displayCount}"/>
+                </aura:set>
+            </aura:if>
+            <!--<lightning:input type="checkbox" label="{!code.value}" name="input2" checked="{!code.isSelected}" required="false" onchange="{!c.displayCount}"/>-->	
+        </aura:iteration>
+    </div>
+    <!--<lightning:dualListbox name="multipleOptionsList"  
+                           label= "List" 
+                           sourceLabel="Available" 
+                           selectedLabel="Selected" 
+                           options="{!v.optionsList}" 
+                           value="{!v.valuesList}" 
+                           onchange="{! c.handleChange }"
+                           variant="label-hidden"/>-->
+    
+</aura:component>

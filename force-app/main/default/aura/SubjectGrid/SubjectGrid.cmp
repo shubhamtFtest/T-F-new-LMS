@@ -1,0 +1,53 @@
+<aura:component controller="TF_AG_ExtendedProductSearchCtr" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="gridColumns" type="List" access="PRIVATE" />
+    <aura:attribute name="term" type="String" default=""/>
+     <aura:attribute name="selectedIds" type="List" default="[]"/>
+    <aura:attribute name="backEndLabel" type="List" default="[]"/>
+    <aura:attribute name="checkedValuesListBox" type="List" />
+    <aura:attribute name="gridData" type="Object"/>
+    <aura:attribute name="gridDataAll" type="Object" access="PRIVATE" />
+    <aura:attribute name="gridExpandedRows" type="List" access="PRIVATE" />
+    <aura:attribute name="currentExpandedRows" type="String" />
+    <aura:registerEvent name="appNetbaseEvent" type="c:TF_AG_SendSelectSubjectClassifyEvt"/>
+    <aura:handler event="c:PPDSearchProductResetComp" action="{!c.resetSubject}"/>
+
+
+    <div class="c-container">
+        <p>Subject Classifications</p>
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="9" padding="around-small">
+                <div class="slds-form-element">
+                    <lightning:input type="text" value="{!v.term}" label="Filter" variant="label-hidden" placeholder="Filter Subject Classifications" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <lightning:button variant="brand" label="Filter Subject" title="Brand action" onclick="{!c.filterNetbaseEnter}" disabled=""/>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div class="slds-form-element">
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12"  smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                 <lightning:button variant="base" label="Expand All" title="Expand All" onclick="{! c.expandAll}"/> <label style="color:red">    (First expand all to select all)</label>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12"  smallDeviceSize="12" mediumDeviceSize="6" largeDeviceSize="6" padding="around-small">
+                 <lightning:button variant="base" label="Collapse All" title="Collapse All" onclick="{! c.collapseAll}"/>
+            </lightning:layoutItem>
+            
+            
+        </lightning:layout>
+    </div>
+<div class="Netbases">
+        <lightning:treeGrid
+            aura:id="treeGrid"
+            columns="{! v.gridColumns }"
+            data="{! v.gridData }"
+            expandedRows="{! v.gridExpandedRows }"
+            onrowselection="{! c.getSelectedRows}"
+            selectedRows = "{!v.selectedIds}"
+            keyField="labelValue"
+        />
+        </div>
+
+</aura:component>

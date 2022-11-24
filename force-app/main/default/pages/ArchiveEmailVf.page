@@ -1,0 +1,43 @@
+<!--
+<apex:page standardController="case" extensions="emailArchive" >
+ <apex:form >
+ <apex:pageBlock >
+ Are you ready to archive :
+ <apex:commandButton value="Yes" action="{!Archive}"/>
+ <apex:commandButton value="no" action="{!exitpg}"/>
+ </apex:pageBlock>
+</apex:form> 
+</apex:page>
+ -->
+
+<apex:page standardController="case" extensions="emailArchive" lightningStylesheets="True">
+ <style>
+
+     p {
+    color: red !important;
+}
+#thing {
+    color:  #ffffff;
+        
+    padding:5px;font-size:15px;background-color:rgb(204, 230, 255);color: #ffffff;
+
+}
+     
+
+    </style>
+    
+    <apex:form >
+      
+        <apex:pageMessages id="msgid">
+        </apex:pageMessages>
+         
+    <p id="thing" >
+        <b>Your Archive Request May Take 2 - 5 Minutes To Process .</b>
+    </p>
+
+    <b> Do you want to Archive Email: &nbsp;&nbsp;</b><apex:commandButton action="{!Archive}" value="CONFIRM" >     </apex:commandButton>&nbsp;&nbsp;
+   
+      <apex:commandButton action="{!exitpg}" value="CANCEL" >
+      </apex:commandButton>
+  </apex:form>
+</apex:page>

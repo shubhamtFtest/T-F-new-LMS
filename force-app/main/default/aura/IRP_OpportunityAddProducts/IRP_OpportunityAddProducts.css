@@ -1,0 +1,3 @@
+.THIS #searchBox .slds-p-around_large .slds-p-around--large {
+	padding: var(--lwc-spacingLarge,1.5rem);
+}

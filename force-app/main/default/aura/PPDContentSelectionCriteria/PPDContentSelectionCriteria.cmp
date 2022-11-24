@@ -1,0 +1,173 @@
+<aura:component controller="TF_PPDProcessController">
+    <!-- Attributes -->     
+    <aura:attribute name="typeOfCollection" type="String"/>
+    <aura:attribute name="activeAccordion" type="String"/>
+    <aura:attribute name="prdName" type="String"/> 
+    <aura:attribute name="prdFamily" type="String"/>
+    <aura:attribute name="textType" type="String"/>
+    <aura:attribute name="publisherImprint" type="String"/>
+    <aura:attribute name="ISBNValue" type="String"/>
+    <aura:attribute name="productTitle" type="String"/>
+    <aura:attribute name="productAuthor" type="String"/>
+    <aura:attribute name="productDOI" type="String"/>
+    <aura:attribute name="multiResultList" type="List" default="[]"/>
+    <aura:attribute name="multiResultCodes" type="List" default="[]"/>
+    <aura:attribute name="PublishedRadioOptions" type="List" default="[
+                                                                      {'label': 'Include', 'value': 'Include'},
+                                                                      {'label': 'Exclude', 'value': 'Exclude'},
+                                                                      {'label': 'Only NYP', 'value': 'Only NYP'}
+                                                                      ]"/>
+    <aura:attribute name="selectPublishedRadio" type="String" default="Include"/>
+    <aura:attribute name="MediumRadioOptions" type="List" default="[
+                                                                   {'label': 'e-Book', 'value': 'e-Book'},
+                                                                   {'label': 'Collection', 'value': 'Collection'} 
+                                                                   ]"/>
+    <aura:attribute name="SelectedMedium" type="String" default="e-Book"/>
+    <aura:attribute name="minPrice" type="Integer" />
+    <aura:attribute name="maxPrice" type="Integer" />
+    <aura:attribute name="pubFromDate" type="Date" />
+    <aura:attribute name="pubToDate" type="Date" />
+    <aura:attribute name="DRMRadioOptions" type="List" default="[
+                                                                {'label': 'Both', 'value': 'Both'},
+                                                                {'label': 'True', 'value': 'true'},
+                                                                {'label': 'False', 'value': 'false'}
+                                                                ]"/>
+    <aura:attribute name="SelectedDRM" type="String" default="Both"/>
+    <aura:attribute name="PublicationCurrencyOptns" type="List" default="[
+                                                                         {'label': 'USD', 'value': 'USD'},
+                                                                         {'label': 'GBP', 'value': 'GBP'},
+                                                                         ]"/>
+    <aura:attribute name="SelPubCurrency" type="String" default="USD"/>
+    <aura:attribute name="FirstPubYearValueFrom" type="String"/>
+    <aura:attribute name="FirstPubYearValueTo" type="String"/>
+    
+    <aura:attribute name="eventFromProdDetail" type="Boolean" default="false"/>
+    <aura:attribute name="selectedNetbaseValues" type="List" default="[]" />
+    <aura:attribute name="sortOrder" type="String" default="desc"/>
+    
+        
+    
+    <aura:registerEvent name="productSearchEvent" type="c:PPDProductSearchEvent"/>
+    <aura:registerEvent name="PPDSearchProductResetComp" type="c:PPDSearchProductResetComp"/>
+    <aura:registerEvent name="productSearchResetEvent" type="c:productSearchResetEvent"/>
+    
+    <aura:handler event="c:TF_AG_SendSelectSubjectClassifyEvt" action="{!c.handleSelectedListEvt}"/>
+    <aura:handler event="c:TF_AG_SendSelectNetbaseEvt" action="{!c.handleSelectedNetbaseEvt}"/>
+    
+    <aura:attribute name="productFamilyLst" type="String[]" default="[]"/>
+    <aura:attribute name="publisherImprintLst" type="String[]" default="[]"/>
+    <aura:attribute name="textTypeLst" type="String[]" default="[]"/>
+    <aura:attribute name="selectedVersionTypes" type="List" default="[]"/>
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="types" type="List" default="[
+                                                      { label: 'e-Book', value: 'e-Book' },
+                                                      { label: 'Hardback', value: 'Hardback' },
+                                                      { label: 'Paperback', value: 'Paperback' },
+                                                      { label: 'Pack - Book and CD', value: 'Pack - Book and CD' },
+                                                      { label: 'Acquisition eBook', value: 'Acquisition eBook' }]"/>
+    
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <!-- body -->
+    <lightning:layout multipleRows="true">
+        
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:input  aura:id="ISBN" type="text"  label="ISBN" placeholder="ISBN" value="{!v.ISBNValue}"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:input  aura:id="Title" type="text"  label="Title" placeholder="Title" value="{!v.productTitle}"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:input  aura:id="Author" type="text"  label="Author" placeholder="Author" value="{!v.productAuthor}"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:input  aura:id="DOI" type="text"  label="DOI" placeholder="DOI" value="{!v.productDOI}"/>
+        </lightning:layoutItem>
+        <!-- <lightning:layoutItem size="6" padding="around-small">
+            <c:NetbaseGrid checkedValuesListBox="{!v.multiResultCodes}"/>
+        </lightning:layoutItem>-->
+        <lightning:layoutItem size="6" padding="around-small">
+            <c:TF_AG_NetbaseDualBoxComp values="{!v.selectedNetbaseValues}" backToProductDetail="{!v.eventFromProdDetail}" checkedValuesListBox="{!v.multiResultCodes}"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="6" padding="around-small">
+            <c:SubjectGrid checkedValuesListBox="{!v.multiResultList}"/>
+        </lightning:layoutItem>
+        <!-- <lightning:layoutItem size="3" padding="around-small">
+            <lightning:radioGroup name="NotYetPublished"
+                                  label="Not Yet Published"
+                                  options="{! v.PublishedRadioOptions }"
+                                  value="{! v.selectPublishedRadio }"
+                                  type="radio"/>
+        </lightning:layoutItem>-->
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:radioGroup name="HasDRM"
+                                  label="Has DRM"
+                                  options="{! v.DRMRadioOptions }"
+                                  value="{! v.SelectedDRM }"
+                                  type="radio"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:radioGroup name="Medium"
+                                  label="Medium/Type"
+                                  options="{! v.MediumRadioOptions }"
+                                  value="{! v.SelectedMedium }"
+                                  disabled="false"
+                                  type="radio"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:input aura:id="field" type="number" label="Publication Price" name="input1" placeholder="Minimum" value="{!v.minPrice}" min="0"/><br/>
+            <lightning:input aura:id="field" type="number" label="" variant = "label-hidden" name="input2" placeholder="Maximum" value="{!v.maxPrice}" min="0"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:input aura:id="PublicationDateFrom" type="date" label="Publication Date" placeholder="From" value="{!v.pubFromDate}" max="{!v.pubToDate}" /><br/>
+            <lightning:input aura:id="PublicationDateTo" type="date" variant = "label-hidden" placeholder="To" value="{!v.pubToDate}" min="{!v.pubFromDate}"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:select aura:id="textType" name="select" label="Text Type" value="{! v.textType }">
+                <aura:iteration items="{!v.textTypeLst}" var="texType">
+                    <option value="{!texType}" text="{!texType}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:select aura:id="pubImprint" name="select" label="Publisher Imprint" value="{! v.publisherImprint }">
+                <aura:iteration items="{!v.publisherImprintLst}" var="pubImp">
+                    <option value="{!pubImp}" text="{!pubImp}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:combobox aura:id="PublicationPrice" name="Publication Price" label="Currency" value="{!v.SelPubCurrency}" options="{! v.PublicationCurrencyOptns}"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:input aura:id="field" name="Fpub" value="{!v.FirstPubYearValueFrom}" placeholder="From YYYY" label="First Published Year" message-when-pattern-mismatch="Invalid format!" pattern="[1-9][0-9]{3}" max="{!v.FirstPubYearValueTo}"/><br/>
+            <lightning:input aura:id="field" name="Fpub" value="{!v.FirstPubYearValueTo}" placeholder="To YYYY" variant = "label-hidden" message-when-pattern-mismatch="Invalid format!" pattern="[1-9][0-9]{3}" min="{!v.FirstPubYearValueFrom}"/>
+        </lightning:layoutItem>
+        
+        
+        <!--<lightning:layoutItem size="3" padding="around-small">
+            <lightning:input  aura:id="productName" type="text"  label="Product Name" placeholder="Search by product name" value="{! v.prdName }"/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" padding="around-small">
+            <lightning:select aura:id="productFamily" name="select" label="Product Family" value="{! v.prdFamily }">
+                <aura:iteration items="{!v.productFamilyLst}" var="fmly">
+                    <option value="{!fmly}" text="{!fmly}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </lightning:layoutItem>-->
+    </lightning:layout>
+    <!--lightning:dualListbox aura:id="versionTypes"
+                           label= "Select Version Type" 
+                           sourceLabel="Available" 
+                           selectedLabel="Selected" 
+                           fieldLevelHelp="Select Version Type" 
+                           options="{!v.types}" 
+                           onchange="{! c.handleChange }"/-->
+    <br/>
+    <div class="srchBtn">
+        
+        <lightning:button label="Reset Criteria" iconPosition="left"  variant="brand" onclick="{! c.getResetState }"/>
+        <lightning:button label="Search" iconName="utility:search" iconPosition="left"  variant="brand" onclick="{! c.searchProduct }"/>
+    </div>
+</aura:component>

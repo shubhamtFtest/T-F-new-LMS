@@ -1,0 +1,110 @@
+<aura:component access="global" controller="TF_ProcessUnsiloresponse">
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="productType" type="String"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="data" type="Object[]"/>
+    <aura:attribute name="fullData" type="List"/>
+    <aura:attribute name="recordCount" type="Integer" default="0"/> 
+    <aura:attribute name="returnProductType" type="String"/>
+    <aura:attribute name="countLst" type="Object[]" access="global"/>
+    <aura:attribute name="radioOptions" type="List"/>
+    <aura:attribute name="radioValue" type="String"/>
+    <aura:attribute type="Boolean" name="showProductTypes" default = "false"/>
+
+    
+    <!-- New Pagination and sorting attributes --> 
+    <aura:attribute type="Integer" name="pageNumber" default="1" />
+    <aura:attribute type="Integer" name="maxPage"	default="1" />
+    <aura:attribute name="pageSize" type="Integer" default="20"/>
+    <aura:attribute name="queryLimit" type="Integer" default="500"/>
+    <!-- pagesPerQuery value should be queryLimit/pageSize -->
+    <aura:attribute name="pagesPerQuery" type="Integer" default="25"/> 
+    <aura:attribute type="Integer" name="pstn"	default="0" />
+    <aura:attribute name="nxtClked" type="String" default="false"/>
+    <aura:attribute name="prevClked" type="String" default="false"/>
+    <aura:attribute name="lastClicked" type="String" default="false"/>
+    <aura:attribute name="firstClicked" type="String" default="false"/>
+    <aura:attribute type="Integer" name="prevPageNum" default="1" />
+    <aura:attribute name="totalRecordCount" type="Integer" default="0"/>
+    
+    <aura:attribute name="calledFrom" type="String"/>
+    
+    <!-- Added by Geetika for PCH-3712 -->
+    <aura:attribute name="searchQueryText" type="String" default=""/>
+    <aura:attribute name="nextPageCursorValue" type="String" default=""/>
+    <aura:attribute name="PrevPageCursorValue" type="String" default=""/>
+    <aura:attribute name="lastPageCursor" type="String" default=""/>
+	<!-- end for PCH-3712 -->
+    
+    <!-- Events-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+    <aura:handler event="c:PPDContentSearchEvent" action="{!c.searchContentHandler}"/>
+    
+    <!-- spinner -->
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    
+    <!-- body -->
+    <lightning:layoutItem size="5" padding="around-small">
+            <c:PPDUnsiloDocSearchBar recordId="{! v.recordId }" calledFrom=''/>
+        </lightning:layoutItem>
+    <lightning:layout>
+        
+        <lightning:layoutItem size="3" padding="around-small">
+            <!--<p>Number of records : {!v.recordCount}</p>-->
+            <p><strong><span style="color: #006DCC;">Showing {!v.recordCount +' '+ v.returnProductType} records.</span></strong></p>
+            
+        </lightning:layoutItem>
+        
+        <lightning:layoutItem size="5">
+                        
+                        <aura:if isTrue="{!v.showProductTypes}">
+                            <div class="slds-border_bottom slds-m-top_x-small">
+                                <lightning:layout  multipleRows="true">
+                                    <lightning:layoutItem flexibility="auto" padding="horizontal-small">
+                                        <div class="slds-m-top_x-small">
+                                            <p><strong><span style="color: #339966;">{! 'Total : '+ v.totalRecordCount}</span></strong></p>
+                                        </div>
+                                    </lightning:layoutItem>
+                                    <aura:iteration items="{!v.radioOptions}" var="optn">
+                                        <lightning:layoutItem flexibility="auto" padding="horizontal-small">
+                                            <div class="center slds-m-top_x-small">
+                                                <lightning:button variant="base" label="{!optn.value}" value = "{!optn.value}" title="{!'Click to view '+ optn.value +' products'}" onclick="{! c.handleProductTypeClick}"/>
+                                                 <b> : {!optn.label}</b>
+                                                <!-- <p> <strong><span style="color: #339966;">{!optn.value} : {!optn.label}</span></strong></p>-->
+                                            </div>
+                                        </lightning:layoutItem>
+                                    </aura:iteration>
+                                </lightning:layout>
+                                <!--  <div padding="around-medium" class="slds-box" aura:id="dispCount">
+                                <lightning:radioGroup name="radioButtonGroup"
+                                                      label=""
+                                                      options="{! v.radioOptions}"
+                                                      value="{! v.radioValue}"
+                                                      type="button"/>
+                            </div>  -->   
+                            </div>
+                        </aura:if>
+                    </lightning:layoutItem>
+                    
+        
+        <lightning:layoutItem size="4" padding="around-small">
+            <div class="right">
+                <c:PPDPagination prevPageNumber= "{!v.prevPageNum}" currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" nextClicked="{!v.nxtClked}" prevClicked="{!v.prevClked}" lastClicked="{!v.lastClicked}" firstClicked="{!v.firstClicked}"/>
+            </div>
+        </lightning:layoutItem>
+        
+    </lightning:layout>
+    <lightning:datatable
+                         columns="{! v.columns }"
+                         data="{! v.data }"
+                         keyField="id"
+                         selectedRows="{! v.selectedRows }"
+                         hideCheckboxColumn="true"
+                         onrowselection="{!c.handleSelectedRow}"
+                         />    
+    
+</aura:component>

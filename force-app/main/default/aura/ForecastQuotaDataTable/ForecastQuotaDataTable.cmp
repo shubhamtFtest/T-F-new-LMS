@@ -1,0 +1,154 @@
+<aura:component controller="CreateForecastQuotaRecords">
+    <aura:attribute name="listForecastingQuota" type="ForecastingQuota[]"/>
+    <aura:attribute name="objForecastingQuota" type="ForecastingQuota"/>
+    <aura:attribute name="editRecId" type="String"/>
+    <aura:attribute name="delRecId" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="editMode" type="boolean" default="false"/>
+    <aura:attribute name="showTable" type="boolean" default="false"/>
+    <aura:attribute name="showFormQuota" type="boolean" default="false"/> 
+    <aura:attribute name="TerFortypeClassObj" type="object" /> 
+    <aura:attribute name="mapIdNameForType" type="Map" />
+    <aura:attribute name="mapIdNameTerritory" type="Map" />
+    <aura:if isTrue="{!v.Spinner}">   
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- Card Body Table-->
+    <div aura:id="listQuota" >
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small " title=""></div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small" title="Currency ISO Code">Currency ISO Code</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small" title="Product Family">Product Family</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small" title="Quota Amount">Quota Amount</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small" title="Quota Quantity">Quota Quantity</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small" title="Quota Month">Quota Month</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small" title="Quota Owner">Quota Owner</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small" title="Territory">Territory</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate slds-p-bottom_xx-small" title="Forecasting Type">Forecasting Type</div>
+                    </th>
+                </tr>
+            </thead>                    
+            <tbody>
+                <aura:iteration items="{!v.listForecastingQuota}" var="item" indexVar="index">
+                    
+                    <tr class="slds-hint-parent">
+                        <td data-label=" ">
+                            <div class="slds-truncate" title="Cloudhub" data-recordId="{!item.Id}" data-index="{!index}">  
+                                <lightning:button variant="base" label="Edit" title="Base action" onclick="{! c.editClicked }"/>
+                                <lightning:button variant="base" label="Delete" title="Base action" onclick="{! c.delPopup }"/>
+                                
+                            </div>
+                        </td>
+                        <td data-label="Opportunity Name" scope="row">
+                            <div class="slds-truncate" title="{!item.CurrencyIsoCode}"> {!item.CurrencyIsoCode}</div>
+                        </td>                        
+                        <td data-label="Account Name">
+                            <div class="slds-truncate" >{!item.ProductFamily}</div>
+                        </td>
+                        <td data-label="Close Date">
+                            <div class="slds-truncate" >{!item.QuotaAmount}</div>
+                        </td>
+                        <td data-label="Prospecting">
+                            <div class="slds-truncate" >{!item.QuotaQuantity}</div>
+                        </td>
+                        <td data-label="Confidence">
+                            <div class="slds-truncate" >{!item.StartDate}</div>
+                        </td>
+                        <td data-label="Amount">
+                            <div class="slds-truncate" >{!item.QuotaOwner.Name}</div>
+                        </td>
+                        <td data-label="Contact">
+                            <div class="slds-truncate" ><!--{!item.Territory2Id} {!v.mapIdNameTerritory.item.Territory2Id} --> 
+                                <c:ForecastTerritoryForecastTypeLabel map="{!v.mapIdNameTerritory}" key="{!item.Territory2Id}" showTerritory="true" />
+                            </div>
+                        </td>
+                        <td data-label="Contact">
+                            <div class="slds-truncate" >
+                                <c:ForecastTerritoryForecastTypeLabel map="{!v.mapIdNameForType}" key="{!item.ForecastingTypeId}" showTerritory="false" />
+                            </div>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>
+    <!--edit amount  pop up starts here -->
+    <div aura:id="ModalPopUp" class="demo-only" style="height: 640px;">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"  title="Close">
+                        
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Edit Quota Amount</h2>
+                    <p class="slds-m-top_x-small"><a>Enter New Quota Amount. To edit other fields delete this record and insert a new record. </a >.</p>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning:input type="number" aura:id="newQuotaAmount" label="New Quota Amount"
+                                     name="newQuotaAmount"                                                                                                
+                                     step="0.01"
+                                     
+                                     />
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.hidePopup}">Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.saveNewAmount}">Save</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+    <!--edit amount  pop up ends here -->
+    
+    <!--dletion confirmation pop up starts here -->
+    <div aura:id="deletionCinfirmation" class="demo-only slds-hide" style="height: 640px;">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"  title="Close">
+                        
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirm Deletion</h2>
+                    <p class="slds-m-top_x-small"></p>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    Are you sure, you want to delete this record ?
+                </div>
+                <footer class="slds-modal__footer"> 
+                    <button class="slds-button slds-button_neutral" onclick="{!c.CancelDel}">Cancel</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.ConfirmDel}">Confirm</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+     <!--dletion confirmation pop up Ends here -->
+</aura:component>

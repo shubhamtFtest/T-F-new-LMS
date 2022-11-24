@@ -1,0 +1,78 @@
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+}
+.loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #ffffff;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.loader p {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 2rem;
+  transform: translate(-50%, -50%);
+}
+.left {
+  width: 100%;
+  float: left;
+  text-align: right;
+  margin-top: 10px;
+}
+.container-datatable {
+  position: relative;
+  max-height: 300px;
+}
+.container-item {
+  position: relative;
+}
+.display_flex {
+  display: flex; 
+  align-items: center;
+}
+.icon-contain {
+  position: absolute;
+  bottom: 75px;
+  right: calc(50% - .75rem);
+}
+.top-padding {
+  padding-top: 40px;
+}
+.slds-form-element__help{
+  min-height: 18px;
+}
+.layout-item{
+  min-height: 100px;
+}
+button[disabled]{ cursor: not-allowed !important; }
+.info_text{
+  color:  gray;
+  padding-left: 5px;
+}
+.info-container{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.info-container.slds-notify_alert, .info-container.slds-notify--alert {
+  justify-content: left;
+  padding-left: 15px;
+}
+
+/*.container .slds-checkbox label {
+  padding-top: 36px;
+  display: block;
+}
+.container .slds-checkbox .slds-checkbox_faux {
+  width: 1.6rem;
+  height: 2rem;
+  display: inline-block;
+}*/

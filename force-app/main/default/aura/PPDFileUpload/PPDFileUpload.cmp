@@ -1,0 +1,92 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="accept" type="List" default="['.csv', '.txt']"/>
+    <aura:attribute name="multiple" type="Boolean" default="flase"/>
+    <aura:attribute name="disabled" type="Boolean" default="false"/>   
+    <aura:attribute name="uniqueId" type="String" default="identifiers.doi"/>  
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="errorMessage" type="String" default=""/>
+    <aura:attribute name="optionValue" type="String" default="Include"/>
+    <aura:attribute name="CollectionType" type="String"/>
+    <aura:attribute name="availableIds" type="List" default="[]"/>
+    <aura:attribute name="uploadedIds" type="List" default="[]"/>
+
+    <aura:attribute name="queryLimit" type="Integer" default="100"/>
+    <aura:attribute type="Integer" name="pstn"	default="0" />
+    <aura:attribute name="fileContent" type="String"/>
+    <aura:attribute name="unAvailableIds" type="String"/>
+    <aura:attribute name="showDownloadBtn" type="Boolean"  default= "false"/>
+    
+
+    
+    <aura:attribute name="options" type="List" default="[
+                                                        {'label': 'Inclusions', 'value': 'Include'},
+                                                        {'label': 'Exclusions', 'value': 'Exclude'}
+                                                        ]"/>
+    
+    
+    <aura:registerEvent name="refreshTitleListComponent" type="c:PPDTitleRefreshEvent"/>
+    <aura:registerEvent name="refreshUnsiloDocListComponent" type="c:PPDRefreshListEvent"/>
+    
+    <aura:handler event="c:PPDGenericEvent" action="{!c.getItemsFromPCMEvt}"/>
+
+    
+    <lightning:layoutItem size="3" padding="around-small">
+        <!-- spinner -->
+        <aura:if isTrue="{!v.IsSpinner}">
+            <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+        </aura:if>
+        <aura:if isTrue="{!v.CollectionType=='Rule based'}">
+            <lightning:radioGroup name="InclusionAndExclusionRadio"
+                                  label="Inclusions/Exclusions"
+                                  options="{! v.options }"
+                                  value="{! v.optionValue }"
+                                  type="radio"
+                                  onchange="{! c.handleRadioChange }"/>
+        </aura:if>
+         <aura:if isTrue="{!v.CollectionType=='Rule based'}">
+             <br/>
+              <p><lightning:formattedText value="*Please upload csv file of ISBNs"/></p>
+        </aura:if>
+        <aura:if isTrue="{!v.CollectionType=='Manual Curation'}">
+            <lightning:select aura:id="select" name="select" label="*Select unique value used in file" onchange="{! c.onChange }">
+                <!--<option value="SFDCId">SFDC Id</option>-->   
+                <option value="identifiers.doi">Book-DOI</option>
+                <option value="identifiers.isbn">Book-ISBN</option>
+                <option value="doi_chapter">Chapter-DOI</option>
+                <option value="doi_article">Article-DOI</option>
+                <option value="doi_creativework">CreativeWork-DOI</option>
+                <option value="doi_entryversion">Entry-version-DOI</option>
+                
+            </lightning:select>
+        </aura:if>
+        <br/>
+       <!-- <lightning:input name="file1" type="file" label="Upload" multiple="false" accept=".csv" onchange="{! c.handleFilesChange }"/>-->
+        <lightning:input name="file1" type="file" label="Upload" multiple="false" accept=".csv" onchange="{! c.getItemsFromPCM }"/>
+
+    </lightning:layoutItem>
+    <br/>
+    <lightning:layout>
+        <lightning:layoutItem padding="around-medium" size="6">
+            <aura:if isTrue="{!v.CollectionType=='Rule based'}">
+                <p><lightning:formattedText value="*Maximum number of rows/Ids supported per upload is 500"/></p>
+                <p>&nbsp;</p>
+            </aura:if>
+            <aura:if isTrue="{!v.CollectionType=='Manual Curation'}">
+                <p><lightning:formattedText value="*Maximum number of rows/Ids supported per upload is 1000"/></p>
+                <p>&nbsp;</p>
+            </aura:if>
+            <p>
+                <lightning:formattedRichText aura:id="infoMessage" class="formattedTextInfo" ></lightning:formattedRichText>
+            </p>
+            <p>&nbsp;</p>
+            <aura:if isTrue="{!v.showDownloadBtn=='true'}">
+                <lightning:button label="Download" iconName="utility:download" variant="brand" onclick = "{! c.downloadIds}"/>
+            </aura:if>
+            
+            <p>
+                <lightning:formattedRichText aura:id="errorMessage" class="formattedText"></lightning:formattedRichText>
+            </p> 
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

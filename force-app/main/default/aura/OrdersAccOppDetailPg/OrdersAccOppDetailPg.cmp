@@ -1,0 +1,159 @@
+<aura:component controller="TF_OrderHubCustomerDetailCntrl"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable,force:hasRecordId,force:hasSObjectName"
+    access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="sObjectName" type="String" />
+    <aura:attribute name="Spinner" type="boolean" default="false" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="NoOrderFound" type="boolean" default="false" />
+    <aura:attribute Name="OrdersFetched" type="object[]" access="private"
+        description="Total number of orders returned" />
+    <aura:attribute Name="pageno" type="integer" access="public" default="1" />
+    <aura:attribute Name="pagesize" type="integer" access="public" default="4" />
+    <aura:attribute Name="recordsPerPage" type="integer" />
+    <aura:attribute name="btnDisable" type="boolean" default="false" />
+    <aura:attribute Name="totalPageSize" type="integer" access="public" default="1" />
+    <aura:attribute Name="salesType" type="List" />
+    <aura:attribute Name="selectedValue" type="String" />
+    <aura:attribute name="options" type="List" />
+
+    <!-- style="height: 10rem;" -->
+    <div>
+        <aura:if isTrue="{!v.Spinner}">
+            <div class="backgroundInverse">
+                <lightning:spinner alternativeText="Loading" size="large" class="CustomeSpinner" variant="brand" />
+            </div>
+
+        </aura:if>
+
+        <div class="slds-section__title  test-id__section-header-container slds-section__title-action slds-grid col slds-size_1-of-1"
+            onclick="{!c.ToggleDropDownPanel}">
+            <div class="">
+                <lightning:icon iconName="utility:chevronright" size="xx-small" aura:id="rightIcon"
+                    alternativeText="Utility image" class="slds-hide slds-m-right_x-small CustHeadingSize" />
+                <lightning:icon iconName="utility:chevrondown" size="xx-small" aura:id="downIcon"
+                    alternativeText="Utility image" class="slds-m-right_x-small CustHeadingSize" />
+                <span class="test-id__section-header-title slds-truncate CustHeadingSize">Orders</span>
+            </div>
+
+            <!--  slds-col slds-size_1-of-3 <div class="slds-col slds-size_2-of-3">
+                ORDERS HERE
+                </div>  -->
+        </div>
+        <div aura:id="cmpContent">
+            <div>
+                <lightning:select aura:id="select" name="select" onchange="{! c.onChange }" class="slds-m-bottom_small"
+                    value="{!v.selectedValue}">
+                    <aura:iteration items="{!v.salesType}" var="salesType">
+                        <option text="{!salesType.label}" value="{!salesType.id}" selected="{!v.salesType.selected}" />
+                    </aura:iteration>
+                </lightning:select>
+            </div>
+
+            <div class="">
+                <div aura:id=" OrdersFetchedId">
+                    <aura:if isTrue="{! !empty(v.OrdersFetched)}">
+                        <!-- style="height: 12rem; " -->
+                        <div class="slds-scrollable_y">
+                            <table
+                                class="slds-table slds-table_cell-buffer slds-no-row-hover slds-table_bordered slds-table_fixed-layout "
+                                role="grid" aura:id="auraTable">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate CustBold" title="Order Number">Order Number</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate CustBold" title="Order Type">Order Type
+                                            </div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate CustBold" title="Order Address SAP BP Number">
+                                                Order
+                                                Address SAP BP Number
+                                            </div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate CustBold" title="Order Date">Order Date</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate CustBold" title="Order Amount">Order Amount</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate CustBold" title="Order Status">Order Status</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <aura:iteration items="{!v.OrdersFetched}" var="item" indexVar="index">
+                                        <tr>
+                                            <td>
+                                                <div title="{!item.orderNumber}">
+                                                    <a href="{! '/lightning/n/UBX_Self_Service_Orders?c__orderNum=' + item.orderNumber + '&amp;c__accId='+v.recordId}"
+                                                        target="_blank"
+                                                        title="Click to see order details">{!item.orderNumber}
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="slds-truncate" title="{!item.addressContactEmail}">
+                                                    {!item.channel}</div>
+                                            </td>
+                                            <td>
+                                                <div class="slds-truncate">{!item.billingAddress.businessPartnerNo}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="slds-truncate" title="{!item.orderDate}"> {!item.orderDate}
+                                                </div>
+                                            </td>
+                                            <td role="gridcell">
+                                                <div class="slds-truncate" title="{!item.taxAmount}">
+
+                                                    <lightning:formattedNumber value="{!item.orderPrice}"
+                                                        style="currency" currencyCode="{!item.invoices[0].currencyy}"
+                                                        maximumFractionDigits="2" />
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div title="{!item.orderStatus}"> {!item.orderStatus}</div>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                            <!-- pagination comp div -->
+                            <div class="slds-align_absolute-center " aura:id="pagiCmp">
+                                <div class="slds-border_bottom slds-p-right_small slds-p-left_small  slds-p-top_small">
+                                    <lightning:button label="Previous" onclick="{!c.previousPg}"
+                                        disabled="{! equals(v.pageno,1) }" iconName="utility:chevronleft"
+                                        iconPosition="left" variant="base" />
+                                    <span class=" slds-m-left_large slds-m-right_large">Page
+                                        {!v.pageno} of {!v.totalPageSize}| Showing records from {!
+                                        (v.pageno-1)*v.pagesize}
+                                        to
+                                        {!((v.pageno-1)*(v.pagesize))+v.recordsPerPage } </span>
+                                    <lightning:button label="Next" onclick="{!c.nextPg}" iconName="utility:chevronright"
+                                        iconPosition="right" variant="base"
+                                        disabled="{! equals(v.pageno,v.totalPageSize)}" />
+                                </div>
+                            </div>
+                            <!-- pagination comp div -->
+                        </div>
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+        <!-- for no Orders    -->
+        <div aura:id="NoOrderFoundId">
+            <aura:if isTrue="{!v.NoOrderFound}">
+                <div
+                    class="slds-text-align_center slds-box slds-box_small  slds-m-left_large slds-m-right_large slds-m-top_large    ">
+                    <lightning:icon iconName="utility:info" alternativeText="Utility image" size="medium" />
+                    <span class="slds-m-left_small">No orders found</span>
+                </div>
+            </aura:if>
+        </div>
+    </div>
+</aura:component>

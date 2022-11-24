@@ -1,0 +1,69 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="operatorValue" type="List" default="['AND']"/>
+    <aura:attribute name="criteriaSize" type="String" default="1"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="hubId" type="String"/>
+    <aura:attribute name="consumer" type="String"/>
+    
+    <aura:attribute name="index" type="Integer"/>
+    <aura:attribute name="items" type="List"/>
+    <aura:attribute name="itemsDefault" type="List" default="[0]"/>
+    <aura:attribute name="queryObjectLst" type="Object[]" access="global"/>
+    <aura:attribute name="implicitObjLst" type="Object[]" access="global"/>
+    <aura:attribute name="implicitFltrValues" type="Object[]" access="global"/>
+
+    <aura:attribute name="queryObjectUnit" type="Object" access="global"/>
+    
+    <aura:attribute name="optionsType" type="List" default="[]"/>
+    <aura:attribute name="selectedType" type="String"/>
+    <aura:attribute name="identifier" type="String" default="Book"/>
+    <aura:attribute type="Boolean" name="missingValue" default = "false"/>
+    
+
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler event="c:productSearchResetEvent" action="{!c.resetSearch}"/>
+    <div class="{!v.missingValue? 'showRed': 'c-container'}">  
+        <lightning:layout >
+            <lightning:layoutItem padding="around-small">
+                <lightning:layoutItem padding="around-small" alignmentBump="bottom" >
+                    <lightning:badge label="Type"/>
+                </lightning:layoutItem>
+            </lightning:layoutItem>
+            <lightning:layoutItem>             
+                <lightning:combobox name="selectType" value="Title" placeholder="Please Select" options="{! v.optionsType }" onchange="{! c.handleTypeChange }"/>
+            </lightning:layoutItem>
+        </lightning:layout>  
+        
+        <lightning:layout>
+            
+            <lightning:layoutItem  size="12">                  
+                <!-- Calling PPDProductSearchUnit in iteration -->
+                <aura:iteration  items="{! v.items }" var="item" indexVar="index">                  
+                    <lightning:layout>  
+                        <lightning:layoutItem >
+                            <c:PPDProductSearchUnit aura:id="ProductSearchUnit" recordId="{! v.recordId }"  index="{#item}" items="{! v.items}" selectedType = "{!v.selectedType}" identifier = "{!v.identifier}" consumer = "{!v.consumer}" inputChangeEvt="{! c.loopChildComp}"></c:PPDProductSearchUnit>
+                        </lightning:layoutItem>
+                     <!-- <lightning:layoutItem padding="around-small">
+                            <lightning:layoutItem padding="around-small">
+                                <lightning:buttonIcon iconName="utility:add"  size="large" alternativeText="Add Criteria" variant="bare"  onclick="{!c.handleAndOperatorClick}" value="{!item}" iconClass="blue" />                            
+                                <lightning:buttonIcon iconName="utility:close"  size="large" alternativeText="Remove Criteria" variant="bare"  onclick="{!c.handleRemoveOperatorClick}" value="{!item}" iconClass="red" />
+                            </lightning:layoutItem>                       
+                        </lightning:layoutItem>-->
+                    </lightning:layout>                    
+                </aura:iteration>
+                
+               <!-- <lightning:button variant="brand" label="test" title="test" onclick="{! c.loopChildComp }" />-->
+                
+            </lightning:layoutItem> 
+            
+        </lightning:layout>        
+    </div>
+    
+    
+    
+    
+    
+    
+</aura:component>

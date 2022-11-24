@@ -1,0 +1,17 @@
+<apex:page standardController="Opportunity">
+
+	<script src="/soap/ajax/8.0/connection.js"></script>
+	<script src="/desktop/desktopApi.js"></script>
+
+    <script type="text/javascript">
+
+		var desktop = new DesktopApi(); 
+		if (desktop.desktopPageWindow) { 
+			window.parent.location.href = "/{!Opportunity.Id}/e?clone=1&00N300000013O9q=&00N300000013O9g=&isdtp=mn&nooverride=1&retURL=/{!Opportunity.Id}&cloneli=1"; 
+		} 
+		else { 
+			window.parent.location.href = "/{!Opportunity.Id}/e?clone=1&00N300000013O9q=&00N300000013O9g=&nooverride=1&retURL=/{!Opportunity.Id}&cloneli=1"; 
+		}
+
+    </script>
+</apex:page>

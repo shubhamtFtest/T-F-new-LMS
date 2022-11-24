@@ -1,0 +1,75 @@
+<aura:component implements="force:lightningQuickAction,lightning:isUrlAddressable" controller="TF_PPDProcessController" access="global">
+    <aura:attribute name="products" type="Product2[]"/>
+    <aura:attribute name="filterObject" type="Object" access="global"/>
+	<aura:attribute name="isSelectAll" type="boolean" default="false"/> 
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+
+    
+        <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="c:PPDProductSearchEvent" action="{!c.productFilterChangeHandler}"/>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+      <div class="slds-modal__container">    
+    	<div class="slds-m-around_xx-large">
+        <h1 class="slds-text-heading--medium">Products</h1>
+        <br/>
+        <!--Products List Table-->
+        <table class="slds-table slds-table--bordered slds-table--cell-buffer" style="border: 1px solid black" role="grid">      
+            <thead>  
+                <tr class="slds-text-title--caps">
+                    <th>           
+                        <label class="slds-checkbox">
+                            <ui:inputCheckbox value="{!v.isSelectAll}" change="{!c.handleSelectAllProducts}" aura:id="selectAll"/>
+                            <span class="slds-checkbox--faux" />
+                            <span class="slds-form-element__label"></span>
+                        </label>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Name">Name</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Account">Code</div>
+                    </th>
+                     
+                    <th scope="col">
+                        <div class="slds-truncate" title="Phone">Family</div>
+                    </th>
+                     
+                    <th scope="col">
+                        <div class="slds-truncate" title="Email">Version Type</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>        
+                <aura:iteration items="{!v.products}" var="product">
+                    <tr>
+                        <th>
+                            <label class="slds-checkbox">
+                                <ui:inputCheckbox aura:id="checkProduct" value="" text="{!product.Id}"/>
+                                <span class="slds-checkbox--faux" />
+                                <span class="slds-form-element__label"></span>
+                            </label>
+                        </th>
+                        <th scope="row">
+                            <div class="slds-truncate" title="{!product.Name}">{!product.Name}</div>
+                        </th>
+                        <td>
+                            <div class="slds-truncate" title="{!product.ProductCode}">{!product.ProductCode}</div>
+                        </td>
+                        <th scope="row">
+                            <div class="slds-truncate" title="{!product.Family}">{!product.Family}</div>
+                        </th>
+                        <td>
+                            <div class="slds-truncate" title="{!product.Version_Type__c}">{!product.Version_Type__c}</div>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+        <div>
+            <br/>
+            <lightning:button label="Submit" class="slds-button_brand" onclick="{!c.handleSelectedPrducts}"  />
+        </div>
+    </div>	
+      </div>
+    </section>
+</aura:component>

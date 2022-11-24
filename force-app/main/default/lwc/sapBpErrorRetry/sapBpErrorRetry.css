@@ -1,0 +1,18 @@
+.sppinerHolder {
+    position: relative;
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+}
+
+.backgroundInverse {
+    position: relative;
+    background-color: #16325c;
+    height: 80px;
+}
+
+.test {
+    position: fixed;
+}
+
+.default {cursor: default;}

@@ -1,0 +1,44 @@
+<apex:page title="Email Preference" controller="EmailPreferenceController" standardStylesheets="true" lightningStylesheets="true">
+    <apex:form >
+        <apex:sectionHeader title="Email Preference" subtitle="for {!email}" rendered="{!NOT(showErrorMessage)}"/>
+    
+        <apex:pageBlock title="" mode="edit">
+        
+            <apex:pageBlockButtons location="both" >
+                <apex:commandButton action="{!cancelUpdate}" value="Cancel" immediate="true"/>
+                <apex:commandButton action="{!updatePreference}" value="Update" rendered="{!NOT(showErrorMessage)}"/>
+            </apex:pageBlockButtons>
+            
+            <apex:pageMessages />
+            <apex:pageMessage summary="{!errorMessage}" severity="error" strength="2" rendered="{!showErrorMessage}" escape="false" id="pmErrors"/> 
+
+            <apex:pageMessage summary="The change you make here will affect all Taylor & Francis Leads and Contacts with the email address of {!email}.<br><br>This change will be applied to all current and future Leads and Contacts.  If unsubscribing this email address it will prevent any commercial (marketing) emails being sent to this email address via Salesforce, the Marketing Cloud, Pardot, and any other email providers used by Taylor & Francis.<br><br>Commercial emails can only be sent to recipients who have opted-in to receive marketing / promotional content.<br><br>You can still send transactional emails to leads or contacts who have unsubscribed from commercial sends. Transactional emails can be sent in response to a user’s interaction with a sales person, web site or app and are defined in strictly functional terms.<br><br>Important: You should only change the email preference status with the express permission of the recipient, especially when re-subscribing an unsubscribed record, penalties for sending commercial email to recipients who have already unsubscribed can be severe.<br><br>If you still wish to proceed, please select the appropriate Status, enter a Reason, and click Update." severity="info" strength="2" escape="false" /> 
+            
+            <apex:pageBlockSection columns="1" showHeader="false" title="pageBlockSection" collapsible="false" id="btgrid" rendered="{!NOT(showErrorMessage)}">
+                <apex:outputField value="{!emailPreference.Email__c}" />
+                <apex:outputText value="{!currentStatus}" label="Current Status" rendered="{!showCurrentStatus}"/>
+                <apex:inputField value="{!emailPreference.Status__c}" label="New Status"/>
+                <apex:outputText value="{!currentReason}" label="Current Reason" escape="false" rendered="{!showCurrentReason}"/>
+                <apex:inputField value="{!emailPreference.Reason__c}" style="width:500px;" required="true"/>
+                <apex:pageBlockTable id="tblLeadsAndContacts" style="width:100%" value="{!listLeadsAndContacts}" var="w" >
+                    <apex:column headerValue="Type" value="{!w.personType}" style="width:100px" />
+                    <apex:column headerValue="Name" >
+                       <!-- <apex:outputLink value="/{!w.personId}" target="_blank">{!w.personName}</apex:outputLink>-->
+                      <!-- <apex:outputLink value= “{!URLFOR({!w.personId},null)}”>{!w.personName}</apex:outputLink>-->
+                       <apex:outputLink value="/{!URLFOR(w.personId)}">{!w.personName}</apex:outputLink>
+                    </apex:column>
+                    <apex:column headerValue="Company" value="{!w.Company}" />
+                    <apex:column headerValue="Phone" value="{!w.personPhone}" style="width:100px" />
+                    <apex:column headerValue="Country" value="{!w.personCountry}" />
+                    <apex:column headerValue="Do Not Email" style="width:75px; text-align:center;" >
+                        <apex:inputCheckbox value="{!w.doNotEmail}" disabled="true" />                
+                    </apex:column>
+                    <apex:column headerValue="OptIn/OptOut Status" value="{!w.optin_optout_status}" style="width:150px" />
+                    <apex:column headerValue="OptIn/OptOut Source" value="{!w.optin_optout_source}" style="width:150px" />
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+        
+    </apex:form>
+</apex:page>

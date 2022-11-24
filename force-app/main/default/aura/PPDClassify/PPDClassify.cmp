@@ -1,0 +1,87 @@
+<aura:component access="global" controller="TF_ProcessUnsiloresponse">
+    <!-- Attributs -->
+    <aura:attribute name="activeAccordion" type="String"/>
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="classesId" type="String"/>
+    <aura:attribute name="exportId" type="String"/>
+    <aura:attribute name="selectedRows" type="List"/> 
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="data" type="Object[]"/>
+    <aura:attribute name="prdDetails" type="Object"/>
+    <aura:attribute name="storedClassesId" type="String"/>
+    <aura:attribute name="fullData" type="List"/>
+    <aura:attribute name="recordCount" type="Integer" default="0"/> 
+    <aura:attribute name="collections" type="List"/>
+    <aura:attribute name="classes" type="List"/>
+    <aura:attribute name="disableClasses" type="Boolean"/>
+    <aura:attribute name="contentType" type="String"/>
+    
+    
+    <!-- New Pagination and sorting attributes --> 
+    <aura:attribute type="Boolean" name="sortAsc" />
+    <aura:attribute type="Integer" name="pageNumber" default="1" />
+    <aura:attribute type="Integer" name="maxPage"	default="1" />
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute name="sortedBy" type="String"/>
+    <aura:attribute name="sortedDirection" type="String"/>
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler event="c:PPDRefreshListEvent" action="{!c.resetClassId}" />
+    <aura:registerEvent name="refreshUnsiloDocListComponent" type="c:PPDRefreshListEvent"/>
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+    
+    <!-- spinner -->
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    
+    <!-- body -->
+    <lightning:accordion aura:id="accordion" activeSectionName="{#v.activeAccordion}" >
+        <lightning:accordionSection name="criteria" label="Classify Criteria">           
+            <lightning:layoutItem size="3" padding="around-small">
+                <lightning:select aura:id="collectionSelect" name="select" label="Select a Collection" onchange="{! c.onCollectionChange }">
+                    <aura:iteration items="{!v.collections}" var="collection">
+                        <option text="{!collection.label}" value="{!collection.value}"/>
+                    </aura:iteration>
+                </lightning:select>
+                <br/>
+                <lightning:select aura:id="classSelect" name="select" label="Select a Class" disabled="{!v.disableClasses}" onchange="{! c.onClassChange}">
+                    <aura:iteration items="{!v.classes}" var="cls">
+                        <option text="{!cls.label}" value="{!cls.value}"/>
+                    </aura:iteration>
+                </lightning:select>
+                <br/>
+                <lightning:button variant="brand" disabled="{!empty(v.classesId)||empty(v.exportId)}" label="Get Content" onclick="{!c.getUnsiloDocs}"/>
+                <br/>
+            </lightning:layoutItem>
+        </lightning:accordionSection>
+        <lightning:accordionSection name="result" label="Classify Result" >                 
+                <div>
+                    <lightning:layout>
+                        <lightning:layoutItem size="6" padding="around-small">
+                            <lightning:button label="Add All" variant="brand" onclick="{!c.addAllContent}" disabled="{!empty(v.data)}"/>   
+                            <p>Number of records : {!v.recordCount}</p>
+                        </lightning:layoutItem>
+                        <lightning:layoutItem size="6" padding="around-small">
+                            <div class="right">
+                                <c:PPDPagination currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" />
+                            </div>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+                <div>
+                    <lightning:datatable
+                                         columns="{! v.columns }"
+                                         data="{! v.data }" 
+                                         keyField="id"
+                                         selectedRows="{! v.selectedRows }"
+                                         hideCheckboxColumn="true"
+                                         onsort="{!c.sortColumn}"
+                                         sortedBy="{!v.sortedBy}"
+                                         sortedDirection="{!v.sortedDirection}"  
+                                         />
+                </div>            
+        </lightning:accordionSection>
+    </lightning:accordion>	
+</aura:component>

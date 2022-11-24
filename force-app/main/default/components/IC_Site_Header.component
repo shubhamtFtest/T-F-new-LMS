@@ -1,0 +1,230 @@
+<apex:component id="headerComponent" >
+
+<body class="accountTab">
+ 
+<script language="JavaScript" type="text/javascript">
+//<!--
+
+function gotoPhantom(TargetIsCurrent)
+{
+    if (TargetIsCurrent) {
+        Url = location.pathname + location.search;
+    } else {
+        Url = document.frm.URL.value;
+    }
+    
+    // get email address and password
+    var userID   = document.frmLogin.uid.value;
+    var password = document.frmLogin.pwd.value;
+    
+    // remove all spaces
+    userID   = userID.replace(/\s/g, "");
+    password = password.replace(/\s/g, ""); 
+    
+    // check for email address and password before submiting the form
+    if (userID.length == 0 || password.length == 0) {
+        alert("You must enter your email address and password to login.  Please try again.");
+    } else {    
+        document.frmLogin.action = "https://www.taylorandfrancis.com/ejournals/authentication/login.asp";
+        document.frmLogin.method="POST";
+        document.frmLogin.submit();
+    }
+}
+//-->
+</script>
+
+<script language="JavaScript" type="text/javascript">
+    function linkBrowser(toHref, windowName)
+    {
+        windowprops = "height=480,width=640,location=1,resizable=1,scrollbars=1,status=1,titlebar=1,toolbar=1,z-lock=0";
+        info = window.open(toHref, windowName, windowprops);
+        if (info.opener == null) 
+        {
+            info.opener = window;
+        }
+        else 
+        {
+            info.focus(); 
+        }
+    }
+</script>
+<!-- BEGIN HEADER -->
+
+<apex:stylesheet value="{!$Resource.CAS_Pagescheme}"/>
+<apex:stylesheet value="{!$Resource.CAS_Fonts}"/>
+<apex:stylesheet value="{!$Resource.CAS_Group}"/>
+<apex:stylesheet value="{!$Resource.CAS_Titlelist}"/>
+
+<!-- * START JAVASCRIPT CALLS * -->
+<script language="JavaScript" src="https://seals.networksolutions.com/siteseal/javascript/siteseal.js" type="text/javascript"></script>
+<script type="text/javascript" language="JavaScript" src="http://www.taylorandfrancis.com/jscripts/searchFunctions.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://www.taylorandfrancis.com/jscripts/JktWinFunction.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://www.taylorandfrancis.com/jscripts/PopupWinFunction.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://www.taylorandfrancis.com/jscripts/cellbg.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://www.taylorandfrancis.com/jscripts/ecommerce.js"></script>
+<script type="text/javascript" language="JavaScript" src="http://www.taylorandfrancis.com/jscripts/ccvalidate.js"></script>
+<!-- * END JAVASCRIPT CALLS * -->
+
+<table height="95" width="100%" cellpadding="0" cellspacing="0" border="0" class="header-bg">
+    <form name="search" action="http://www.taylorandfrancis.com/shopping_cart/search/search.asp" class="autonomy">
+        <tr>
+            <td width="20%" align="left">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td valign="top"><a href="http://www.taylorandfrancis.com/default.asp" target="_top"><img src="{!URLFOR($Resource.CAS_tandf_banner_top_logo)}" alt="Taylor & Francis Group - Books Home Page" width="235" height="65" border="0" class="pixel" /></a></td>
+                    </tr>
+                    <tr>
+                        <td valign="top"><a href="http://www.taylorandfrancis.com/default.asp" target="_top"><img src="{!URLFOR($Resource.CAS_tandf_banner_bottom_logo)}" alt="Taylor & Francis Group - Books Home Page" width="235" height="30" border="0" class="pixel" /></a></td>
+                    </tr>
+                </table>
+            </td>
+
+            <td width="80%" align="right" valign="top">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr valign="top">
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    
+                    <tr><td>
+<img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="30" class="pixel" />
+</td></tr>
+                    
+                   
+                </table>
+            </td>
+        </tr>
+    </form>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td height="1"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel" /></td>
+</tr>
+
+    <tr>
+        <td width="100%" colspan="3" height="17" class="breadcrumb-bg-light" align="right"></td>
+    </tr>
+    <tr>
+    <td height="2" colspan="3" class="breadcrumb-bg-dark"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="2" class="pixel" /></td>
+    </tr>
+        <tr>
+    <td height="22" colspan="3"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="22" class="pixel" /></td>
+    </tr>
+    <tr>
+        <td width="158" valign="top"><table width="158" border="0" cellspacing="0" cellpadding="0" bgcolor="white">
+   <tr>
+    <td width="3"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="3" height="1" class="pixel" /></td>
+    <td valign="top">
+
+        <!-- begin general resources navigation -->
+       
+      <table width="155" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td height="30" valign="top"><img src="{!URLFOR($Resource.CAS_Resources_Gif)}" alt="Website Resources" width="155" height="22" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" target="_top" href="http://www.taylorandfrancis.com">Home</a></td>
+        </tr>
+           
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" href="http://www.taylorandfrancis.com/about">About Us</a></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" target="_top" href="http://www.taylorfrancis.com">eBooks</a></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" href="javascript:linkBrowser('http://taylorandfrancis.com/books/', 'assocWin');">Books</a></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" href="javascript:linkBrowser('https://taylorandfrancis.com/journals/', 'assocWin');">Journals</a></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" href="javascript:linkBrowser('https://taylorandfrancis.com/privacy', 'assocWin');">Privacy policy</a></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+            <tr> 
+              <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" target="_top"  href="http://pages.email.taylorandfrancis.com/updates">Updates</a></td>  
+            </tr>
+            <tr> 
+              <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel" /></td>
+            </tr>
+       
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="30" valign="top"><img src="{!URLFOR($Resource.CAS_Imprints_Gif)}" width="155" height="22"></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" href="javascript:linkBrowser('http://www.crcpress.com/', 'assocWin');">CRC Press</a></td>
+        </tr>
+       
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+        <tr>
+          <td height="25" onMouseOver="CellBgOver(this)" onMouseOut="CellBgOut(this)"><a class="leftnavlink" href="javascript:linkBrowser('http://www.routledge.com/', 'assocWin');">Routledge</a></td>
+        </tr>
+        <tr>
+          <td height="1" class="horzline"><img src="{!URLFOR($Resource.CAS_Blank_Gif)}" width="1" height="1" class="pixel"></td>
+        </tr>
+      </table>
+        <!-- end general resources navigation -->
+    </td>
+   </tr>
+</table>
+</td>
+
+                    <td width="98%" height="100%" valign="top">
+                        <table border="0" cellpadding="0" cellspacing="2" align="center" width="100%">
+                            <tr>
+                                <td width="3" nowrap><spacer type="block" width="3" height="1"></td>
+                                <td width="100%">
+                                <!--begin-->
+                                
+
+
+<table border="0" cellpadding="0" cellspacing="1" align="center" width="100%">
+    <tr>
+        <td valign="top" width="75%">
+            <table border="0" cellpadding="0" cellspacing="0" align="center" width="98%">
+                <tr><td height="2"><spacer type="block" height="2" width="1"></td></tr>
+                <!-- DISPLAY PROMO START -->
+                <tr>
+                    <td>
+
+            <table width="95%" border="0" cellspacing="0" cellpadding="2">
+                <tr>
+                    <td valign="top">
+
+            <!-- end the header -->
+
+</apex:component>

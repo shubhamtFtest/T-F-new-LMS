@@ -1,0 +1,7 @@
+<aura:event type="COMPONENT">
+    <aura:attribute name="isActiveTab" type="Boolean"/>
+    <aura:attribute name="inSalesforce" type="Boolean"/>
+    <aura:attribute name="pcmUUID" type="Boolean"/>
+    <aura:attribute name="isBespokeQLI" type="Boolean" default="true"/>
+    <aura:attribute name="iscollection" type="Boolean" default="false"/>
+</aura:event>

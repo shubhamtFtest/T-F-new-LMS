@@ -1,0 +1,7 @@
+<!--
+Modified by Jeff Lup - 2016.03.28 - CHG0072245 - Errors on New Opportunity in Lightning
+-->
+<apex:page standardController="Opportunity">
+    <apex:outputText value="You may work with consortiums after first saving the opportunity." rendered="{!Opportunity.Id == null}" /> <!-- CHG0072245 -->
+    <c:TFOpportunityOwnership opportunity="{!Opportunity}" rendered="{!NOT(Opportunity.Id == null)}" /> <!-- CHG0072245 -->
+</apex:page>

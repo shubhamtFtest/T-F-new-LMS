@@ -1,0 +1,42 @@
+<apex:page showheader="false" controller="OrganizationMessageController" >
+<apex:outputpanel id="pnlRedirect" rendered="{!DisplayMessage}">
+<head> 
+ <apex:stylesheet value="{!URLFOR($Resource.bootstrap_3_2_0_dist, 'bootstrap-3.2.0-dist/css/bootstrap.min.css')}"/>
+ <apex:stylesheet value="{!URLFOR($Resource.bootstrap_3_2_0_dist, 'bootstrap-3.2.0-dist/css/bootstrap-theme.min.css')}"/>
+ <apex:includeScript value="{!URLFOR($Resource.jquery_1_11_1, 'jquery-ui-1.11.1.custom/external/jquery/jquery.js')}"/>  
+ <apex:includeScript value="{!URLFOR($Resource.bootstrap_3_2_0_dist, 'bootstrap-3.2.0-dist/js/bootstrap.min.js')}"/>
+</head>
+ 
+    <script type="text/javascript">
+        var $j = jQuery.noConflict();
+        $j(window).load(function()
+            {
+            $j('#orgModal').modal('show');
+            });
+    </script>        
+     
+ 
+<apex:form >
+ 
+<div class="modal bs-example-modal-lg" id="orgModal" tabindex="-1" role="dialog" aria-labelledby="orgModalLabel" aria-hidden="true" data-backdrop="static" >
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"> 
+        <div class="alert alert-{!AlertType}" role="alert"> <h4 class="modal-title"> <strong>{!OrgWideMessage.Message_Type__c}Hello {!$User.FirstName} {!$User.LastName}</strong>, {!OrgWideMessage.Name}</h4></div>
+      </div>
+      <div class="modal-body">
+      <apex:outputText value="{!OrgWideMessage.Message__c}" escape="false"/>
+      </div>
+      <div class="modal-footer">
+        <apex:commandButton style="btn btn-primary"  action="{!yesSave}" value="{!OrgWideMessage.Yes_Button_Text__c}"/>
+        &nbsp;
+        <apex:commandButton style="btn btn-primary"  action="{!noSave}" value="{!OrgWideMessage.No_Button_Text__c}" rendered="{!DisplayNoButton}"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+</apex:form>
+</apex:outputpanel> 
+ 
+</apex:page>

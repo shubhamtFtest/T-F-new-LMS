@@ -1,0 +1,22 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="ISBN" type="String"/>
+    <aura:attribute name="title" type="String"/>
+    <aura:attribute name="author" type="String"/>
+    <aura:attribute name="doi" type="String"/>
+    <aura:attribute name="netbase" type="List"/>
+    <aura:attribute name="subjectList" type="List"/>
+    <aura:attribute name="mediumData" type="String"/>
+    <aura:attribute name="publishData" type="String"/>
+    <aura:attribute name="minPrice" type="String"/>
+    <aura:attribute name="maxPrice" type="String"/>
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="sortOrderFieldName" type="String"/>
+    <aura:attribute name="drmData" type="String"/>
+    <aura:attribute name="currencyTypeData" type="String"/>
+    <aura:attribute name="firstPubYearDataFrom" type="String"/>
+    <aura:attribute name="firstPubYearDataTo" type="String"/>
+    <aura:attribute name="publcFromDate" type="String"/>
+    <aura:attribute name="textType" type="String"/>
+    <aura:attribute name="publisherImprint" type="String"/>
+    <aura:attribute name="publcToDate" type="String"/>
+</aura:event>

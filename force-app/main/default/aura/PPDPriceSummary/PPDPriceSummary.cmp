@@ -1,0 +1,77 @@
+<aura:component controller="TF_PPDProcessController">
+    <!-- Attributes --> 
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="showUpdate" type="Boolean" default="false" />
+    <aura:attribute name="showSave" type="Boolean" default="true" />
+    <aura:attribute name="SumPriceinGBP" type="Decimal" default="0.00" />
+    <aura:attribute name="SumPriceinUSD" type="Decimal" default="0.00" />
+    <aura:attribute name="priceinGBP" type="String"/>
+    <aura:attribute name="priceinUSD" type="String"/>  
+    <aura:attribute name="IsRecordLocked" type="String"/>
+    <aura:attribute name="IsSpinner" type="Boolean" default="false" />
+    <aura:attribute name="typeOfCollection" type="String" default="Manual Curation"/>
+    <aura:attribute name="IsUpdatedByUser" type="String" default="false" />
+    <aura:attribute name="DiscountedPercentage" type="Decimal" default="0.00" />
+    <aura:attribute name="DiscountedPriceinGBP" type="Decimal" default="0.00" />
+    <aura:attribute name="DiscountedPriceinUSD" type="Decimal" default="0.00" />
+    
+
+       
+    
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <!--<aura:handler event="c:PPDTitleRefreshEvent" action="{! c.refreshPriceSummary}" />-->
+    <aura:handler event="c:PPDTotalPriceRefreshEvent" action="{! c.setTotalPrice}" />
+	<aura:handler name="change" value="{!v.priceinGBP}" action="{!c.onDiscountChange}" />
+	<aura:handler name="change" value="{!v.priceinUSD}" action="{!c.onDiscountChange}" />
+    
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    <div class="c-container" >
+    <!-- body -->
+        <!--<lightning:badge label="Price" class="align"/>-->
+        
+         <lightning:formattedText value="Price" class="align"/>
+    <div class="slds-box" style="width:40%;padding:10px;margin:10px;" >   
+        <div>Total price of products in collection in GBP: <lightning:formattedNumber value="{!v.SumPriceinGBP}" maximumFractionDigits="2"/> £  (BYO)</div>
+       <!-- <div>Total price of products in collection in GBP: {!v.SumPriceinGBP} £</div>-->
+      
+          <lightning:input  aura:id="unitPriceInGBP" name="priceinGBP" type="number"  step="0.01"  placeholder="£" label="Enter List Price in GBP" style="padding-bottom:5px;" value="{!v.priceinGBP}" min='0.00'/>      
+    </div>
+        
+     <div class="slds-box" style="width:40%;padding:10px;margin:10px;" >  
+         <div>Total price of products in collection in USD: <lightning:formattedNumber value="{!v.SumPriceinUSD}" maximumFractionDigits="2"/> $  (BYO)</div>
+      <!--  <div>Total price of products in collection in USD: {!v.SumPriceinUSD} $</div>  -->
+         <lightning:input  aura:id="unitPriceInUSD" name="priceinUSD" type="number"  step="0.01"  placeholder="$" label="Enter List Price in USD" style="padding-bottom:10px;" value="{!v.priceinUSD}" min='0.00'/>
+         
+    </div>
+        
+    <div class="slds-box" style="width:40%;padding:10px;margin:10px;" >  
+         <lightning:input  aura:id="discountPercentage" name="disPercentage" type="number"  step="0.01"  placeholder="%" label="Enter Discount Percentage (%)" style="padding-bottom:10px;" value="{!v.DiscountedPercentage}" min='0.00' onchange="{! c.onDiscountChange }"/>
+         
+    </div>
+        
+    <div class="slds-box" style="width:40%;padding:10px;margin:10px;" >   
+          <lightning:input  aura:id="discountedPriceInGBP" name="discountedpriceinGBP" type="number"  step="0.01"  placeholder="£" label="Discounted Price in GBP" style="padding-bottom:5px;" value="{!v.DiscountedPriceinGBP}" min='0.00' disabled='true'/>      
+    </div>
+        
+     <div class="slds-box" style="width:40%;padding:10px;margin:10px;" >  
+         <lightning:input  aura:id="discountedPriceInUSD" name="discountedpriceinUSD" type="number"  step="0.01"  placeholder="$" label="Discounted Price in USD" style="padding-bottom:10px;" value="{!v.DiscountedPriceinUSD}" min='0.00' disabled='true'/>
+      </div>
+
+        
+    <div style="width:15%;padding:5px;" >       
+       <!-- <lightning:input  aura:id="unitPriceInGBP" name="priceinGBP" type="number"  step="0.01"  placeholder="£" label="Base Price in GBP" style="padding-bottom:5px;" required='true' value="{!v.priceinGBP}" min='0.00'/>
+        <lightning:input  aura:id="unitPriceInUSD" name="priceinUSD" type="number"  step="0.01"  placeholder="$" label="Base Price in USD" style="padding-bottom:10px;" required='true' value="{!v.priceinUSD}" min='0.00'/>-->
+       <aura:if isTrue="{!v.IsRecordLocked=='true'}">
+        <aura:if isTrue="{!v.showSave}">
+            <lightning:button aura:id="btnSave" disabled="{!empty(v.priceinGBP) || empty(v.priceinUSD)}" label="Save" variant="brand" onclick="{!c.createBundlePriceBookEntry }" />
+        </aura:if>    
+        <aura:if isTrue="{!v.showUpdate}">
+            <lightning:button aura:id="btnUpdate" disabled="{!empty(v.priceinGBP) || empty(v.priceinUSD)}" label="Update" variant="brand" onclick="{!c.updateBundlePriceBookEntry }"/>
+        </aura:if>
+           </aura:if>
+    </div>
+    </div> 
+</aura:component>

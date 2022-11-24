@@ -1,0 +1,44 @@
+<apex:page Controller="PCIEditEmailMessageController"  action="{!isValidId}">
+<apex:sectionHeader title="PCI Edit Email Message" subtitle="{!em.Subject}"/>
+<apex:form >
+     <apex:pageBlock title="Email Message" mode="edit">
+     
+      <apex:pageBlockButtons location="both">
+               <apex:commandButton value="Save" action="{!save}" rendered="{!showControllers}"/> 
+               <apex:commandButton value="Cancel" action="{!cancel}" rendered="{!showControllers}"/>     
+          </apex:pageBlockButtons>   
+          <apex:pageMessages />
+          <apex:pageBlockSection showHeader="false" columns="2" >
+          
+          </apex:pageBlockSection>
+          
+          <apex:pageBlockSection title="Email Information" showHeader="false" columns="1" >
+          <apex:outputField title="Message Date" value="{!em.MessageDate}"/>
+          <apex:outputField title="To Address" value="{!em.ToAddress}"/>
+          <apex:outputField title="From Address" value="{!em.FromAddress}"/>
+                     <apex:pageBlockSectionItem rendered="{!showHtml}">
+                        <apex:outputLabel value="Html Body" for="emailMessageBody" rendered="{!showHtml}"/> 
+                        <apex:inputTextarea id="emailMessageBody" value="{!em.HtmlBody}" rendered="{!showHtml}" rows="30" cols="250"  style="width:3500;" />
+                        
+                        
+                        </apex:pageBlockSectionItem>
+                        
+                        <apex:pageBlockSectionItem rendered="{!(!showHtml)}">
+                        <apex:outputLabel value="Text Body" for="emailMessageText" rendered="{!(!showHtml)}"/>
+                        <apex:inputTextarea id="emailMessageText" value="{!em.TextBody}" rendered="{!(!showHtml)}" rows="30" cols="250"  style="width:3500;"/>
+                        
+                       
+                    </apex:pageBlockSectionItem>
+         </apex:pageBlockSection>
+          
+             <apex:pageBlockSection showHeader="false" columns="2" >
+          
+          </apex:pageBlockSection>
+          <!--
+                <apex:outputField title="Html Body" value="{!em.HtmlBody}"  rendered="{!showHtml}"/>
+               <apex:outputField title="Text Body" value="{!em.TextBody}" rendered="{!(!showHtml)}"/>
+               -->
+     
+     </apex:pageBlock>
+     </apex:form>   
+</apex:page>

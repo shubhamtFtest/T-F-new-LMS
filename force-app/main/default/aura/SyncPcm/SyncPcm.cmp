@@ -1,0 +1,25 @@
+<aura:component controller="TF_UpdateProductToApproved" implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global">
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="showError" type="Boolean" default="false"/>
+    <aura:attribute name="showMsg" type="Boolean" default="false"/>
+    <aura:attribute name="showBottonContent" type="Boolean" default="true"/>
+    
+    <aura:if isTrue="{!v.showBottonContent}">
+        Do you want to Sync the Product with PCM.<br></br>
+        <lightning:button variant="brand" label="Yes" title="Sync To PCM" onclick="{! c.updateProduct }" />
+        <lightning:button variant="brand" label="No" title="Sync To PCM" onclick="{! c.closePopup }" />
+    </aura:if>
+    
+    
+    <aura:if isTrue="{!v.showMsg}">
+        Your Request is accepted successfully, it will be processed soon. <h1>Thank You</h1>
+        <lightning:button variant="brand" label="Done" title="Sync To PCM" onclick="{! c.closePopup }" />
+        
+    </aura:if> 
+    <aura:if isTrue="{!v.showError}"> 
+        There is Some Issue at our End Or the Api is Down.
+        <lightning:button variant="brand" label="Done" title="Sync To PCM" onclick="{! c.closePopup }" />
+        
+    </aura:if>
+    
+</aura:component>

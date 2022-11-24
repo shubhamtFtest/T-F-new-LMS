@@ -1,0 +1,31 @@
+<template>  
+  <div class="slds-m-left_xx-large slds-m-right_xx-large slds-m-bottom_medium slds-border_top slds-border_right slds-border_left slds-border_bottom">
+  <lightning-card 
+  variant="narrow"
+            icon-name="standard:contact" title="Create Contact">
+     
+        <lightning-record-edit-form object-api-name="Case" record-id={recordId}>
+          <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-2" align="left">
+    <lightning-input-field field-name="SuppliedName" value= {SuppliedName}  onchange={handleChangeName}></lightning-input-field>
+     </div>
+     <div class="slds-col slds-size_1-of-2" align="left">
+      <lightning-input-field field-name="SuppliedEmail" value= {SuppliedEmail}  onchange={handleChangeEmail}></lightning-input-field>
+    </div>
+        </div>
+        <div class="slds-col slds-size_1-of-1" align="left">
+          <lightning-input-field field-name="AccountId" value ={AccountId} ></lightning-input-field>
+          </div>
+         </lightning-record-edit-form>
+         <lightning-record-edit-form object-api-name="Contact">
+              <lightning-input-field field-name="Mailing_Country_List__c" value={Mailing_Country_List__c} onchange={handleChangeMailing_Country_List__c}></lightning-input-field>
+              <lightning-input-field field-name="Business__c" value= {Business__c}  onchange={handleChangeBusiness__c}></lightning-input-field>
+         </lightning-record-edit-form>
+         
+         <div slot="footer" >
+          <lightning-button type="submit" variant="brand-outline" label="Cancel"  onclick={closeModal} ></lightning-button>&nbsp;&nbsp;
+          <lightning-button  type="submit" variant="brand" label="Save"  onclick={createContact} ></lightning-button>
+        </div>
+      </lightning-card>
+    </div>
+    </template>

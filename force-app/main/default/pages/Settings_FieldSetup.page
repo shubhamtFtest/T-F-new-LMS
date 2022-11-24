@@ -1,0 +1,18 @@
+<apex:page controller="SettingsFieldSetupExtension" showHeader="false" sidebar="false">
+
+    <apex:form id="frm">
+    
+        <apex:pageBlock >
+        
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton action="{!save}" value="Save" oncomplete="parent.document.getElementById('lnkHideBox').click();"/>
+                <apex:commandButton action="{!cancel}" value="Cancel" oncomplete="parent.document.getElementById('lnkHideBox').click();"/>
+            </apex:pageBlockButtons>
+            
+            <apex:dynamicComponent componentValue="{!SettingFieldSetupPageLayout}"/>
+  
+        </apex:pageBlock>
+
+    </apex:form>
+
+</apex:page>

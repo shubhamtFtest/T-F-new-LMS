@@ -1,0 +1,87 @@
+<!--Created By: Shalini Singh
+	Description: Providing the retry functionality for external channel order cancellation -->
+<aura:component controller="Trig_cancelNonSFOrder" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global"  >
+    
+    <aura:attribute name="isCancelled" type="boolean" default="false" description="Use to indicate wheather it's a success or error"/>
+    <aura:attribute name="isNotAttempted" type="boolean" default="false" description="Use to indicate wheather this functionality hit by the trigger or not"/>
+    <aura:attribute name="recordId" type="Id" description="Use to get current record id"/>
+    <aura:attribute name="messageOnOrder" type="String" description="Use to store message field value of order object"/>
+    <aura:attribute name="spinner" type="boolean" default="false" description="use to show spinner after clicking on proceed button"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onLoad}"/>
+    
+    <!--Define Spinner- After clicking on cancel order button-->
+    <aura:if isTrue="{!v.spinner}">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <h3 slot="title" class="slds-border_bottom slds-p-left_large slds-p-vertical_large">
+        <lightning:icon iconName="utility:connected_apps" alternativeText="Connected" title="Connected" />
+        <b style="font-size: medium;"> Retry Order Cancellation Process</b>
+    </h3><br/>
+    
+    <div class="" style="">
+        <lightning:layout class="slds-p-left_medium">
+            <lightning:layoutItem flexibility="auto, no-grow" padding="around-small">
+                <div class="custom-box"><h1><b>Order Cancellation</b></h1></div>
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto, no-grow" padding="around-small">
+                <div class="custom-box">
+                    <aura:if isTrue="{!v.isCancelled}">
+                        
+                        <aura:if isTrue="{!v.isNotAttempted}">
+                            <lightning:icon iconName="utility:warning" alternativeText="Warning!" title="Warning" />
+                            <aura:set attribute="else">
+                                <lightning:icon size="xx-small" iconName="action:approval" alternativeText="Success" title="Success" />
+                            </aura:set>
+                        </aura:if>
+                        
+                        <!--<lightning:icon size="xx-small" iconName="action:approval" alternativeText="Success" title="Success" />-->
+                        <aura:set attribute="else">
+                            <lightning:icon size="xx-small" iconName="action:close" alternativeText="Error" title="Error" />
+                        </aura:set>
+                    </aura:if> 
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" padding="around-small">
+                <div class="custom-box">{!v.messageOnOrder}</div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div><br/><br/><br/>
+    
+    <aura:if isTrue="{!v.isCancelled}">
+        <aura:set attribute="else">
+            <lightning:layout class="slds-p-top_medium slds-align_absolute-center">
+                <lightning:layoutItem>
+                    <div class="custom-box">Click proceed to execute retry functionality</div>
+                </lightning:layoutItem>
+            </lightning:layout>
+        </aura:set>
+    </aura:if>
+    
+    <lightning:layout class="slds-align_absolute-center">
+        <aura:if isTrue="{!v.isCancelled}">
+            <lightning:layoutItem padding="around-small">
+                <lightning:button variant="brand-outline" label="Cancel" title="Cancel" onclick="{! c.closeAction }" />
+            </lightning:layoutItem>
+            
+            <aura:set attribute="else">
+                <lightning:layoutItem padding="around-small">
+                    <lightning:button variant="brand-outline" label="Proceed" title="Proceed" onclick="{! c.cancelSelectedOrderRetry }" />    
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-small">
+                    <lightning:button variant="brand-outline" label="Cancel" title="Cancel" onclick="{! c.closeAction }" />   
+                </lightning:layoutItem>
+            </aura:set>
+        </aura:if> 
+    </lightning:layout>
+    
+    
+</aura:component>

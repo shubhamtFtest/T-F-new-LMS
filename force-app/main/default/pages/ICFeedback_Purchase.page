@@ -1,0 +1,35 @@
+<apex:page showHeader="false" standardStylesheets="true">
+    <apex:composition template="ICSiteTemplate">
+        <apex:define name="body">
+        
+        <h1 style="color: #80B4E4">Thank you for your feedback.</h1>
+        
+        <p></p><b>Please send payments to: </b><p></p>  
+        
+        <b>UK and rest of the world:</b><br>
+        <blockquote>Receipts Section<br>
+        Taylor & Francis Group<br> 
+        Informa UK Ltd<br> 
+        Sheepen Place<br> 
+        Colchester<br> 
+        Essex CO3 3LP UK<br>
+        Tel: +44 (0) 20 7017 6510<br>
+        Fax: +44 (0) 20 7017 6683<br>
+        E-mail: <a href="mailto:t&fcredit.control@informa.com">t&fcredit.control@informa.com</a>
+        </blockquote>
+        <p></p>  
+                
+        <b>US, Canada and South America:</b><br>
+        <blockquote>Taylor and Francis Group LLC<br>
+        PO Box 409267<br>
+        Atlanta, GA 30384-9267<br>
+        Tel: Toll free 1 800 634 7064<br>
+        Fax: Toll free 1 800 248 4724<br>
+        E-mail: <a href="mailto:orders@taylorandfrancis.com">orders@taylorandfrancis.com</a>        
+        </blockquote><p></p>
+        
+        For more information about our books, special offers or subject based selections please visit <a href="http://www.taylorandfrancis.com/">http://www.taylorandfrancis.com</a>
+            
+        </apex:define>
+    </apex:composition>
+</apex:page>

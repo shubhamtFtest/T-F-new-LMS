@@ -1,0 +1,98 @@
+<!-- 
+ Created by Jeff Lup on 2014.04.08, CHG0057797, for Journals
+ Modified by Jeff Lup on 2015.05.12, INC1574586
+-->
+
+<apex:page id="pg" standardController="Opportunity" extensions="OppRenewalPromptLb_TFJournalsController" showHeader="false" sidebar="false" action="{!yesRenewal}">
+    <apex:form id="frm">
+    
+        <apex:pageBlock title="FIELDS TO BE CLONED" rendered="false">
+            <apex:outputField value="{!Opportunity.StageName}" />
+            <apex:outputField value="{!Opportunity.AccountId}" />
+            <apex:outputField value="{!Opportunity.Next_Renewal__c}" />
+            <apex:outputField value="{!Opportunity.CloseDate}" />
+            <apex:outputField value="{!Opportunity.Volume_Year__c}" />
+            <apex:outputField value="{!Opportunity.Start_Date__c}" />
+            <apex:outputField value="{!Opportunity.End_Date__c}" />
+            <apex:outputField value="{!Opportunity.OwnerId}" />
+            <apex:outputField value="{!Opportunity.Participating_institutions__c}" />
+            <apex:outputField value="{!Opportunity.Pricebook2Id}" />
+            <apex:outputField value="{!Opportunity.CurrencyIsoCode}" />
+            <apex:outputField value="{!Opportunity.RecordtypeId}" />
+            <apex:outputField value="{!Opportunity.Deal_Type__c}" />
+            <apex:outputField value="{!Opportunity.Parent_Opportunty__c}" />
+            <apex:outputField value="{!Opportunity.ReVisit_Date__c}" />
+            <apex:outputField value="{!Opportunity.Multi_year_deal__c}"/>
+            <apex:outputField value="{!Opportunity.Multi_Year_Deal_Start_Year__c}"/>
+            <apex:outputField value="{!Opportunity.Multi_Year_Deal_End_Year__c}"/>
+          
+        </apex:pageBlock>
+    
+        <apex:actionFunction name="saveNoRenewal" action="{!noRenewal}" />
+        <!-- <apex:outputText value="Archive One-Offs will be renewed as Archive Maintenance Fee Products, at price zero.  All other Products will be renewed as the same Product, at price zero.  You will be taken to the Renewal Opportunity after saving, where you can change anything that doesn’t conform to these cloning rules." /> -->
+        
+        <apex:outputText value="Create Next Year's Renewal Opportunity for {!Opportunity.Account.Name}?" style="font-size: 150%;" />
+        <br/><br/>
+        
+        <apex:outputText value="Always say 'Yes' and allow Salesforce to create next year's Renewal Opportunity unless there is no prospect for renewal next year." />
+        <br/><br/>
+        <apex:outputText value="You will be taken to the Renewal Opportunity after saving, where you can change anything that doesn't conform to the cloning rules." />
+        <br/><br/>
+        <apex:outputText value="***You cannot progress your original Opportunity to Closed Won without completing this step." />
+        <br/><br/>
+        <apex:actionStatus id="status_yes" startText=" creating renewal..." stopText="" startStyle="font-weight:bold" stopStyle="font-weight:bold" />
+        <apex:actionStatus id="status_no" startText=" saving reason..." stopText="" startStyle="font-weight:bold" stopStyle="font-weight:bold" />
+        <apex:commandButton id="btnYes" action="{!yesRenewal}" value="Yes" onclick="hideButtons();" oncomplete="parent.document.location.replace('/{!renewalId}');" rerender="status_yes" status="status_yes"/>
+        &nbsp;
+        <apex:commandButton id="btnNo" action="{!noRenewal}" value="No" onclick="hideButtons_No();" oncomplete="conditionalClose();" rerender="status_no" status="status_no"/>        
+        <apex:outputText id="otNoMessage" value=" If No, please specify a reason below..." />
+        <br/>
+        <br/>
+        <apex:inputTextarea id="noreason" value="{!reasonForNoRenewal}" style="width:510px; height:45px;" />
+        <apex:actionStatus id="status_revert" startText=" reverting opportunity back to '{!oldStage}'..." stopText="" startStyle="font-weight:bold" stopStyle="font-weight:bold" />
+        <apex:outputPanel id="opOldStage" rendered="{!showOldStage}">
+            <br/>
+            <apex:outputText value="Or click " />
+            <apex:commandLink action="{!cancelClosedWon}" value="here" onclick="hideButtons();" oncomplete="parent.document.location.replace('/{!oppId}');" rerender="status_revert" status="status_revert" />
+            <apex:outputText value=" to revert the original Opportunity to '{!oldStage}' and also create no renewal." />
+        </apex:outputPanel>
+    </apex:form>
+    
+    <script type="text/javascript">
+
+        function hideButtons() {
+            document.getElementById('pg:frm:btnYes').style.visibility="hidden";
+            document.getElementById('pg:frm:btnNo').style.visibility="hidden";
+            document.getElementById('pg:frm:otNoMessage').style.visibility="hidden";
+            try {
+                //inside a try catch block because sometimes this outputPanel is not rendered - INC1574586
+                document.getElementById('pg:frm:opOldStage').style.visibility="hidden";
+            } catch(err) {
+            }
+        }
+        function hideButtons_No() {
+            var x=document.getElementById('pg:frm:noreason');
+            if (x.value != "") {
+                document.getElementById('pg:frm:btnYes').style.visibility="hidden";
+                document.getElementById('pg:frm:btnNo').style.visibility="hidden";
+                document.getElementById('pg:frm:otNoMessage').style.visibility="hidden";
+                try {
+                    //inside a try catch block because sometimes this outputPanel is not rendered - INC1574586
+                    document.getElementById('pg:frm:opOldStage').style.visibility="hidden";
+                } catch(err) {
+                }
+            }
+        }
+        
+        function conditionalClose() {
+            var x=document.getElementById('pg:frm:noreason');
+            if (x.value != "") {
+                //saveNoRenewal();
+                //parent.document.getElementById('lnkHideBox').click();
+                parent.document.location.replace('/{!oppId}');
+            }
+        }
+
+    </script>
+        
+</apex:page>

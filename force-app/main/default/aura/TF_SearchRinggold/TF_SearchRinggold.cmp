@@ -1,0 +1,142 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="TF_SearchRinggoldIdCallout">
+    
+    <!-- init method loads the data attribute values -->
+    <aura:handler name="init" action="{!c.calloutCtrl}" value="{!this}"/>
+     
+    <!--Declare Attributes-->
+    <aura:attribute name="Spinner" type="boolean" default="true"/>
+    <aura:attribute name="objectList" type="List" />
+    <aura:attribute name="thirdParty" type="boolean" default="false"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="rgId" type="String" />
+    <aura:attribute name="tableCols" type="List"/>
+    <aura:attribute name="selectedRows" type="List" />
+    <aura:attribute name="accUpdate" type="String" />
+    <aura:attribute name="AccRec" type="Account" />
+    <aura:attribute name="showErrors" type="boolean" default="false"/>
+    <aura:attribute name="ringgoldError" type="boolean" default="false"/>
+    <aura:attribute name="errorMsg" type="String"/>
+    
+    <!-- Component -->
+    <aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+       <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+         <span class="slds-assistive-text">Loading</span>
+         <div class="slds-spinner__dot-a"></div>
+         <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+ </aura:if>
+    <div class="slds-p-around_medium slds-form slds-form_compound" style="width: 440px;">
+        <fieldset class="slds-form-element slds-form-element_compound">
+  <div class="slds-form-element__control">
+    <div class="slds-form-element__row">
+      <div class="slds-size_1-of-2">
+        <div class="slds-form-element">
+          <label class="slds-form-element__label" for="input-01">Account Name:</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="input-01" class="slds-input" value="{!v.AccRec.Name}" onchange="{! c.handleInputNameChange }"/>
+          </div>
+        </div>
+      </div>
+      <div class="slds-size_1-of-2">
+        <div class="slds-form-element">
+          <label class="slds-form-element__label" for="input-02">Website:</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="input-02" class="slds-input" value="{!v.AccRec.Website}" onchange="{! c.handleInputWebsiteChange }"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slds-form-element__control">
+    <div class="slds-form-element__row">
+      <div class="slds-size_1-of-2">
+        <div class="slds-form-element">
+          <label class="slds-form-element__label" for="input-01">City:</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="input-03" class="slds-input" value="{!v.AccRec.BillingCity}" onchange="{! c.handleInputCityChange }"/>
+          </div>
+        </div>
+      </div>
+      <div class="slds-size_1-of-2">
+        <div class="slds-form-element">
+          <label class="slds-form-element__label" for="input-02">State:</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="input-04" class="slds-input" value="{!v.AccRec.BillingState}" onchange="{! c.handleInputStateChange }"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slds-form-element__control">
+    <div class="slds-form-element__row">
+      <div class="slds-size_1-of-2">
+        <div class="slds-form-element">
+          <label class="slds-form-element__label" for="input-01">Zip Code:</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="input-05" class="slds-input" value="{!v.AccRec.BillingPostalCode}" onchange="{!c.handleInputZipChange}"/>
+          </div>
+        </div>
+      </div>
+      <div class="slds-size_1-of-2">
+        <div class="slds-form-element">
+          <label class="slds-form-element__label" for="input-02">Country:</label>
+          <div class="slds-form-element__control">
+            <input type="text" id="input-06" class="slds-input" value="{!v.AccRec.BillingCountry}" onchange="{!c.handleInputCountryChange}"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</fieldset>
+        <br/>
+        <div class="slds-form-element">
+            <lightning:button
+                    label="Search"
+                    variant="brand"
+                    onclick="{! c.searchRinggoldCtrl }"
+            />
+        </div>
+    </div>
+
+    <br/><br/>
+    <aura:if isTrue="{!v.showErrors}">
+        <!-- Show the message to ui -->
+        <div class="slds-notify slds-notify_toast slds-theme_error">
+            <span class="slds-assistive-text">error</span>
+            <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small slds-align_absolute-center">Another Account found with same Ringgold Id.</h2> 
+                <lightning:formattedUrl value="{!v.errorMsg}" label="Go to Account" target="_blank" />
+                <h2 class="slds-text-heading_small ">Select another ringgold id or click on reject.</h2>
+
+            </div><br/>
+            <lightning:button
+                    label="Reject"
+                    variant="brand"
+                    onclick="{!c.rejectRequest}"
+            />
+        </div>
+    </aura:if>
+    
+  <div style="width: 100%;" class="slds-form-element">
+  <lightning:datatable suppressBottomBar = "false" aura:id="dataTable"
+                keyField="RinggoldId"
+                maxRowSelection="1"
+                selectedRows="{!v.selectedRows }"
+                data="{! v.objectList }"
+                columns="{! v.tableCols}"
+                onrowselection="{!c.handleSelect}"
+                hideCheckboxColumn="false"/>
+               
+  </div> 
+    <aura:if isTrue="{!v.ringgoldError}">
+        <!-- Show the message to ui -->
+        <div class="slds-notify slds-notify_toast slds-theme_error">
+            <span class="slds-assistive-text">error</span>
+            <div class="slds-notify__content">
+            	<h2 class="slds-text-heading_small slds-align_absolute-center">Error to fetch Ringgold Data. Please try again after some time.</h2> 
+			</div>
+        </div>
+    </aura:if>
+</aura:component>

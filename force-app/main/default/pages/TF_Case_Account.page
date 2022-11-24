@@ -1,0 +1,13 @@
+<apex:page sidebar="true" showHeader="true" standardController="Case">
+  <!--<apex:pageBlock>-->
+    <!--<apex:pageBlockSection>-->
+      <apex:form >
+        <apex:outputText value="Account">
+        </apex:outputText>
+        &nbsp;
+        <apex:outputField value="{!case.AccountId}"/>
+        <apex:commandButton value="save"/>
+      </apex:form>
+    <!--</apex:pageBlockSection>-->
+  <!--</apex:pageBlock>-->
+</apex:page>

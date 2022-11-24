@@ -1,0 +1,16 @@
+<aura:component >
+    <!-- ForecastTerritoryForecastTypeLabel -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="map" type="map"/>
+    <aura:attribute name="key" type="string"/>
+    <aura:attribute name="showTerritory" type="Boolean"/>
+    <aura:attribute name="territoryName" type="string"/>
+    <aura:attribute name="forecasteName" type="string"/>
+    <!-- territory-->
+    <aura:if isTrue="{!v.showTerritory}">
+        {!v.territoryName}
+        <aura:set attribute="else">
+            {!v.forecasteName}
+        </aura:set>
+    </aura:if>    
+</aura:component>

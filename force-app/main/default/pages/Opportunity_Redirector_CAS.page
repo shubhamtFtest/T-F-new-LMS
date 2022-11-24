@@ -1,0 +1,21 @@
+<!-- Created by Jeff Lup - 2015.03.26 - CHG0063907 -->
+<!-- Modified by Jeff Lup - 2015.11.09 - CHG0069310 - Lightning Look & Feel -->
+<!-- Modified by Jeff Lup - 2017.10.09 - CHG0038379 -->
+<apex:page standardController="Opportunity">
+    <c:jQuery />
+    <script language="javascript">
+        var j$ = jQuery.noConflict();
+        j$(document).ready(function() {
+            //if ("{!Opportunity.RecordTypeId}" == "01260000000DXs4AAG" && "{!Opportunity.CAS_Course_Cat1__c}" == "") {
+            if ("{!Opportunity.RecordType.Name}" == "T&F - CAS Opportunity" && "{!Opportunity.CAS_Course_Cat1__c}" == "") {
+                if (isLightningExperienceOrSalesforce1())
+                    sforce.one.navigateToURL("/apex/cas_course_categories?id={!Opportunity.Id}");
+                else
+                    parent.window.location.href = '/apex/CAS_Course_Categories_Edit?id={!Opportunity.Id}';
+            }
+        });
+        function isLightningExperienceOrSalesforce1() {
+            return((typeof sforce != 'undefined') && sforce && (!!sforce.one));
+        }
+    </script>
+</apex:page>

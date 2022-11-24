@@ -1,0 +1,14 @@
+.THIS.c-container {
+    border: 1px solid #d8dde6;
+    margin: 10px 0 20px 0;
+    background-color: #dbdde0;
+}
+
+.THIS.notify {  
+    color: red;
+}
+
+.THIS .showRed input{
+    border-color: red;
+    box-shadow: 0 0 3px red;
+}

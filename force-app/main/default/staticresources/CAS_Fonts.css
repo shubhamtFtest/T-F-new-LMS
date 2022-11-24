@@ -1,0 +1,428 @@
+/*---	
+	
+	Copyright (c) 2004 Taylor & Francis Group.
+	XHTML CSS Selectors 	
+	
+	****** Revision:		1.0
+	****** Date:			08/03/04
+	****** Author:			Phil Wright
+
+	This Cascading Style Sheet defines FONT selector declarations.
+
+	*******************************************
+	
+			1. DEFUALT SETTINGS
+			2. HEADER SETTINGS
+			3. LEFT NAV LINKS
+			4. ENLARGE LINK
+			5. READ MORE LINK
+
+	*******************************************
+	
+---*/
+
+
+/* ---BODY--- */
+
+p.default, .defaulttext
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #000000;
+	}
+	
+a.booktitle, .booktitlelink
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 9pt;
+	font-style : normal;
+	font-weight : bold;
+	color : #007FBE;
+	text-decoration:none;
+	}
+
+a.booktitle:hover, .booktitlelink:hover
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight : bold;
+	color : #007FBE;
+	text-decoration:underline;
+	} 
+
+
+a.default, .defaultlink
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #007FBE;
+	text-decoration:none;
+	}
+
+a.default:hover, .defaultlink:hover
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #007FBE;
+	text-decoration:underline;
+	} 
+
+
+p.default-blk, ul, li, ol, blockquote, .defaulttext-blk
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #000000;
+	}
+	
+a.default-blk, .defaultlink-blk
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #000000;
+	text-decoration:none;
+	}
+
+a.default-blk:hover, .defaultlink-blk:hover
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #000000;
+	text-decoration:underline;
+	} 
+
+/* --- TEXT --- */
+
+.text1-blk
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 9pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #000000;
+	text-decoration:none;
+	}
+
+.text2-blk
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 9pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #000000;
+	text-decoration:none;
+	}
+
+.text1-dk-blu
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 9pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #007FBE;
+	text-decoration:none;
+	}
+
+.text2-dk-blu
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 9pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #007FBE;
+	text-decoration:none;
+	}
+
+.text-search-results-dk-blu
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #007FBE;
+	text-decoration:none;
+	}
+
+.title1-blk
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 11pt;
+	font-style : normal;
+	font-weight : normal;
+	}
+
+.title1-dk-blu
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 12pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #007FBE;
+	}
+
+.title_bar
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 14pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #72ADDE;
+	}
+
+/* --- HEADER LINKS --- */
+
+a.toprightnav
+	{
+	font-family: arial, helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 9pt;
+	color: #ffffff;
+	text-decoration: none;
+	}
+	
+a.toprightnav:hover
+	{
+	font-family: arial, helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 9pt;
+	color: #ffffff;
+	text-decoration: underline;
+	}
+
+/* --- LEFT NAV LINKS --- */
+
+.leftnavlink
+	{
+	font-family:  arial,helvetica,sans-serif;
+	font-size:8pt;
+	font-weight: normal;
+	color: #666666;
+	text-decoration: none;
+	text-indent:3px;
+	}
+
+.leftnavlink:hover
+	{
+	font-family:  arial,helvetica,sans-serif;
+	font-size:8pt;
+	font-weight: normal;
+	color: #666666;
+	text-decoration: underline;
+	text-indent:3px;
+	}
+	
+.pageheading
+	{
+	font-family: trebuchet MS, arial, helvetica, sans-serif;
+	font-size: 12pt;
+	color: #72ADDE;
+	font-weight: bold;
+	}
+
+/* --- ENLARGE --- */
+a.large-jacket
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :8pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #4192D3;
+	text-decoration:none;
+	}
+	
+a.large-jacket:hover
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :8pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #4192D3;
+	text-decoration:underline;
+	}
+	
+/* --- READMORE --- */
+a.read-more
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :8pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #007FBE;
+	text-decoration:none;
+	}
+	
+a.read-more:hover
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :8pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #007FBE;
+	text-decoration:underline;
+	}
+
+/* --- CATEGORIES --- */
+a.category
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #94bce5;
+	text-decoration:none;
+	}
+	
+a.category:hover
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :10pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #94bce5;
+	text-decoration:underline;
+	}
+
+a.sub-category
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #94bce5;
+	text-decoration:underline;
+	}
+	
+a.sub-category:hover
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #94bce5;
+	text-decoration:underline;
+	}
+
+a.sub-category-left
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :8pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #94bce5;
+	text-decoration:none;
+	}
+	
+a.sub-category-left:hover
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :8pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #94bce5;
+	text-decoration:underline;
+	}
+
+/* --- NEXT/PREVIOUS PAGE --- */
+.page 
+	{
+	text-decoration: none; 
+	color: #4192D3;
+	}
+	
+A.page:link 
+	{
+	font-family: verdana; 
+	font-size: 8pt; 
+	font-style : normal;
+	font-weight: bold; 
+	color: #007FBE; 
+	text-decoration: none;
+	}
+
+A.page:hover 
+	{
+	font-family: verdana; 
+	font-size: 8pt; 
+	font-style : normal;
+	font-weight: bold; 
+	color: #007FBE; 
+	text-decoration:none;
+	}
+
+A.page:visited 
+	{
+	font-family: verdana; 
+	font-size: 8pt; 
+	font-style : normal;
+	font-weight: bold; 
+	color: #007FBE; 
+	text-decoration:none;
+	}
+
+p.title
+	{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size :9pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #666666;
+	}
+
+p.blurb
+	{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size :8pt;
+	font-style : normal;
+	font-weight : normal;
+	color : #666666;
+	}
+
+.subnav
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 9pt;
+	font-style : normal;
+	font-weight : bold;
+	color : #336699;
+	text-decoration:none;
+}
+
+.subnav:hover
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 9pt;
+	font-style : normal;
+	font-weight : bold;
+	color : #336699;
+	text-decoration:underline;
+} 
+
+.gstextbook
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 17px;
+	font-weight : bold;
+	color : #666666;
+}
+
+/* --- PAGE MESSAGES --- */
+.msg-wait-dk-blu
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 17px;
+	font-weight : bold;
+	color : #007FBE;
+}

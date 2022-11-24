@@ -1,0 +1,23 @@
+<aura:component >
+    <aura:attribute name="currentPageNumber" type="Integer" required="true" />
+    <aura:attribute name="maxPageNumber" type="Integer" required="true" />
+    <aura:attribute name="nextClicked" type="String" />
+    <aura:attribute name="prevClicked" type="String" />
+    <aura:attribute name="lastClicked" type="String"/>
+    <aura:attribute name="prevPageNumber" type="Integer"/>
+    <aura:attribute name="firstClicked" type="String"/>
+    <!--aura:handler event="c:PPDGenericEvent" action="{!c.resetPageNum}"/-->
+    
+    
+    <div>
+        <lightning:buttonGroup>
+            <lightning:button onclick="{!c.firstPage}" label="First"/>
+            <lightning:button onclick="{!c.prevPage}" label="Prev"/>
+            <lightning:button>
+                {!v.currentPageNumber}/{!v.maxPageNumber}
+            </lightning:button>
+            <lightning:button onclick="{!c.nextPage}" label="Next"/>
+            <lightning:button onclick="{!c.lastPage}" label="Last"/>
+        </lightning:buttonGroup>     
+    </div>
+</aura:component>

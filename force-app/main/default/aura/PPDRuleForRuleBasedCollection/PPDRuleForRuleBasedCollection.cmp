@@ -1,0 +1,111 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="ruleValues" type="Object" />
+    <aura:attribute name="netBaseValues" type="String[]" />
+    <aura:attribute name="subjectValues" type="String[]" />
+    <aura:attribute name="filterObjectLst" type="Object[]" access="global"/>
+    <aura:attribute name="multiTypeRulesLst" type="Object[]" access="global"/>
+    <aura:attribute name="tempRuleVal" type="String" />
+    <aura:attribute name="queryString" type="String" />
+    <aura:attribute name="isDynamicUi" type="String" default="false"/>
+    <aura:attribute name="noRule" type="String" default="true" />
+    
+    
+    
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler event="c:PPDRuleRefresh" action="{!c.init}"/>
+    
+    <div class="slds-box" style="width:100%">
+        <lightning:badge label="Rule" class="align"/>
+        <aura:if isTrue="{!v.noRule == 'true'}">
+            <div class="slds-card">
+                <lightning:layout>
+                    <lightning:layoutItem padding="around-small" flexibility="auto">
+                        <p>
+                            <lightning:formattedRichText aura:id="msgForBlankRule"></lightning:formattedRichText>
+                        </p>
+                    </lightning:layoutItem>
+                </lightning:layout>        
+            </div> 
+        </aura:if>
+        
+        <aura:if isTrue="{!v.isDynamicUi != 'true'}">
+            <lightning:layout  multipleRows="true">
+                <aura:iteration items="{!v.filterObjectLst}" var="record">
+                    <aura:if isTrue="{!and(record.value != null,record.value!= '')}">
+                        <aura:if isTrue="{!and(record.label != 'Netbase',record.label!= 'Subject List')}">
+                            <lightning:layoutItem flexibility="auto" size="6" >            
+                                <div class="label">{!record.label}</div>
+                                <div class="field">{!record.value}</div><br></br>         
+                            </lightning:layoutItem>
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!and(record.value != '[]',record.value!= '')}">
+                                    <lightning:layoutItem flexibility="auto" size="6" >            
+                                        <lightning:textarea name="txtArea" value="{!record.value}"
+                                                            label="{!record.label}" readonly="true"/>
+                                    </lightning:layoutItem>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>           
+                    </aura:if>          
+                </aura:iteration>
+            </lightning:layout>
+        </aura:if>
+        
+        <lightning:layout  multipleRows="true">
+            <aura:iteration items="{!v.multiTypeRulesLst}" var="typeRulesLst" indexVar="indexVar">
+               <aura:if isTrue="{!indexVar != 0}">
+                  <!--   <aura:if isTrue="{!and(indexVar != 0,typeRulesLst.productType !=null)}">-->
+                    <lightning:layoutItem padding="around-small" size="12">
+                        <lightning:badge label="OR"/>
+                    </lightning:layoutItem>
+                </aura:if>
+                      <!--<aura:if isTrue="{!(typeRulesLst.productType !=null)}">-->
+                <lightning:layoutItem padding="around-small" size="12">
+                    <div class="slds-box">
+                        <lightning:layout  multipleRows="false">
+                            <lightning:layoutItem padding="around-small">
+                                <p>
+                                    <b>Type : {!typeRulesLst.productType}</b>
+                                </p>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                        <lightning:layout>
+                            <lightning:layoutItem padding="around-small" size="12">
+                                <aura:iteration items="{!typeRulesLst.ruleElementLst}" var="ruleElement">
+                                    <aura:if isTrue="{!ruleElement.type == 'criteria'}">
+                                        <lightning:layout  multipleRows="false">
+                                            <lightning:layoutItem padding="around-small">
+                                                <lightning:input name="inp2" disabled="true" value="{!ruleElement.attributeLabel}" label="inp2" variant="label-hidden"/>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem padding="around-small">
+                                                <lightning:input name="inp3" disabled="true" value="{!ruleElement.relationshipLabel}" label="inp3" variant="label-hidden"/>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem padding="around-small">
+                                                <aura:if isTrue="{!or(ruleElement.relationshipLabel == 'IN', ruleElement.relationshipLabel == 'NOT IN')}">
+                                                    <lightning:textarea name="txtArea" value="{!ruleElement.value}"
+                                                                        variant="label-hidden" disabled="true"/>
+                                                    <aura:set attribute="else">
+                                                        <lightning:input name="inp4" disabled="true" value="{!ruleElement.value}" label="inp4" variant="label-hidden"/>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </lightning:layoutItem>
+                                        </lightning:layout>
+                                    </aura:if>
+                                    <aura:if isTrue="{!and(ruleElement.type == 'logical',ruleElement.value == 'OR')}">
+                                        <lightning:layoutItem padding="around-small">
+                                           <lightning:badge label="OR"/>
+                                        </lightning:layoutItem>
+                                    </aura:if>
+                                </aura:iteration>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                </lightning:layoutItem>
+                           <!-- </aura:if>-->
+            </aura:iteration>
+        </lightning:layout>
+        
+    </div> 
+</aura:component>

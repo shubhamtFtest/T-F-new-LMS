@@ -1,0 +1,113 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" controller="TF_POFLicenseController" >
+<aura:attribute name="isFormOpen" type="boolean" default="true" /> 
+<aura:attribute name="ErrorMessage" type="String" default="" />
+<aura:attribute name="hasPartyId" type="String" default="" />
+<aura:attribute name="hasContactPartyId" type="String" default="" />
+<aura:attribute name="ParentContactId" type="String" default="" />
+<aura:attribute name="ParentAccountName" type="String" default="" />
+<aura:attribute name="RecordTypeId" type="String" default="" />
+<aura:attribute name="message" type="String" default="" />   
+<aura:attribute name="isSaveDisable" type="boolean" default="false" />
+<aura:attribute name="PurchaseDatee" type="Date" default="" />
+<aura:attribute name="minDate" type="Date" />
+<aura:attribute name="endMinDate" type="Date" />
+<aura:attribute name="dynamicEndMinnDate" type="Date" />
+<aura:attribute name="startDateValue" type="Date" />
+<aura:attribute name="endDateValue" type="Date" />
+<aura:attribute name="dynamicEndDateValue" type="Date" />
+	<aura:attribute name="startDateMessage" type="String" />
+    <aura:attribute name="endDateMessage" type="String" />
+     
+    <!-- Handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.fetchContactDetails}"/>
+    
+    <div class="slds-modal__header">
+        <h2 id="header1" class="slds-text-heading--medium">Create New License</h2>
+    </div>
+     <div>
+        <lightning:formattedRichText name="ErrorMessage" aura:id="ErrorMessageField" readonly="true" value="{!v.ErrorMessage}" class="myMesageClass"></lightning:formattedRichText>
+    </div>
+    <aura:if isTrue="{!v.isFormOpen}">
+        
+        <lightning:recordEditForm aura:id="LicenseCreateForm"                                              
+                                  objectApiName="License__c"
+                                  onsubmit="{!c.CreateLicense}"                                                                                
+                                  onsuccess="{!c.handleOnSuccess}"
+                                  onerror="{!c.handleOnError}" 
+                                  recordTypeId="{!v.RecordTypeId}">
+            
+            <!-- the messages component is for error messages -->
+            <lightning:messages value=""></lightning:messages>
+            <lightning:layout>
+                <lightning:layoutItem padding="around-medium" size="6">
+                    <lightning:inputField fieldName="Contact__c" aura:id="Contact__c" value="{!v.ParentContactId}" disabled="true" class="none" />
+                    <div class="parent">
+                        <div class="child">
+                            <lightning:icon iconName="standard:contact" alternativeText="Account" size="x-small"/>
+                        </div>
+                    </div>
+                    <lightning:input type="text" name="Contact__c" label="Contact" value="{!v.ParentAccountName}" disabled="true"/><br/>
+                    <lightning:inputField fieldName="License_Type__c" aura:id="License_Type__c"  onchange="{!c.SetMandatory}" />                    
+                    <lightning:input type="date" 
+                                     label="Start Date" 
+                                     Name="Start_Date__c" 
+                                     aura:id="Start_Date__c"
+                                     class="customRequired CustleftPadding" 
+                                     min="{!v.minDate}"
+                                     dateStyle="short"
+                                     onchange="{!c.checkStartDate}"
+                                     messageWhenRangeUnderflow="{!v.startDateMessage}"/>
+                    <lightning:inputField fieldName="Start_Date__c" aura:id="Start_Datee__c" disabled="true" value="{!v.startDateValue}" variant="label-hidden" class="none"/>
+                    <br/>
+                    <lightning:inputField fieldName="Order_Number__c" aura:id="Customer__c"/>
+                    <lightning:inputField fieldName="Update_Type__c" aura:id="Update_Type__c" onchange="{!c.updateTypeMandatory}"/>
+                    <lightning:input type="date" 
+                                     label="Dynamic License End Date" 
+                                     Name="Dynamic_License_End_Date__c" 
+                                     aura:id="Dynamic_License_End_Date__c"
+                                     class="customRequired CustleftPadding"
+                                     min="{!v.dynamicEndMinnDate}"
+                                     dateStyle="short"
+                                     onchange="{!c.checkDynamicEndDate}"
+                                     messageWhenRangeUnderflow="{!v.startDateMessage}"/>
+                                     <!--value="{!v.dynamicEndDateValue}"/ -->
+                    <lightning:inputField fieldName="Dynamic_License_End_Date__c" aura:id="Dynamic_License_End_Datee__c" disabled="true" value="{!v.dynamicEndDateValue}" variant="label-hidden" class="none"/>
+                    <br/>
+                    
+                </lightning:layoutItem>
+                <lightning:layoutItem padding="around-medium"  size="6"> 
+                    <lightning:inputField fieldName="Description__c" aura:id="Description__c"/>
+                    <lightning:inputField fieldName="Product__c" aura:id="Product__c" class="customRequired"/>                           
+                    <lightning:input type="date" 
+                                     label="End Date" 
+                                     Name="End_Date__c" 
+                                     aura:id="End_Date__c"
+                                     min="{!v.endMinDate}"
+                                     dateStyle="short"
+                                     onchange="{!c.checkEndDate}"
+                                     messageWhenRangeUnderflow="{!v.endDateMessage}"/>
+                    <lightning:inputField fieldName="End_Date__c" aura:id="End_Datee__c" disabled="true" value="{!v.endDateValue}" variant="label-hidden" class="none"/>
+                    <br/>
+                    <lightning:input type="date" 
+                                     label="Purchase Date" 
+                                     Name="Purchase_Date__c" 
+                                     aura:id="Purchase_Date__c"
+                                     dateStyle="short"
+                                     disabled="true"
+                                     value="{!v.PurchaseDatee}"/>
+                    <lightning:inputField fieldName="Purchase_Date__c" aura:id="Purchase_Datee__c" disabled="true" value="{!v.PurchaseDatee}" variant="label-hidden" class="none"/>                
+                    <!--lightning:inputField fieldName="Status__c" aura:id="Status__c"/-->
+                    <lightning:inputField fieldName="Grant_Type__c" aura:id="Grant_Type__c"/>
+                </lightning:layoutItem>
+            </lightning:layout>
+            <div class="slds-m-top_medium">               
+                <lightning:button variant="brand" label="Cancel" title="Cancel" onclick="{!c.closeModal}"/>
+                <lightning:button  variant="brand" type="submit" name="update" label="Create" disabled="{!v.isSaveDisable}" />
+            </div>
+            <div>
+               <lightning:formattedRichText name="inputMessage" aura:id="messageField" readonly="true" value="{!v.message}" class="myMesageClass"></lightning:formattedRichText>
+            </div>
+        </lightning:recordEditForm>  
+    </aura:if>
+
+</aura:component>

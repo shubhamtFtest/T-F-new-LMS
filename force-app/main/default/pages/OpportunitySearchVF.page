@@ -1,0 +1,18 @@
+<apex:page standardController="Opportunity"  sidebar="false">
+    <apex:includeLightning />
+
+    <div id="lightning" />
+
+    <script>
+        $Lightning.use("c:SearchOpportunityApp", function() {
+          $Lightning.createComponent("c:OpportunitySearchComponent",
+          { 
+              
+          },
+          "lightning",
+          function(cmp) {
+            
+          });
+        });
+    </script>
+</apex:page>

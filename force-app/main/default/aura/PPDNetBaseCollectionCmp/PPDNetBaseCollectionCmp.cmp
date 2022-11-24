@@ -1,0 +1,74 @@
+<aura:component controller="TF_PPDProcessController">
+    <aura:attribute name="values" type="List" default="[]"/>
+    <aura:attribute name="backToProductDetail" type="Boolean"/>
+    <aura:attribute name="checkedValuesListBox" type="List" default="[]" />
+    <aura:attribute name="NetbaseReturnList" type="List" default="[]"/>
+    <aura:attribute name="term" type="String" default=""/>
+    <aura:attribute name="disableSearch" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="selectedNetbaseValues" type="List" default="[]" />
+  <!--  <aura:registerEvent name="appNetbaseEvent" type="c:TF_AG_SendSelectNetbaseEvt"/>-->
+    <aura:attribute name="lstAllNetbases" type="Object[]"/>
+    <aura:attribute name="lstNetbases" type="Object[]" />
+    <aura:attribute name="lstFilterResultNetbases" type="Object[]" />
+    <aura:attribute name="lstPreservedNetbase" type="List" default="[]" />
+    <aura:attribute name="countSelected" type="Integer" default="0" />
+    <aura:attribute name="flag" type="Boolean" default="false" />
+    <aura:attribute name="isViewSelected" type="Boolean" default="false" /> 
+    <aura:attribute name="typeOfClassification" type="String" default="NetBase"/>
+    <aura:attribute name="valueInp" type="String" />
+    
+    <!--<aura:attribute name="lstSelectedNetbases" type="Object[]"/>-->
+    <!--<aura:handler name="change" value="{!v.term}" action="{!c.searchNetbases}" />-->
+    <aura:handler event="c:PPDSearchProductResetComp" action="{!c.resetNetbase}"/>
+    
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+      <aura:if isTrue="{!v.IsSpinner}">
+       <lightning:spinner variant="brand"  size="large" />
+      </aura:if>
+    
+    <div class="c-container">
+       <!-- <p>Netbase Classifications</p>-->
+        <lightning:layout multipleRows="true">
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="9" padding="around-small">
+                <div class="slds-form-element" onkeypress="{!c.filterNetbaseEnter}">
+                    <lightning:input type="text" value="{!v.term}" label="Filter" variant="label-hidden" placeholder="Filter Classifications" />
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3" padding="around-small">
+                <lightning:button variant="brand" label="Filter" title="Brand action" onclick="{!c.searchNetbases}" disabled="{!v.disableSearch}"/>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div class="slds-form-element">
+        <lightning:layout>
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:button variant="base" label="Check All" title="Check All" onclick="{! c.checkAllNetbase}" />
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="horizontal-large">
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="horizontal-large">
+            </lightning:layoutItem>
+            <lightning:layoutItem  padding="horizontal-small">
+                <lightning:button variant="base" label="Un-Check All" title="Un-Check All" onclick="{! c.unCheckAllNetbase}" />
+            </lightning:layoutItem>        
+            
+        </lightning:layout>
+    </div>
+    <div class="Netbases">
+        <aura:iteration items="{!v.lstNetbases}" var="code">
+            <aura:if isTrue="{!v.isViewSelected}">
+                <aura:if isTrue="{!code.isSelected}">
+                	<lightning:input type="checkbox" label="{!code.value}"  name="input2" checked="{!code.isSelected}" required="false" onchange="{!c.displayCount}"/>
+                </aura:if>
+            	<aura:set attribute="else">
+                  <lightning:input type="checkbox" label="{!code.value}"  name="input2" checked="{!code.isSelected}" required="false" onchange="{!c.displayCount}"/>
+                </aura:set>
+            </aura:if>
+            
+        </aura:iteration>
+    </div>
+    
+    
+    
+</aura:component>

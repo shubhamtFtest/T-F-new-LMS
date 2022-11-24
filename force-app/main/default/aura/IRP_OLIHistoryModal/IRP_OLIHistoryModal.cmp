@@ -1,0 +1,117 @@
+<!-- IRP_OLIHistoryModal-->
+<aura:component controller="TF_IndiaRePrintHistoryCtr">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="isHistoryModalOpen" type="boolean" default="false"/> 
+    <aura:attribute name="opportunityLineItemId" type="string"/>
+    <aura:attribute name="ispord" type="boolean" default="false"/>
+
+    <aura:attribute name="history" type="list"/>
+    
+    <aura:if isTrue="{!v.isHistoryModalOpen}">        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div id="historymodal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeHistoryModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h1 class="slds-text-heading--medium">OLI Details</h1>    
+                </header>
+                
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="overflow: overlay;">
+                    <!--{!v.opportunityLineItemId}-->
+                    <table class="slds-table slds-table--bordered slds-table--striped slds-table--cell-buffer ">
+                        <thead>
+                            <tr class="slds-text-heading--label">
+                                <th scope="col" ><div  title="Index">#</div></th>
+                                <th scope="col" ><div  title="UMC">UMC</div></th>
+                                <th scope="col"><div  title="MRP">Date</div></th>
+                                <th scope="col"><div  title="MRP">MRP</div></th>
+                                <th scope="col"><div  title="Customer Quote">Customer Quote</div></th>
+                                <th scope="col" ><div  title="Gross Margin">Gross Margin</div></th>
+                                <th scope="col"><div  title="Quantity">Quantity</div></th>
+                                <th scope="col" ><div  title="Extent">Extent</div></th>
+                                <th scope="col"><div  title="Text Color">Text Color</div></th>
+                                <th scope="col"><div  title="Paper GSM">Paper Type</div></th>
+                                <th scope="col" ><div   title="Reprint Binding">Reprint Binding</div></th>
+                                <th scope="col" ><div  title="Date">Create Date</div></th>
+                                <th scope="col" ></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:if isTrue="{!not(empty(v.history))}">
+                            <aura:iteration items="{!v.history}" var ="hist" indexVar="idx">                               
+                                <tr>
+                                    <td><div  title="index">{!idx+1}</div></td>
+                                    <td>
+                                        <div  title="UMC">
+                                            <lightning:formattedNumber value="{!hist.UMC__c}" maximumFractionDigits="2"/>
+                                        </div>
+                                    </td>
+                                    <td><div  title="UMC">
+                                        <lightning:formattedDateTime value="{!hist.CreatedDate}" year="2-digit" month="short" day="2-digit" weekday="long"/>
+                                        </div></td>
+                                    <td>
+                                        <div  title="MRP">
+                                            <lightning:formattedNumber value="{!hist.MRP__c}" maximumFractionDigits="2"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div  title="Customer Quote">
+                                            <lightning:formattedNumber value="{!hist.Customer_Quote__c}" maximumFractionDigits="2"/>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div  title="Gross Margin">
+                                            <lightning:formattedNumber value="{!hist.Gross_Margin__c}" maximumFractionDigits="2"/>
+                                        </div>
+                                    </td>
+                                    <td><div  title="Quantity">{!hist.Quantity__c}</div></td>
+                                    <td><div  title="Extent">{!hist.Paper_size__c}</div></td>
+                                    <td><div  title="Text Color">{!hist.Text_Color__c}</div></td> 
+                                    <td><div  title="Paper GSM">{!hist.Paper_GSM__c}</div></td>
+                                    <td><div   title="Reprint Binding">{!hist.Version_Type__c}</div></td>
+                                    <td><div  title="{!hist.CreatedDate}">                                       
+                                        <lightning:formattedDateTime value="{!hist.CreatedDate}"/>
+                                        </div></td>
+                                    <td>
+                                            <aura:if isTrue="{!hist.Is_Approved_UMC__c}">
+												<lightning:button value="{!hist.Id}" variant="success" label="Select UMC" title="Select UMC" onclick="{! c.saveFinalUMC }" disabled="true"/>
+                                                <aura:set attribute="else">
+													<lightning:button value="{!hist.Id}" variant="brand" label="Select UMC" title="Select UMC" onclick="{! c.saveFinalUMC }" />
+                                                </aura:set>
+                                            </aura:if>                                                                                        
+                                    </td>
+                                    <aura:if isTrue="{!v.ispord}">
+                                        <td>
+                                             <aura:if isTrue="{!hist.Is_Approved_UMC__c}">
+                                              <lightning:button value="{!hist.Id}" variant="brand" label="Delete" title="Delete" onclick="{! c.DeleteRec }" disabled="true"/>
+                                                <aura:set attribute="else">
+                                            <lightning:button value="{!hist.Id}" variant="brand" label="Delete" title="Delete" onclick="{! c.DeleteRec }" />
+                                                </aura:set>
+                                            </aura:if>
+                                        </td>
+                                    </aura:if>
+                                </tr>
+                            </aura:iteration>
+                                <aura:set attribute="else">
+                                    <tr><td colspan="10"><center><span style="color:red">RECORD NOT FOUND</span></center></td></tr>
+                                </aura:set>
+                            </aura:if>
+                        </tbody>
+                    </table> 					
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Close"
+                                      title="Close"
+                                      onclick="{! c.closeHistoryModel }"/>
+                </footer>
+            </div>
+            </div>
+        </section>       
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if> 	
+</aura:component>

@@ -1,0 +1,11 @@
+.THIS .greenumc {
+    color: green;
+    font-weight:bold;
+    font-size:1.5em;
+}
+.THIS .redumc {
+    color: green;
+    font-weight:bold;
+    font-size:1.5em;
+}
+.THIS #printCostCalculatorModal .slds-modal__container{ height : auto; max-height: 120vh; width: 100%; max-width: 150vh; }

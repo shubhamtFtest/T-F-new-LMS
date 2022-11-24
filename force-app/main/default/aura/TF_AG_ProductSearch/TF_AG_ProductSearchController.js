@@ -1,0 +1,1088 @@
+({
+    init: function(component,event,helper) {
+        /*Creating Radio Button Data for Book Medium Section*/
+        helper.showSpinner(component, event);
+        var lstMediumData=component.get("v.lstMedium");
+        var mediumAllData={'name':'All','value':'All','isChecked':true};
+        var mediumHardBackData={'name':'Hardback','value':'Hardback','isChecked':false};
+        var mediumPaperbackData={'name':'Paperback','value':'Paperback','isChecked':false};
+        lstMediumData.push(mediumAllData);
+        lstMediumData.push(mediumHardBackData);
+        lstMediumData.push(mediumPaperbackData);
+        component.set("v.lstMedium",lstMediumData);
+        
+        /*Creating Radio button Data for Not Yet Published Section*/
+        var lstpublishData=component.get("v.lstPublished");
+        var publishIncludeData={'name':'Include','value':'Include','isChecked':true};
+        var publishexcludeData={'name':'Exclude','value':'Exclude','isChecked':false};
+        var publishNYPData={'name':'Only NYP','value':'Only NYP','isChecked':false};
+        lstpublishData.push(publishIncludeData);
+        lstpublishData.push(publishexcludeData);
+        lstpublishData.push(publishNYPData);
+        helper.getLoggedInUser(component,event);
+    }, 
+    openProductDetailPage:function(component,event,helper){
+        component.set("v.ProductText",'Product Detail');
+        //var productSearchData=component.get("v.lstProductData");
+        var productSearchData=component.get("v.lstProductDataWrapper");
+        var productIndex=event.getSource().get("v.value");
+        //var productIndex=event.currentTarget.getAttribute("data-attriVal")
+        console.log(productSearchData[productIndex]);
+        component.set("v.productDetailData",productSearchData[productIndex]);
+        component.set("v.showproductSearch",true);
+        component.set("v.showSearchData",false);
+        
+    },
+    searchProduct:function(component,event,helper){
+        debugger;
+        helper.showSpinner(component, event);
+        //component.set("v.disableSearch",true);
+        component.set("v.offsetValue",0);
+        component.set("v.lstDisplayPages",[]);
+        component.set("v.secondShowRangeIndex",1);
+        component.set("v.firstShowRangeIndex",1);
+        component.set("v.selectedValue",1);
+        //component.set("v.searchProductTitle","Searching......");
+        helper.checkFilterDataValidations(component,event);
+    },
+    searchProductEnter:function(component,event,helper){
+        helper.checkFilterDataValidationsOnEnter(component,event);
+    },
+    handleBackToResultEvt:function(component,event,helper){
+        var getSelectedTabValue=component.get("v.setSelectedTab")
+        var getsetSelectedChildTab=component.get("v.setSelectedChildTab");
+        var value = event.getParam("backPageName");
+        if(getSelectedTabValue === 'productTab'){
+            component.set("v.showproductSearch",false);
+            component.set("v.showSearchData",true);
+            component.set("v.ProductText",'Product Search');
+            // make false of multiisbn pagination attribute
+            component.set("v.showMultiIsbnPages",false);
+            component.set("v.showMultiIsbnResultCount",false);
+            // Enable attribute of product search pagination
+            component.set("v.showProductSearchPages",true);
+            component.set("v.showResultCount",true);
+            component.set("v.eventFromProdDetail",true);
+            //helper.getProductSearchCount(component,event);
+            //helper.populatePageValues(component,event,component.get("v.lstDisplayPages"));
+        }
+        if(getSelectedTabValue === 'multiIsbnTab' && getsetSelectedChildTab === "isbnListTab"){
+            component.set("v.showproductSearch",false);
+            component.set("v.showSearchData",true);
+            component.set("v.ProductText",'Product Search');
+            var listData=component.get("v.multiIsbnListData");
+            helper.getSearchCount(component,event,listData);
+            // make true of multiisbn pagination attribute
+            component.set("v.showMultiIsbnPages",true);
+            component.set("v.showMultiIsbnResultCount",true);
+            // make false attribute of product search pagination
+            component.set("v.showProductSearchPages",false);
+            component.set("v.showResultCount",false);
+        }
+        if(getSelectedTabValue === 'multiIsbnTab' && getsetSelectedChildTab === "uploadCsvTab"){
+            component.set("v.showproductSearch",false);
+            component.set("v.showSearchData",true);
+            component.set("v.ProductText",'Product Search');
+            component.set("v.showProductSearchPages",false);
+            component.set("v.showResultCount",false);
+        }
+    },
+    showSpinner: function(component, event, helper) {
+        component.set("v.Spinner", true); 
+    },
+    
+    hideSpinner : function(component,event,helper){
+        component.set("v.Spinner", false);
+    },
+    selectSubjectCode:function(component, event, helper) {
+        var selectVal = component.find("subjectCode");
+        var resultCmp = component.find("multiResult");
+        //resultCmp.set("v.value", selectVal.get("v.value"));
+    },
+    selectSubjectList:function(component, event, helper) {
+        var selectVal1 = component.find("subjectList");
+        var resultCmp1 = component.find("multiResultList");
+        resultCmp1.set("v.value", selectVal1.get("v.value"));
+    },
+    selectMedium:function(component, event, helper){
+        /*var isTrue=event.getSource().get("v.checked");
+        var lstSelectedItems=component.get("v.lstSelectedMedium");
+        if(isTrue){
+            var value=event.getSource().get("v.value");
+            lstSelectedItems.push(value);
+        }
+        else{
+            var value=event.getSource().get("v.value");
+            if(lstSelectedItems.indexOf(value) !== -1){
+                var index=lstSelectedItems.indexOf(value);
+                lstSelectedItems.splice(index,1);
+            }
+        }*/
+        var isTrue=event.getSource().get("v.checked");
+        var value=event.getSource().get("v.value");
+        component.set("v.lstSelectedMedium",value);
+        console.log('v.lstSelectedMedium----'+v.lstSelectedMedium);
+              
+        //component.set("v.lstSelectedMedium",lstSelectedItems);
+    },
+    selectpublish:function(component, event, helper){
+        var isTrue=event.getSource().get("v.checked");
+        var value=event.getSource().get("v.value");
+        component.set("v.selectPublishedRadio",value);
+    },
+    handleSelectedListEvt:function (component, event){
+        var value = event.getParam("selectedSubjectListValues");
+        for(var j in value){
+               value[j]=value[j].value;
+            }
+        console.log('event Listval='+JSON.stringify(value));
+        component.set("v.multiResultList",value);
+    },
+    handleSelectedSubjectCodeEvt:function (component, event){
+        var value = event.getParam("selectedSubjectCodes");
+        for(var j in value){
+               value[j]=value[j].value;
+            }
+        console.log('event Codevalue='+JSON.stringify(value));
+        component.set("v.multiResultCodes",value);
+    },
+    searchMultiIsbn:function(component,event,helper){
+        debugger;
+        var listData=component.find('multiIsbn').get("v.value");
+        console.log('listData='+listData);
+        if(listData !==undefined && listData!== ''){
+            component.set("v.showMultiISBNTabISBNArrownUp",false);
+            component.set("v.showMultiISBNTabTitleArrownUp",false);
+            component.set("v.showMultiISBNTabAuthorArrownUp",false);
+            component.set("v.showMultiISBNTabPubDateArrownUp",false);
+            component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+            component.set("v.showMultiISBNTabDiscountArrownUp",false);
+            component.set("v.showMultiISBNTabListPriceArrownUp",false);
+            component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+            component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+            component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+            component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+            component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+            component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+            component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            component.set("v.multiISBNTabSortOrder",'desc');
+            component.set("v.multiISBNTabSortOrderByField",'Name');
+            component.set("v.disableMultiIsbnSearchBtn",true);
+            component.set("v.searchProductMultiISBN",'Searching.....');
+            component.set("v.firstMulltiIsbnShowRangeIndex",1);
+            component.set("v.secondMulltiIsbnShowRangeIndex",1);
+            component.set("v.selectedISBNValue",1);
+            component.set("v.lstDisplayMultiIsbnPages",[]);
+            component.set("v.paginationMultuIsbnDataSearch",false);
+            helper.serachMultiIsbnList(component,event);
+        }
+        else{
+            helper.showToastMessage(component,event,'Search box cannot be blank.','Alert','error');
+        }
+    },
+    handleActive:function(component,event,helper){
+        var value=event.getSource().get("v.id");
+        var storeSelectedValue=component.get("v.storeSelectedTabValue");
+        var getSelectedChildTabValue=component.get("v.setSelectedChildTab");
+        var lstMultiIsbnTableData=component.get("v.lstMultiIsbnProductData");
+        var lstproductTableData=component.get("v.lstProductTableData");
+        var lstCsvData=component.get("v.lstUploadCsvData");
+        component.set("v.offsetValue",0);
+        console.log('lstproductTableData:='+lstproductTableData);
+        //component.set("v.lstDisplayPages",[]);
+        if(value !== storeSelectedValue){
+           if(value === 'productTab' && lstproductTableData.length !==0){
+                console.log('In product')
+                component.set("v.lstProductDataWrapper",lstproductTableData)
+                //helper.getProductSearchCount(component,event);
+                component.set("v.showSearchData",true);
+                // make false of multiisbn pagination attribute
+                component.set("v.showMultiIsbnPages",false);
+                component.set("v.showMultiIsbnResultCount",false);
+                // Make false upload CSV data
+                component.set("v.showUploadCsvPages",false);
+                component.set("v.showUploadCsvResultCount",false);
+                // Enable attribute of product search pagination
+                component.set("v.showProductSearchPages",true);
+                component.set("v.showResultCount",true);
+            }
+            if(value === 'multiIsbnTab' && lstMultiIsbnTableData.length!==0 && getSelectedChildTabValue === 'isbnListTab'){
+                // make false attribute of product search pagination
+                component.set("v.showProductSearchPages",false);
+                component.set("v.showResultCount",false);
+                // Make false upload csv data
+                component.set("v.showUploadCsvPages",false);
+                component.set("v.showUploadCsvResultCount",false);
+                // make true of multiisbn pagination attribute
+                component.set("v.showMultiIsbnPages",true);
+                component.set("v.showMultiIsbnResultCount",true);
+                component.set("v.lstProductDataWrapper",lstMultiIsbnTableData)
+                // Call again multiisbn data pagination when click on multiisbn tab with already populated data
+                var listData=component.get("v.multiIsbnListData");
+                //helper.getSearchCount(component,event,listData);
+                component.set("v.showSearchData",true);
+                component.set("v.showUploadCsvPages",false);
+                component.set("v.showUploadCsvResultCount",false);
+            }
+            console.log('@@@@@####'+lstCsvData.length);
+            if(value === 'multiIsbnTab' && lstCsvData.length!==0 && getSelectedChildTabValue === 'uploadCsvTab'){
+                component.set("v.showUploadCsvResultCount",true);
+                component.set("v.showUploadCsvPages",true);
+                component.set("v.lstProductDataWrapper",lstCsvData)
+                component.set("v.showSearchData",true);
+                component.set("v.showMultiIsbnPages",false);
+                component.set("v.showProductSearchPages",false);
+           }
+            if(value === 'multiIsbnTab' && lstMultiIsbnTableData.length === 0){
+                component.set("v.showProductSearchPages",false);
+                component.set("v.showResultCount",false);
+            }
+            if(value === 'multiIsbnTab' && lstCsvData.length === 0){
+                component.set("v.showProductSearchPages",false);
+                component.set("v.showResultCount",false);
+            }
+            if(value === 'multiIsbnTab' && lstMultiIsbnTableData.length === 0 && getSelectedChildTabValue === 'isbnListTab'){
+                component.set("v.showSearchData",false); 
+                component.set("v.showProductSearchPages",false);
+                component.set("v.showResultCount",false);
+            }
+            if(value === 'multiIsbnTab' && lstCsvData.length === 0 && getSelectedChildTabValue === 'uploadCsvTab'){
+                component.set("v.showSearchData",false); 
+                component.set("v.showProductSearchPages",false);
+                component.set("v.showResultCount",false);
+            }
+            if(value === 'productTab' && lstproductTableData.length === 0 ){
+                console.log('hiiiiiiiiiiiii');
+                component.set("v.showSearchData",false);
+                component.set("v.showUploadCsvResultCount",false);
+                component.set("v.showUploadCsvPages",false);
+                component.set("v.showMultiIsbnPages",false);
+                component.set("v.showMultiIsbnResultCount",false);
+            } 
+        }
+        component.set("v.storeSelectedTabValue",value);
+    },
+    handleFilesChange : function (component, event,helper) {
+        //    component.set("v.disableMultiIsbnSearchBtn",true);
+        var fileObj = component.find("fileId").get("v.files");
+        if(fileObj !== null){
+            component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+	        component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+    	    component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+        	component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+            component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+            component.set("v.showMultiISBNCsvTabDiscountPercentArrownUp",false);
+            component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+            component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+            component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+            component.set("v.multiISBNCsvTabSortOrder",'desc');
+            component.set("v.multiISBNCsvTabSortOrderByField",'name');
+            component.set("v.disableCSVSearchBtn",true);
+            component.set("v.selectedCSVPageValue",1);
+            component.set("v.firstUploadCsvShowRangeIndex",1);
+            component.set("v.secondUploadCsvShowRangeIndex",1);
+            component.set("v.searchProductCSV",'Searching.....');
+            component.set("v.isSortingAscCSVDiscountPrice",false);
+            component.set("v.isSortingDescCSVDiscountPrice",false);
+            component.set("v.isSortingAscCSVDiscountPercent",false);
+            component.set("v.isSortingDescCSVDiscountPercent",false);
+            component.set("v.lstDisplayUploadCsv",[]);
+            component.set("v.fileObject",component.find("fileId").get("v.files"));
+            helper.uploadHelper(component, event);
+        }
+        else{
+            helper.showToastMessage(component,event,'Please upload CSV file.','Alert','error');
+        }
+    },
+    handlePageDisplay:function(component, event,helper){
+        var value=event.getSource().get("v.value");
+        var getSelectedChildTabValue=component.get("v.setSelectedChildTab");
+        var getSelectedTabValue=component.get("v.setSelectedTab");
+        if(getSelectedTabValue ==='productTab'){
+            helper.handlePageDisplayHelper(component, event,value);
+        }
+        if(getSelectedTabValue ==='multiIsbnTab' && getSelectedChildTabValue !== 'uploadCsvTab'){
+            helper.handleMultiIsbnPageDisplayHelper(component, event,value);
+        }
+        if(getSelectedTabValue ==='multiIsbnTab' && getSelectedChildTabValue === 'uploadCsvTab'){
+            helper.handleUploadCSVPageDisplayHelper(component, event,value);
+        }
+    },
+    displayFile:function(component,event,helper){
+        var filename = component.find("fileId").get("v.files");
+        component.set("v.fileName",component.find("fileId").get("v.files")[0]['name']);
+    },
+    downloadExcel : function (component, event,helper) {
+        helper.csvHelper(component, event);
+    },
+    showNextPage:function(component, event,helper){
+        debugger;
+        var getSelectedTabValue=component.get("v.setSelectedTab");
+        var getSelectedChildTabValue=component.get("v.setSelectedChildTab");
+        if(getSelectedTabValue ==='productTab'){
+            var value=component.get("v.selectedValue");
+            var nextPage=parseInt(value)+1;
+            component.set("v.selectedValue",nextPage)
+            helper.handlePageDisplayHelper(component, event,nextPage);
+        }
+        if(getSelectedTabValue ==='multiIsbnTab' && getSelectedChildTabValue !== 'uploadCsvTab'){
+            var value=component.get("v.selectedISBNValue");
+            var nextPage=parseInt(value)+1;
+            component.set("v.selectedISBNValue",nextPage)
+            helper.handleMultiIsbnPageDisplayHelper(component, event,nextPage);
+        }
+        if(getSelectedChildTabValue==='uploadCsvTab' && getSelectedTabValue ==='multiIsbnTab')
+        {
+            var value=component.get("v.selectedCSVPageValue");
+            var nextPage=parseInt(value)+1;
+            component.set("v.selectedCSVPageValue",nextPage)
+            helper.handleUploadCSVPageDisplayHelper(component, event,nextPage);
+        }
+    },
+    showPrevPage:function(component, event,helper){
+        debugger;
+        var getSelectedTabValue=component.get("v.setSelectedTab");
+        var getSelectedChildTabValue=component.get("v.setSelectedChildTab");
+        if(getSelectedTabValue ==='productTab'){
+            var value=component.get("v.selectedValue");
+            var prevPage=parseInt(value)-1;
+            component.set("v.selectedValue",prevPage)
+            helper.handlePageDisplayHelper(component, event,prevPage);
+        }
+        if(getSelectedTabValue ==='multiIsbnTab' && getSelectedChildTabValue !== 'uploadCsvTab'){
+            var value=component.get("v.selectedISBNValue");
+            var prevPage=parseInt(value)-1;
+            component.set("v.selectedISBNValue",prevPage)
+            helper.handleMultiIsbnPageDisplayHelper(component, event,prevPage);
+        }
+        if(getSelectedTabValue ==='multiIsbnTab' && getSelectedChildTabValue === 'uploadCsvTab'){
+            var value=component.get("v.selectedCSVPageValue");
+            var prevPage=parseInt(value)-1;
+            component.set("v.selectedCSVPageValue",prevPage)
+            helper.handleUploadCSVPageDisplayHelper(component, event,prevPage);
+        }        
+    },
+    handleChildTabActive:function(component,event,helper){
+        var value=event.getSource().get("v.id");
+        var lstMultiIsbnTableData=component.get("v.lstMultiIsbnProductData");
+        var lstCsvData=component.get("v.lstUploadCsvData");
+        if(value === 'isbnListTab' && lstMultiIsbnTableData.length>0){
+            component.set("v.showUploadCsvPages",false);
+            component.set("v.showMultiIsbnPages",true);
+            component.set("v.showMultiIsbnResultCount",true);
+            component.set("v.showSearchData",true); 
+            component.set("v.lstProductDataWrapper",lstMultiIsbnTableData)
+        }
+        if(value === 'uploadCsvTab' && lstCsvData.length>0){
+            component.set("v.showMultiIsbnPages",false);
+            component.set("v.showUploadCsvPages",true);
+            component.set("v.showUploadCsvResultCount",true);
+            component.set("v.showSearchData",true);
+            component.set("v.showProductSearchPages",false);
+            component.set("v.lstProductDataWrapper",lstCsvData)
+        }
+        if(value === 'isbnListTab' && lstMultiIsbnTableData.length === 0){
+            component.set("v.showUploadCsvPages",false);
+            component.set("v.showUploadCsvResultCount",false);
+            component.set("v.showSearchData",false); 
+        }
+        if(value === 'uploadCsvTab' && lstCsvData.length === 0){
+            component.set("v.showMultiIsbnPages",false);
+            component.set("v.showSearchData",false); 
+        }
+    },
+    sorting:function(component, event, helper) {
+        var getTabSelectedValue=component.get("v.storeSelectedTabValue");
+        var getSelectedChildTab=component.get("v.setSelectedChildTab");
+       	var data=event.currentTarget.getAttribute("data-id");/*To get clicked Attribute on which sorting will work*/
+        if(data === 'isbn'){
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showISBNArrownUp") === false){
+                    component.set("v.showISBNArrownUp",true);
+                    component.set("v.sortOrder",'asc');
+                }
+                else{
+                    component.set("v.showISBNArrownUp",false);
+                    component.set("v.sortOrder",'desc');
+                }
+                component.set("v.sortOrderByField",'ProductCode');
+                component.set("v.showTitleArrownUp",false);
+                component.set("v.showAuthorArrownUp",false);
+                component.set("v.showPubDateArrownUp",false);
+                component.set("v.showPlanPubArrownUp",false);
+                component.set("v.showDiscountPercentArrownUp",false);
+                component.set("v.showDiscountPriceArrownUp",false);
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.showCurrentAvailArrownUp",false);
+                component.set("v.isSortingAscDiscountPrice",false);
+				component.set("v.isSortingDescDiscountPrice",false);
+                component.set("v.isSortingAscDiscountPercent",false);
+				component.set("v.isSortingDescDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabISBNArrownUp") === false){
+                    component.set("v.showMultiISBNTabISBNArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNTabISBNArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNTabSortOrderByField",'ProductCode');
+                component.set("v.showMultiISBNTabTitleArrownUp",false);
+                component.set("v.showMultiISBNTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                component.set("v.showMultiISBNTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+                component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+                component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+                component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabISBNArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabISBNArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'ProductCode');
+                component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountArrownUp",false);
+                component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPrice",false);
+                component.set("v.isSortingDescCSVDiscountPrice",false);
+                component.set("v.isSortingAscCSVDiscountPercent",false);
+                component.set("v.isSortingDescCSVDiscountPercent",false);
+            }
+        }
+        if(data === 'title'){
+            console.log(component.get("v.showTitleArrownUp"))
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showTitleArrownUp") === false){
+                    component.set("v.showTitleArrownUp",true);
+                    component.set("v.sortOrder",'asc');
+                }
+                else{
+                    component.set("v.showTitleArrownUp",false);
+                    component.set("v.sortOrder",'desc');
+                }
+                component.set("v.sortOrderByField",'Name');
+                component.set("v.showISBNArrownUp",false);
+                component.set("v.showAuthorArrownUp",false);
+                component.set("v.showPubDateArrownUp",false);
+                component.set("v.showPlanPubArrownUp",false);
+                component.set("v.showDiscountPercentArrownUp",false);
+                component.set("v.showDiscountPriceArrownUp",false);
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.showCurrentAvailArrownUp",false);
+                component.set("v.isSortingAscDiscountPrice",false);
+				component.set("v.isSortingDescDiscountPrice",false);
+                component.set("v.isSortingAscDiscountPercent",false);
+                component.set("v.isSortingDescDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabTitleArrownUp") === false){
+                    component.set("v.showMultiISBNTabTitleArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNTabTitleArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNTabSortOrderByField",'Name');
+                component.set("v.showMultiISBNTabISBNArrownUp",false);
+                component.set("v.showMultiISBNTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                component.set("v.showMultiISBNTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+                component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+                component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+                component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabTitleArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabTitleArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'Name');
+                component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountArrownUp",false);
+                component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPrice",false);
+                component.set("v.isSortingDescCSVDiscountPrice",false);
+                component.set("v.isSortingAscCSVDiscountPercent",false);
+                component.set("v.isSortingDescCSVDiscountPercent",false);
+            }
+        }
+        if(data === 'author'){
+            console.log(component.get("v.showAuthorArrownUp"))
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showAuthorArrownUp") === false){
+                    console.log('checkj');
+                    component.set("v.showAuthorArrownUp",true);
+                    component.set("v.sortOrder",'asc');
+                    console.log(component.get("v.showAuthorArrownUp"));
+                }
+                else{
+                    component.set("v.showAuthorArrownUp",false);
+                    component.set("v.sortOrder",'desc');
+                }
+                component.set("v.sortOrderByField",'Lead_Author_Editor__c');
+                component.set("v.showISBNArrownUp",false);
+                component.set("v.showTitleArrownUp",false);
+                component.set("v.showPubDateArrownUp",false);
+                component.set("v.showPlanPubArrownUp",false);
+                component.set("v.showDiscountPercentArrownUp",false);
+                component.set("v.showDiscountPriceArrownUp",false);
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.showCurrentAvailArrownUp",false);
+                component.set("v.isSortingAscDiscountPrice",false);
+				component.set("v.isSortingDescDiscountPrice",false);
+                component.set("v.isSortingAscDiscountPercent",false);
+                component.set("v.isSortingDescDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabAuthorArrownUp") === false){
+                    component.set("v.showMultiISBNTabAuthorArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNTabAuthorArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNTabSortOrderByField",'Lead_Author_Editor__c');
+                component.set("v.showMultiISBNTabISBNArrownUp",false);
+                component.set("v.showMultiISBNTabTitleArrownUp",false);
+                component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                component.set("v.showMultiISBNTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+                component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+                component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+                component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabAuthorArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabAuthorArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'Lead_Author_Editor__c');
+                component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountArrownUp",false);
+                component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPrice",false);
+                component.set("v.isSortingDescCSVDiscountPrice",false);
+                component.set("v.isSortingAscCSVDiscountPercent",false);
+                component.set("v.isSortingDescCSVDiscountPercent",false);
+            }
+        }
+        if(data === 'pubDate'){
+            console.log(component.get("v.showPubDateArrownUp"))
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showPubDateArrownUp") === false){
+                    console.log('checkj');
+                    component.set("v.showPubDateArrownUp",true);
+                    component.set("v.sortOrder",'asc');
+                    console.log(component.get("v.showPubDateArrownUp"));
+                }
+                else{
+                    component.set("v.showPubDateArrownUp",false);
+                    component.set("v.sortOrder",'desc');
+                }
+                component.set("v.sortOrderByField",'US_Publication_Date__c');
+                component.set("v.showISBNArrownUp",false);
+                component.set("v.showTitleArrownUp",false);
+                component.set("v.showAuthorArrownUp",false);
+                component.set("v.showPlanPubArrownUp",false);
+                component.set("v.showDiscountPercentArrownUp",false);
+                component.set("v.showDiscountPriceArrownUp",false);
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.showCurrentAvailArrownUp",false);
+                component.set("v.isSortingAscDiscountPrice",false);
+				component.set("v.isSortingDescDiscountPrice",false);
+                component.set("v.isSortingAscDiscountPercent",false);
+                component.set("v.isSortingDescDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabPubDateArrownUp") === false){
+                    component.set("v.showMultiISBNTabPubDateArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNTabSortOrderByField",'US_Publication_Date__c');
+                component.set("v.showMultiISBNTabISBNArrownUp",false);
+                component.set("v.showMultiISBNTabTitleArrownUp",false);
+                component.set("v.showMultiISBNTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                component.set("v.showMultiISBNTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+                component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+                component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+                component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabPubDateArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabPubDateArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'US_Publication_Date__c');
+                component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountArrownUp",false);
+                component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPrice",false);
+                component.set("v.isSortingDescCSVDiscountPrice",false);
+                component.set("v.isSortingAscCSVDiscountPercent",false);
+                component.set("v.isSortingDescCSVDiscountPercent",false);
+            }
+        }
+        if(data === 'planPubDate'){
+            console.log(component.get("v.showPlanPubArrownUp"))
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showPlanPubArrownUp") === false){
+                    console.log('checkj');
+                    component.set("v.showPlanPubArrownUp",true);
+                    component.set("v.sortOrder",'asc');
+                    console.log(component.get("v.showPlanPubArrownUp"));
+                }
+                else{
+                    component.set("v.showPlanPubArrownUp",false);
+                    component.set("v.sortOrder",'desc');
+                }
+                component.set("v.sortOrderByField",'US_Planned_Publication_Date__c');
+                component.set("v.showISBNArrownUp",false);
+                component.set("v.showTitleArrownUp",false);
+                component.set("v.showAuthorArrownUp",false);
+                component.set("v.showPubDateArrownUp",false);
+                component.set("v.showDiscountPercentArrownUp",false);
+                component.set("v.showDiscountPriceArrownUp",false);
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.showCurrentAvailArrownUp",false);
+                component.set("v.isSortingAscDiscountPrice",false);
+				component.set("v.isSortingDescDiscountPrice",false);
+                component.set("v.isSortingAscDiscountPercent",false);
+                component.set("v.isSortingDescDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabPlanPubArrownUp") === false){
+                    component.set("v.showMultiISBNTabPlanPubArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNTabSortOrderByField",'US_Planned_Publication_Date__c');
+                component.set("v.showMultiISBNTabISBNArrownUp",false);
+                component.set("v.showMultiISBNTabTitleArrownUp",false);
+                component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNTabAuthorPubArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                component.set("v.showMultiISBNTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+                component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+                component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+                component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabPlanPubArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabPlanPubArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'US_Planned_Publication_Date__c');
+                component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNCsvTabAuthorPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountArrownUp",false);
+                component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPrice",false);
+                component.set("v.isSortingDescCSVDiscountPrice",false);
+                component.set("v.isSortingAscCSVDiscountPercent",false);
+                component.set("v.isSortingDescCSVDiscountPercent",false);
+            }
+        }
+        if(data === 'currentAvailability'){
+            console.log(component.get("v.showCurrentAvailArrownUp"))
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showCurrentAvailArrownUp") === false){
+                    console.log('checkj');
+                    component.set("v.showCurrentAvailArrownUp",true);
+                    component.set("v.sortOrder",'asc');
+                    console.log(component.get("v.showCurrentAvailArrownUp"));
+                }
+                else{
+                    component.set("v.showCurrentAvailArrownUp",false);
+                    component.set("v.sortOrder",'desc');
+                }
+                component.set("v.sortOrderByField",'US_Inventory_Status__c');
+                component.set("v.showISBNArrownUp",false);
+                component.set("v.showTitleArrownUp",false);
+                component.set("v.showAuthorArrownUp",false);
+                component.set("v.showPubDateArrownUp",false);
+                component.set("v.showPlanPubArrownUp",false);
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.showDiscountPercentArrownUp",false);
+                component.set("v.showDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscDiscountPrice",false);
+				component.set("v.isSortingDescDiscountPrice",false);
+                component.set("v.isSortingAscDiscountPercent",false);
+                component.set("v.isSortingDescDiscountPercent",false);
+            }
+		if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabCurrentAvailArrownUp") === false){
+                    component.set("v.showMultiISBNTabCurrentAvailArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNTabSortOrderByField",'US_Inventory_Status__c');
+                component.set("v.showMultiISBNTabISBNArrownUp",false);
+                component.set("v.showMultiISBNTabTitleArrownUp",false);
+            	component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNTabListPriceArrownUp",false);
+            	component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+            	component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+            	component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+            	component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+            	component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabCurrentAvailArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'US_Inventory_Status__c');
+                component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPrice",false);
+                component.set("v.isSortingDescCSVDiscountPrice",false);
+                component.set("v.isSortingAscCSVDiscountPercent",false);
+                component.set("v.isSortingDescCSVDiscountPercent",false);
+            }
+        }
+        if(data === 'listPrice'){
+            console.log(component.get("v.showListPriceArrownUp"))
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showListPriceArrownUp") === false){
+                    console.log('checkj');
+                    component.set("v.showListPriceArrownUp",true);
+                    component.set("v.sortOrder",'asc');
+                    console.log(component.get("v.showListPriceArrownUp"));
+                }
+            else{
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.sortOrder",'desc');
+            }
+            component.set("v.sortOrderByField",'UnitPrice');
+            component.set("v.showISBNArrownUp",false);
+            component.set("v.showTitleArrownUp",false);
+            component.set("v.showAuthorArrownUp",false);
+            component.set("v.showPubDateArrownUp",false);
+            component.set("v.showPlanPubArrownUp",false);
+            component.set("v.showDiscountPercentArrownUp",false);
+            component.set("v.showDiscountPriceArrownUp",false);
+            component.set("v.showCurrentAvailArrownUp",false);
+            component.set("v.isSortingAscDiscountPrice",false);
+			component.set("v.isSortingDescDiscountPrice",false);
+            component.set("v.isSortingAscDiscountPercent",false);
+            component.set("v.isSortingDescDiscountPercent",false);
+		}
+        if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabListPriceArrownUp") === false){
+                    component.set("v.showMultiISBNTabListPriceArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNTabListPriceArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNTabSortOrderByField",'UnitPrice');
+                component.set("v.showMultiISBNTabISBNArrownUp",false);
+                component.set("v.showMultiISBNTabTitleArrownUp",false);
+                component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                component.set("v.showMultiISBNTabAuthorArrownUp",false);
+            	component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+            	component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+            	component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+            	component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+            	component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabListPriceArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabListPriceArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'asc');
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'UnitPrice');
+                component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountArrownUp",false);
+                component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPrice",false);
+                component.set("v.isSortingDescCSVDiscountPrice",false);
+                component.set("v.isSortingAscCSVDiscountPercent",false);
+                component.set("v.isSortingDescCSVDiscountPercent",false);
+            }
+        }
+		if(data === 'discountPercent'){
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showDiscountPercentArrownUp") === false){
+                    component.set("v.showDiscountPercentArrownUp",true);
+                    component.set("v.sortOrder",'desc');
+                    component.set("v.isSortingAscDiscountPercent",true);
+                    component.set("v.isSortingDescDiscountPercent",false);
+                }
+                else{
+                    component.set("v.showDiscountPercentArrownUp",false);
+                    component.set("v.sortOrder",'desc');
+                    component.set("v.isSortingDescDiscountPercent",true);
+                    component.set("v.isSortingAscDiscountPercent",false);
+                }
+                component.set("v.sortOrderByField",'Name');
+                component.set("v.showISBNArrownUp",false);
+                component.set("v.showTitleArrownUp",false);
+                component.set("v.showAuthorArrownUp",false);
+                component.set("v.showPubDateArrownUp",false);
+                component.set("v.showPlanPubArrownUp",false);
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.showCurrentAvailArrownUp",false);
+                component.set("v.showDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscDiscountPrice",false);
+				component.set("v.isSortingDescDiscountPrice",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabDiscountPercentArrownUp") === false){
+                    component.set("v.showMultiISBNTabDiscountPercentArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                    component.set("v.isSortingAscMultiISBNDiscountPercent",true);
+                    component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+                }
+                else{
+                    component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                    component.set("v.isSortingDescMultiISBNDiscountPercent",true);
+                    component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+                }
+                component.set("v.multiISBNTabSortOrderByField",'Name');
+                component.set("v.showMultiISBNTabISBNArrownUp",false);
+                component.set("v.showMultiISBNTabTitleArrownUp",false);
+                component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNTabListPriceArrownUp",false);
+            	component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+				component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabDiscountPercentArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabDiscountPercentArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                    component.set("v.isSortingAscCSVDiscountPercent",true);
+                    component.set("v.isSortingDescCSVDiscountPercent",false);
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabDiscountPercentArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                    component.set("v.isSortingAscCSVDiscountPercent",false);
+                    component.set("v.isSortingDescCSVDiscountPercent",true);
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'Name');
+                component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPrice",false);
+				component.set("v.isSortingDescCSVDiscountPrice",false);
+            }
+        }
+        if(data === 'discountPrice'){
+            if(getTabSelectedValue === 'productTab'){
+                if(component.get("v.showDiscountPriceArrownUp") === false){
+                    component.set("v.showDiscountPriceArrownUp",true);
+                    component.set("v.sortOrder",'desc');
+                    component.set("v.isSortingAscDiscountPrice",true);
+                    component.set("v.isSortingDescDiscountPrice",false);
+                }
+                else{
+                    component.set("v.showDiscountPriceArrownUp",false);
+                    component.set("v.sortOrder",'desc');
+                    component.set("v.isSortingDescDiscountPrice",true);
+                    component.set("v.isSortingAscDiscountPrice",false);
+                }
+                component.set("v.sortOrderByField",'Name');
+                component.set("v.showISBNArrownUp",false);
+                component.set("v.showTitleArrownUp",false);
+                component.set("v.showAuthorArrownUp",false);
+                component.set("v.showPubDateArrownUp",false);
+                component.set("v.showPlanPubArrownUp",false);
+                component.set("v.showCurrentAvailArrownUp",false);
+                component.set("v.showListPriceArrownUp",false);
+                component.set("v.showDiscountPercentArrownUp",false);
+                component.set("v.isSortingAscDiscountPercent",false);
+				component.set("v.isSortingDescDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'isbnListTab'){
+                if(component.get("v.showMultiISBNTabDiscountPriceArrownUp") === false){
+                    component.set("v.showMultiISBNTabDiscountPriceArrownUp",true);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                    component.set("v.isSortingAscMultiISBNDiscountPrice",true);
+                    component.set("v.isSortingDescMultiISBNDiscountPrice",false);
+                }
+                else{
+                    component.set("v.showMultiISBNTabDiscountPriceArrownUp",false);
+                    component.set("v.multiISBNTabSortOrder",'desc');
+                    component.set("v.isSortingDescMultiISBNDiscountPrice",true);
+                    component.set("v.isSortingAscMultiISBNDiscountPrice",false);
+                }
+                component.set("v.multiISBNTabSortOrderByField",'Name');
+                component.set("v.showMultiISBNTabISBNArrownUp",false);
+                component.set("v.showMultiISBNTabTitleArrownUp",false);
+                component.set("v.showMultiISBNTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNTabListPriceArrownUp",false);
+            	component.set("v.showMultiISBNTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNTabDiscountPercentArrownUp",false);
+                component.set("v.isSortingAscMultiISBNDiscountPercent",false);
+				component.set("v.isSortingDescMultiISBNDiscountPercent",false);
+            }
+            if(getTabSelectedValue ==='multiIsbnTab' && getSelectedChildTab === 'uploadCsvTab'){
+                if(component.get("v.showMultiISBNCsvTabDiscountPriceArrownUp") === false){
+                    component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",true);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                    component.set("v.isSortingAscCSVDiscountPrice",true);
+                    component.set("v.isSortingDescCSVDiscountPrice",false);
+                }
+                else{
+                    component.set("v.showMultiISBNCsvTabDiscountPriceArrownUp",false);
+                    component.set("v.multiISBNCsvTabSortOrder",'desc');
+                    component.set("v.isSortingAscCSVDiscountPrice",false);
+                    component.set("v.isSortingDescCSVDiscountPrice",true);
+                }
+                component.set("v.multiISBNCsvTabSortOrderByField",'Name');
+                component.set("v.showMultiISBNCsvTabISBNArrownUp",false);
+                component.set("v.showMultiISBNCsvTabTitleArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPubDateArrownUp",false);
+                component.set("v.showMultiISBNCsvTabPlanPubArrownUp",false);
+                component.set("v.showMultiISBNCsvTabAuthorArrownUp",false);
+                component.set("v.showMultiISBNCsvTabListPriceArrownUp",false);
+                component.set("v.showMultiISBNCsvTabCurrentAvailArrownUp",false);
+                component.set("v.showMultiISBNCsvTabDiscountPercentArrownUp",false);
+                component.set("v.isSortingAscCSVDiscountPercent",false);
+				component.set("v.isSortingDescCSVDiscountPercent",false);
+            }
+        }
+        if(getTabSelectedValue === 'productTab'){
+            	helper.getSearchProductDataHelper(component,event);
+        }
+        if(getTabSelectedValue === 'multiIsbnTab' && getSelectedChildTab==='isbnListTab'){
+            helper.serachMultiIsbnList(component,event);
+        }
+        if(getTabSelectedValue === 'multiIsbnTab' && getSelectedChildTab==='uploadCsvTab'){
+            helper.uploadHelper(component,event);
+        }
+        /* Redirect to first page */
+        var value=1;
+        var getSelectedChildTabValue=component.get("v.setSelectedChildTab");
+        var getSelectedTabValue=component.get("v.setSelectedTab");
+        if(getSelectedTabValue ==='productTab'){
+            helper.handlePageDisplayHelper(component, event,value);
+        }
+        if(getSelectedTabValue ==='multiIsbnTab' && getSelectedChildTabValue === 'isbnListTab'){
+            helper.handleMultiIsbnPageDisplayHelper(component, event,value);
+        }
+        if(getSelectedTabValue ==='multiIsbnTab' && getSelectedChildTabValue === 'uploadCsvTab'){
+            helper.handleUploadCSVPageDisplayHelper(component, event,value);
+        }
+    }
+})

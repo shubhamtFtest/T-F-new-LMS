@@ -1,0 +1,32 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_ProcessUnsiloresponse">
+    <aura:attribute name="accept" type="List" default="['.txt']"/>
+    <aura:attribute name="multiple" type="Boolean" default="flase"/>
+    <aura:attribute name="disabled" type="Boolean" default="false"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+
+
+    <aura:registerEvent name="refreshUnsiloDocListComponent" type="c:PPDRefreshListEvent"/>
+
+    <lightning:layoutItem size="3" padding="around-small">
+        <!-- spinner -->
+        <aura:if isTrue="{!v.IsSpinner}">
+            <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+        </aura:if>
+        
+        <lightning:fileUpload  name="fileUploader"
+                              label= "Upload"
+                              multiple="{!v.multiple}"
+                              accept="{!v.accept}"
+                              disabled="{!v.disabled}"
+                              recordId="{!v.recordId}"
+                              onuploadfinished="{! c.handleUploadFinished }"/>
+    </lightning:layoutItem>
+    <br/>
+    <p><lightning:formattedText value="Maximum number of rows supported per upload is 5000"/></p>
+    <p>&nbsp;</p>
+    <p>
+            <lightning:formattedRichText aura:id="msgRichText"></lightning:formattedRichText>
+   </p>
+    
+</aura:component>

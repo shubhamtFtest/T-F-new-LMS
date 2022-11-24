@@ -1,0 +1,289 @@
+<apex:page standardcontroller="TFOAC_Opportunity__c" extensions="TFOAC_OpprotunityController">
+
+    <apex:includeScript value="{!URLFOR($Resource.TFAcqusition,'/Scripts/jQuery.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.TFAcqusition,'/Scripts/BlockUI.js')}"/>
+    <script>
+        function popup(){
+            alert("Do you want change Currency Code?");           
+         }
+    </script>
+    <apex:sectionheader title="{!$ObjectType.TFOAC_Opportunity__c.label} Edit" subtitle="{!IF(ISNULL(TFOAC_Opportunity__c.Name), 'New OAC Opportunity',TFOAC_Opportunity__c.Name)}"/>
+    <apex:form >
+        <apex:pageblock mode="edit" title="{!$ObjectType.TFOAC_Opportunity__c.label} Edit">
+            <apex:pageMessages />
+            <apex:pageblockbuttons >
+                <apex:commandbutton value="Save" action="{!Save}"/>
+                <apex:commandbutton value="Cancel" action="{!Cancel}"/>
+            </apex:pageblockbuttons>
+
+            
+                <apex:pageblocksection title="Fields" showheader="false" columns="2">
+                    <apex:pageBlockSectionItem HelpText="Full name of negotiating entity">
+                        <apex:outputLabel for="OppName" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Name.label}"/>
+                        <apex:inputfield id="OppName"  value="{!TFOAC_Opportunity__c.Name}" required="true"/>
+                    </apex:pageBlockSectionItem> 
+                    
+                    
+                      <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Bid_Lead__c.inlineHelpText}">
+                        <apex:outputLabel for="bidlead" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Bid_Lead__c.label}"/>
+                        <apex:inputfield id="bidlead" value="{!TFOAC_Opportunity__c.Bid_Lead__c}" required="true"/>
+                    </apex:pageBlockSectionItem> 
+
+                       
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Host_Areas__c.inlineHelpText}">
+                        <apex:outputLabel for="hostAreas" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Host_Areas__c.label}"/>
+                        <apex:inputfield id="hostAreas" value="{!TFOAC_Opportunity__c.Host_Areas__c}" required="true" />
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageblocksectionitem />
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.PartnerType__c.inlineHelpText}">
+                        <apex:outputLabel for="PartnerType" value="{!$ObjectType.TFOAC_Opportunity__c.fields.PartnerType__c.label}"/>
+                        <apex:inputfield id="PartnerType" value="{!TFOAC_Opportunity__c.PartnerType__c}" required="false"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Ownership__c.inlineHelpText}">
+                        <apex:outputLabel for="Ownership" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Ownership__c.label}"/>
+                        <apex:inputfield id="Ownership" value="{!TFOAC_Opportunity__c.Ownership__c}" required="true"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.ToBeCoPublished__c.inlineHelpText}">
+                        <apex:outputLabel for="ToBeCoPublished__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.ToBeCoPublished__c.label}"/>
+                        <apex:actionRegion id="ToBeCoPublishedRegion">
+                            <apex:inputfield id="ToBeCoPublished__c" value="{!TFOAC_Opportunity__c.ToBeCoPublished__c}" required="false">
+                                <apex:actionSupport event="onchange" reRender="publisherName"/>
+                            </apex:inputfield>
+                        </apex:actionRegion>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+                </apex:pageblocksection>
+            
+                <apex:outputPanel id="publisherName">
+                    <apex:pageBlockSection columns="2"> 
+                        <apex:pageBlockSectionItem rendered="{!TFOAC_Opportunity__c.ToBeCoPublished__c == 'Yes'}" HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.CoPublisherName__c.inlineHelpText}">
+                            <apex:outputLabel for="CoPublisherName__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.CoPublisherName__c.label}"/>
+                            <apex:inputfield id="CoPublisherName__c" value="{!TFOAC_Opportunity__c.CoPublisherName__c}" required="false"/>
+                        </apex:pageBlockSectionItem> 
+                    </apex:pageBlockSection>
+                </apex:outputPanel> 
+                <apex:pageblocksection showheader="false" columns="2">
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Publishing_office__c.inlineHelpText}">
+                        <apex:outputLabel for="PublishingOffice" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Publishing_office__c.label}"/>
+                        <apex:inputfield id="PublishingOffice" value="{!TFOAC_Opportunity__c.Publishing_office__c}" required="true"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Supporting_Editorial_Contact__c.inlineHelpText}">
+                        <apex:outputLabel for="Supporting_Editorial_Contact" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Supporting_Editorial_Contact__c.label}"/>
+                        <apex:inputfield id="Supporting_Editorial_Contact" value="{!TFOAC_Opportunity__c.Supporting_Editorial_Contact__c}" required="false"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Estimated_contract_closing_date__c.inlineHelpText}">
+                        <apex:outputLabel for="Estimated_contract_closing_date" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Estimated_contract_closing_date__c.label}"/>
+                        <apex:inputfield id="Estimated_contract_closing_date" value="{!TFOAC_Opportunity__c.Estimated_contract_closing_date__c}" required="false"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.NDA_status__c.inlineHelpText}">
+                        <apex:outputLabel for="NDA_status" value="{!$ObjectType.TFOAC_Opportunity__c.fields.NDA_status__c.label}"/>
+                        <apex:inputfield id="NDA_status" value="{!TFOAC_Opportunity__c.NDA_status__c}" required="true"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Date_NDA_deposited_with_Legal__c.inlineHelpText}">
+                        <apex:outputLabel for="Date_NDA_deposited_with_Legal" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Date_NDA_deposited_with_Legal__c.label}"/>
+                        <apex:inputfield id="Date_NDA_deposited_with_Legal" value="{!TFOAC_Opportunity__c.Date_NDA_deposited_with_Legal__c}" required="false"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.NDA_expiry__c.inlineHelpText}">
+                        <apex:outputLabel for="NDA_expiry" value="{!$ObjectType.TFOAC_Opportunity__c.fields.NDA_expiry__c.label}"/>
+                        <apex:inputfield id="NDA_expiry" value="{!TFOAC_Opportunity__c.NDA_expiry__c}" required="false"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Relationshp_with_T_F_Books__c.inlineHelpText}">
+                        <apex:outputLabel for="Relationshp_with_T_F_Books" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Relationshp_with_T_F_Books__c.label}"/>
+                        <apex:inputfield id="Relationshp_with_T_F_Books" value="{!TFOAC_Opportunity__c.Relationshp_with_T_F_Books__c}" required="false"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Books_relationship_comments__c.inlineHelpText}">
+                        <apex:outputLabel for="Books_relationship_comments" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Books_relationship_comments__c.label}"/>
+                        <apex:inputfield id="Books_relationship_comments" value="{!TFOAC_Opportunity__c.Books_relationship_comments__c}" required="false"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Opportunity_Profile__c.inlineHelpText}">
+                        <apex:outputLabel for="Opportunity_Profile" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Opportunity_Profile__c.label}"/>
+                        <apex:inputfield id="Opportunity_Profile" value="{!TFOAC_Opportunity__c.Opportunity_Profile__c}" required="false"/>
+                    </apex:pageBlockSectionItem>    
+                    <apex:pageblocksectionitem />
+                    
+                    <apex:pageBlockSectionItem rendered="{!IF(ISNULL(TFOAC_Opportunity__c.Name), false,true)}" >
+                        <apex:outputLabel id="CurrencyCode" for="Currency_Code"  value="Change Currency Code" />
+                        <apex:inputfield label="Currency Code" onchange="popup();" id="CurrencyCode1"  value="{!TFOAC_Opportunity__c.Currency_Code__c}" />
+                    </apex:pageBlockSectionItem> 
+                    
+                    <apex:inputfield label="Currency" id="CurrencyIsoCode" rendered="{!IF(NOT(hasAlignesJournals) && ISNULL(TFOAC_Opportunity__c.Name),true,false)}" value="{!TFOAC_Opportunity__c.CurrencyIsoCode}" required="true"/> 
+                   <!-- <apex:outputfield label="Currency" id="CurrencyIsoCode1" rendered="{!hasAlignesJournals}" value="{!TFOAC_Opportunity__c.CurrencyIsoCode}" /><br/> -->
+                    <apex:pageblocksectionitem />
+                    
+                     <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.OwnerId.inlineHelpText}">
+                        <apex:outputLabel for="OwnerId" value="{!$ObjectType.TFOAC_Opportunity__c.fields.OwnerId.label}"/>
+                        <apex:outputfield id="OwnerId" value="{!TFOAC_Opportunity__c.OwnerId}"/>
+                    </apex:pageBlockSectionItem>
+
+                </apex:pageblocksection>
+              
+               <apex:pageBlockSection title="Contact History" showHeader="true" columns="2">
+                    
+                 <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.LastContactedDate__c.inlineHelpText}">
+                        <apex:outputLabel for="LastContactedDate__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.LastContactedDate__c.label}"/>
+                        <apex:inputfield id="LastContactedDate__c" value="{!TFOAC_Opportunity__c.LastContactedDate__c}" required="false"/>
+                 </apex:pageBlockSectionItem> 
+                 
+                 <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Next_contact_date__c.inlineHelpText}">
+                        <apex:outputLabel for="Next_contact_date" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Next_contact_date__c.label}"/>
+                        <apex:inputfield id="Next_contact_date" value="{!TFOAC_Opportunity__c.Next_contact_date__c}" required="false"/>
+                 </apex:pageBlockSectionItem> 
+                 
+              
+               </apex:pageBlockSection>
+               
+               <apex:pageBlockSection title="Bid History" showHeader="true" columns="2">
+                   
+              <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Bid_Due_Date__c.inlineHelpText}">
+                        <apex:outputLabel for="Bid_Due_Date" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Bid_Due_Date__c.label}"/>
+                        <apex:inputfield id="Bid_Due_Date" value="{!TFOAC_Opportunity__c.Bid_Due_Date__c}" required="false"/>
+              </apex:pageBlockSectionItem>
+               
+                <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Who_Won_Bid__c.inlineHelpText}">
+                   <apex:outputLabel for="Who_Won_Bid" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Who_Won_Bid__c.label}"/>
+                   <apex:inputfield id="Who_Won_Bid" value="{!TFOAC_Opportunity__c.Who_Won_Bid__c}" required="false"/>    
+               </apex:pageBlockSectionItem> 
+                 
+			    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Offer_made_date__c.inlineHelpText}">
+                        <apex:outputLabel for="Offer_made_date" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Offer_made_date__c.label}"/>
+                        <apex:inputfield id="Offer_made_date" value="{!TFOAC_Opportunity__c.Offer_made_date__c}" required="false"/>
+                </apex:pageBlockSectionItem> 
+               
+               <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Other__c.inlineHelpText}">
+                   <apex:outputLabel for="Other" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Other__c.label}"/>
+                   <apex:inputField id="Other" value="{!TFOAC_Opportunity__c.Other__c}" required="false"/> 
+               </apex:pageBlockSectionItem>  
+               
+              <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Offer_accepted_date__c.inlineHelpText}">
+                   <apex:outputLabel for="Offer_accepted_date" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Offer_accepted_date__c.label}"/>
+                   <apex:inputfield id="Offer_accepted_date" value="{!TFOAC_Opportunity__c.Offer_accepted_date__c}" required="false"/>
+              </apex:pageBlockSectionItem> 
+                   
+               <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Consultant__c.inlineHelpText}" >
+                   <apex:outputLabel for="Consultant" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Consultant__c.label}"/>
+                   <apex:inputField id="Consultant" value="{!TFOAC_Opportunity__c.Consultant__c}" required="false"/> 
+               </apex:pageBlockSectionItem>  
+                   
+               </apex:pageBlockSection> 
+                
+                
+                <apex:pageblocksection title="Financial Information" showheader="true" columns="2">
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Year_1_turnover__c.inlineHelpText}">
+                        <apex:outputLabel for="Year_1_turnover" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Year_1_turnover__c.label}"/>
+                        <apex:outputfield id="Year_1_turnover" value="{!TFOAC_Opportunity__c.Year_1_turnover__c}" />
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Year1TurnoverOverride__c.inlineHelpText}">
+                        <apex:outputLabel for="Year1TurnoverOverride" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Year1TurnoverOverride__c.label}"/>   
+                        <apex:inputfield id="Year1TurnoverOverride" value="{!TFOAC_Opportunity__c.Year1TurnoverOverride__c}" required="false"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.EstimatedGrossMarginYear1__c.inlineHelpText}">
+                        <apex:outputLabel for="EstimatedGrossMarginYear1" value="{!$ObjectType.TFOAC_Opportunity__c.fields.EstimatedGrossMarginYear1__c.label}"/>   
+                        <apex:outputfield id="EstimatedGrossMarginYear1" value="{!TFOAC_Opportunity__c.EstimatedGrossMarginYear1__c}" />
+                    </apex:pageBlockSectionItem>
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Estimated_gross_margin_year_1_ovr__c.inlineHelpText}">
+                        <apex:outputLabel for="Estimated_gross_margin_year_1_ovr" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Estimated_gross_margin_year_1_ovr__c.label}"/>   
+                        <apex:inputfield id="Estimated_gross_margin_year_1_ovr" value="{!TFOAC_Opportunity__c.Estimated_gross_margin_year_1_ovr__c}" required="false"/>
+                    </apex:pageBlockSectionItem>
+
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.CurrentAnnualTurnover__c.inlineHelpText}">
+                        <apex:outputLabel for="CurrentAnnualTurnover" value="{!$ObjectType.TFOAC_Opportunity__c.fields.CurrentAnnualTurnover__c.label}"/>   
+                        <apex:outputfield id="CurrentAnnualTurnover" value="{!TFOAC_Opportunity__c.CurrentAnnualTurnover__c}" />
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.CurrentAnnualTurnoverOverwrite__c.inlineHelpText}">
+                        <apex:outputLabel for="CurrentAnnualTurnoverOverwrite__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.CurrentAnnualTurnoverOverwrite__c.label}"/>  
+                        <apex:inputfield id="CurrentAnnualTurnoverOverwrite__c" value="{!TFOAC_Opportunity__c.CurrentAnnualTurnoverOverwrite__c}" required="false"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Purchase_price__c.inlineHelpText}">
+                        <apex:outputLabel for="Purchase_price__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Purchase_price__c.label}"/>  
+                        <apex:outputfield id="Purchase_price__c" value="{!TFOAC_Opportunity__c.Purchase_price__c}" />
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.PurchasePriceOverride__c.inlineHelpText}">
+                        <apex:outputLabel for="PurchasePriceOverride__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.PurchasePriceOverride__c.label}"/>    
+                        <apex:inputfield id="PurchasePriceOverride__c" value="{!TFOAC_Opportunity__c.PurchasePriceOverride__c}" required="false"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Sign_on_fee__c.inlineHelpText}">
+                        <apex:outputLabel for="Sign_on_fee__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Sign_on_fee__c.label}"/>    
+                        <apex:outputfield id="Sign_on_fee__c" value="{!TFOAC_Opportunity__c.Sign_on_fee__c}" />
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.SignOnFeeOverride__c.inlineHelpText}">
+                        <apex:outputLabel for="SignOnFeeOverride__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.SignOnFeeOverride__c.label}"/>    
+                        <apex:inputfield id="SignOnFeeOverride__c" value="{!TFOAC_Opportunity__c.SignOnFeeOverride__c}" required="false"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.Weighted_Turnover_Year_1__c.inlineHelpText}">
+                        <apex:outputLabel for="Weighted_Turnover_Year_1__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.Weighted_Turnover_Year_1__c.label}"/>  
+                        <apex:outputfield id="Weighted_Turnover_Year_1__c" value="{!TFOAC_Opportunity__c.Weighted_Turnover_Year_1__c}" />
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSectionItem HelpText="{!$ObjectType.TFOAC_Opportunity__c.fields.WeightedTurnoverYear1OverwriteFormula__c.inlineHelpText}">
+                        <apex:outputLabel for="WeightedTurnoverYear1OverwriteFormula__c" value="{!$ObjectType.TFOAC_Opportunity__c.fields.WeightedTurnoverYear1OverwriteFormula__c.label}"/>    
+                        <apex:outputfield id="WeightedTurnoverYear1OverwriteFormula__c" value="{!TFOAC_Opportunity__c.WeightedTurnoverYear1OverwriteFormula__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:pageBlockSectionItem />
+                    
+                    
+                            
+                        
+                </apex:pageblocksection>
+            
+        </apex:pageblock>
+        <apex:inputHidden id="availableHostAreas" value="{!userAvailableHostAreas}"/>
+    </apex:form>
+    <script>
+        var $j = jQuery.noConflict();
+        $j( document ).ready(function() {
+            hideHostAreas();
+            hideContractTypes();
+        });
+    
+        function hideHostAreas(){
+            var availableOptions = $j("[id$='availableHostAreas']").val();
+            console.log(availableOptions);
+
+            $j("[id$='hostAreas']").find('option').each(function(){
+                if( $j(this).val() == 'Multiple Host Areas'){
+                    return;
+                }else if($j(this).val() == 'Digital Content' && '{!isDigitalContentUser}' === 'true') {
+                    return;
+                }else if($j(this).val() == 'Digital Content' && '{!isAllowedToSwithcProduct}' !== 'true'){
+                    $j(this).hide();
+                }else if(availableOptions.indexOf($j(this).val()) == -1){
+                    $j(this).hide();
+                    
+                }
+            });
+        }
+    </script>
+</apex:page>

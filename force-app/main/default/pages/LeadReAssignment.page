@@ -1,0 +1,22 @@
+<apex:page controller="LeadReAssignmentController" showHeader="false" sidebar="false" cache="false" action="{!init}">
+
+    <div style="width:80%; font-weight:bold; border:1px solid #000; background:#f2f2f2; padding:1em; margin:1em auto;">
+
+        <apex:outputPanel rendered="{!RenderLead_Assign}">
+            <p style="font-size:20px;">Lead: {!lead.Name}, {!lead.Company} has been re-assigned to {!owner.Name}.</p>
+            <p style="font-size:16px;"><a href="{!LeadUrl}">Click Here</a> to view the details of this lead in salesforce.com.</p>
+        </apex:outputPanel>
+
+
+        <apex:outputPanel rendered="{!RenderLead_Update}">
+            <p style="font-size:20px;">Lead: {!lead.Name}, {!lead.Company} has been updated to a status of {!status}.</p>
+            <p style="font-size:16px;"><a href="{!LeadUrl}">Click Here</a> to view the details of this lead in salesforce.com.</p>
+        </apex:outputPanel>
+                
+        <apex:outputPanel rendered="{!DontRenderLead}">
+            Cannot update lead.
+        </apex:outputPanel>
+        
+    </div>
+    
+</apex:page>

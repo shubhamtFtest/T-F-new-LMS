@@ -1,0 +1,49 @@
+<!--CHG0049990 - Hailey Niemand 02.05.2013: Modified table-->
+<!--INC0929069 - Hailey Niemand 28.05.2013: Replaced field pse__Parent_Opportunity__c with Parent_Opportunty__c-->
+
+<apex:component access="global" controller="TFClosedWonNotificationController" >
+  <apex:attribute name="value" type="Opportunity" assignTo="{!OpportunityObj}" description="Opportunity record"/>
+  <p>Owner: {!Opp.Owner.Name}</p>
+  <p>Account: {!Opp.Account.Name}</p>
+  <p>Opportunity Name: {!Opp.Name}</p>
+  <p>Opportunity Type: {!Opp.Type}</p>
+  <p>Volume Year: {!Opp.Volume_Year__c}</p>
+  <p>Parent Opportunity: {!Opp.Parent_Opportunty__r.Name}</p> 
+  <!--<p>Amount USD: {!Opp.Amount_USD__c}</p> CHG0053364--> 
+  <p>Amount USD: {!ROUND(Opp.Amount_USD__c, 2)}</p> 
+  <p>&nbsp;</p>
+  <br>
+  </br>
+  <table cellspacing="0">
+    <tr>
+      <th align="left">Product</th>
+      <th align="left">Total Price</th>
+      <th align="left">Net Price</th>
+    </tr>
+    <apex:repeat value="{!Olis}" var="oli">
+      <tr>
+        <td>{!oli.ProductName__c}</td>
+        <td>{!oli.TotalPrice}&nbsp;{!oli.CurrencyIsoCode}</td>
+        <td>{!oli.Net_Price__c}&nbsp;{!oli.CurrencyIsoCode}</td>
+      </tr>
+    </apex:repeat>
+  </table>
+  <br>
+  </br>
+  <p>&nbsp;</p>
+  <p>Primary Contact: {!PrimaryContact.Name} ({!PrimaryContact.Account.Name})</p>
+  <p>Mailing Address:</p>
+  <div style="padding-left:10px">
+    <p>{!PrimaryContact.MailingStreet}</p>
+    <p>{!PrimaryContact.MailingCity}</p>
+    <p>{!PrimaryContact.MailingState}</p>
+    <p>{!PrimaryContact.MailingPostalCode}</p>
+    <p>{!PrimaryContact.MailingCountry}</p>
+  </div>
+  <p>&nbsp;</p>
+  <p>Phone: {!PrimaryContact.Phone}</p>
+  <p>Email: {!PrimaryContact.Email}</p>
+  <p>&nbsp;</p>
+  <p>Link here for more details: <a href="{!OppURL}">{!OppURL}</a>
+</p>
+</apex:component>

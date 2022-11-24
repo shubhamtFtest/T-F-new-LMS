@@ -1,0 +1,17 @@
+<apex:page standardController="Opportunity" extensions="CASReAdoptController" action="{!doAction}">
+    <apex:pageBlock title="Hidden Fields" rendered="false">
+        <apex:outputField value="{!Opportunity.isClosed}" />
+        <apex:outputField value="{!Opportunity.isWon}" />
+        <apex:outputField value="{!Opportunity.Next_Renewal__c}" />
+    </apex:pageBlock>
+    <apex:pageBlock title="Re-adoption Not Allowed" rendered="{!NOT(adoptionAllowed)}">
+        {!errorMessage}
+        <br /><br />
+        <apex:outputLink value="/{!Opportunity.Id}" >Click Here</apex:outputLink> to return to the previous Opportunity.
+    </apex:pageBlock>
+    <apex:pageBlock title="The Re-adoption Opportunity Has Been Created" rendered="{!adoptionAllowed}" >
+        <!--<apex:outputLink value="/{!Opportunity.Id}" >Click Here</apex:outputLink> to open the previous Opportunity.-->
+        <!--<br /><br />-->
+        <apex:outputLink value="/{!newOppId}" >Click Here</apex:outputLink> to open to the newly created Opportunity.
+    </apex:pageBlock>
+</apex:page>

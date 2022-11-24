@@ -1,0 +1,180 @@
+<!--
+    Created by Jeff Lup - 2015.08.21 - PRJ0012643
+    Modified by Jeff Lup - 2016.03.28 - CHG0072245 - Errors on New Opportunity in Lightning
+-->
+
+<apex:page standardController="Opportunity" extensions="ICR_InlineEditController" id="ICRcomp" action="{!init}">
+    
+    <style>
+        .search {
+            font-family: Arial,Helvetica,sans-serif;
+            font-size:1.2em;
+            font-weight:bold;
+            margin-right: 20px;
+        }
+        .label {
+            margin-right:10px;
+            font-weight:bold;
+        }
+        div.bPageBlock.brandSecondaryBrd.apexDefaultPageBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }
+        div.bPageBlock.brandSecondaryBrd.bEditBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }       
+        .dataCol, .labelCol, .data2Col {
+            background-color: #f8f8f8 !important;
+        }
+        .datePicker {
+            top: 100px !important;
+            left:350px !important;
+        }
+    </style>    
+    
+    <apex:form id="frmICR">
+    
+        <apex:pageBlock title="Hidden Fields" rendered="false">
+            <apex:outputField value="{!Opportunity.CreatedDate}" />
+        </apex:pageBlock>
+    
+        <!-- ****************************************************** -->
+        <!-- ******************** Display Mode ******************** -->
+        <!-- ****************************************************** -->
+
+        <apex:outputText value="You may add contact roles after first saving the opportunity." rendered="{!Opportunity.Id == null}" /> <!-- CHG0072245 -->
+        
+        <apex:pageBlock title="" id="pbICR" mode="view" rendered="{!AND(NOT(isInlineEditMode),NOT(Opportunity.Id == null))}"> <!-- CHG0072245 -->
+            <apex:pageBlockButtons location="Top">
+                <apex:messages />
+                <apex:commandButton value="Add/Edit" action="{!editAll}" rerender="frmICR" />
+            </apex:pageBlockButtons>
+
+            <apex:outputpanel style="overflow:auto;height:275px;" layout="block">
+                <apex:pageBlockSection title="Contact Roles" columns="1" id="pbsICR" showHeader="false" >
+    
+                    <apex:pageBlockTable value="{!icrWrapperList}" var="w">
+                        <apex:column headerValue="Contact">
+                            <apex:outputLink target="_blank" value="/{!w.icr.Contact__c}">{!w.icr.Contact__r.Name}</apex:outputLink>
+                        </apex:column>
+                        <apex:column headerValue="Account">
+                            <apex:outputLink target="_blank" value="/{!w.icr.Contact__r.AccountId}">{!w.icr.Contact__r.Account.Name}</apex:outputLink>
+                        </apex:column>
+                        <apex:column value="{!w.icr.Contact_Role_s__c}" />
+                        <apex:column value="{!w.icr.Primary_Contact__c}" headervalue="Primary"/>
+                        <apex:column value="{!w.icr.Email__c}" />
+                        <apex:column value="{!w.icr.Phone__c}" />
+                        <apex:column value="{!w.address}" headerValue="Address" />
+                        <apex:column value="{!w.icr.LastModifiedDate}" />
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:outputpanel>
+        </apex:pageBlock>
+
+        <!-- ****************************************************** -->
+        <!-- ********************** Edit Mode ********************* -->
+        <!-- ****************************************************** -->
+
+        <apex:pageBlock title="" id="pbICRedit" mode="view" rendered="{!isInlineEditMode}">
+            <apex:pageBlockButtons location="Top">
+                <apex:commandButton value="New" action="{!addNew}" rerender="pbICRedit" />
+                <apex:commandButton value="Save" action="{!saveAll}" rerender="frmICR" status="saveStatus" />
+                <apex:commandButton value="Cancel" action="{!cancel}" rerender="frmICR" immediate="true" />
+                <apex:actionStatus startText=" saving..." stopText="" id="saveStatus"/>
+            </apex:pageBlockButtons>
+            
+            <apex:outputpanel style="overflow:auto;height:275px;" layout="block">
+                
+                <apex:pageBlockSection title="Contact Roles" columns="1" id="pbsICRedit" showHeader="false">
+
+                    <apex:outputPanel id="panErrors">
+                        <apex:pageMessages />
+                        <apex:pageMessage summary="{!errorMessage}" severity="error" strength="2" rendered="{!showErrorMessage}" escape="false" id="pmErrors"/> 
+                    </apex:outputPanel>
+    
+                    <apex:pageBlockTable value="{!icrWrapperList}" var="w">
+                    
+                        <apex:column width="50">
+                            <apex:commandLink value="Remove" action="{!removeICR}" reRender="pbICRedit" immediate="true">
+                                <apex:param value="{!w.tempIcrId}" assignTo="{!selectedTempIcrId}" name="selectedTempIcrId"/>
+                            </apex:commandLink>
+                        </apex:column>
+                        
+                        <apex:column headervalue="Contact" >
+                            <apex:outputLink rendered="{!NOT(w.icr.Id == null)}" target="_blank" value="/{!w.icr.Contact__c}">{!w.icr.Contact__r.Name}</apex:outputLink>
+                            <apex:inputField value="{!w.icr.Contact__c}" style="width:100px" rendered="{!w.icr.Id == null}" required="true">
+                                <apex:actionSupport event="onchange" action="{!contactSelected}" rerender="pbsICRedit">
+                                    <apex:param name="rowNumber" value="{!w.rowNumber}" assignTo="{!selectedRowNumber}"/>
+                                </apex:actionSupport>
+                            </apex:inputField>    
+                        </apex:column>
+                        <apex:column headervalue="Role" width="150">
+                            <apex:inputField style="width=150px" value="{!w.icr.Contact_Role_s__c}" >
+                                <apex:actionSupport event="onchange" action="{!roleChanged}" rerender="pbsICRedit">
+                                    <apex:param name="rowNumber" value="{!w.rowNumber}" assignTo="{!selectedRowNumber}"/>
+                                </apex:actionSupport>
+                            </apex:inputField>
+                        </apex:column>
+                        <apex:column headervalue="Primary" >
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <apex:inputField value="{!w.icr.Primary_Contact__c}" >
+                                <apex:actionSupport event="onclick" action="{!unselectOtherPrimary}" rerender="pbsICRedit">
+                                    <apex:param name="rowNumber" value="{!w.rowNumber}" assignTo="{!selectedRowNumber}"/>
+                                </apex:actionSupport>
+                            </apex:inputField>    
+                        </apex:column>
+    
+                        <apex:column headervalue="Name & Contact Details" >
+                            <table>
+                                <tr><td>First Name</td><td><apex:inputField style="width:120px" value="{!w.icr.Contact__r.FirstName}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                                <tr><td>Last Name</td><td><apex:inputField style="width:120px" value="{!w.icr.Contact__r.LastName}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                                <tr><td>Job Title</td><td><apex:inputField style="width:120px" value="{!w.icr.Contact__r.Title}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                                <tr><td>Email</td><td><apex:inputField style="width:120px" value="{!w.icr.Contact__r.Email}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                                <tr><td>Phone</td><td><apex:inputField style="width:120px" value="{!w.icr.Contact__r.Phone}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                            </table>
+                        </apex:column>
+
+                        <apex:column headervalue="Address" >
+                            <table>
+                                <tr><td>Street</td><td><apex:inputField style="width:120px;" value="{!w.icr.Contact__r.MailingStreet}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                                <tr><td>City</td><td><apex:inputField style="width:120px;" value="{!w.icr.Contact__r.MailingCity}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                                <tr><td>State</td><td><apex:inputField style="max-width:120px;" value="{!w.icr.Contact__r.MailingState}" /></td></tr>
+                                <tr><td>Postal Code</td><td><apex:inputField style="width:120px;" value="{!w.icr.Contact__r.MailingPostalCode}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                                <tr><td>Country</td><td><apex:inputField style="width:120px;" value="{!w.icr.Contact__r.MailingCountry}" required="{!NOT(w.icr.Contact__c == null)}" /></td></tr>
+                            </table>
+                        </apex:column>                        
+                        
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:outputpanel>
+        </apex:pageBlock>
+        
+    </apex:form>
+    
+    <script language="javascript">
+        function checkAll(linkName, checkboxName)
+        {
+            if (j$("[id*='"+linkName+"']").html() == "Select All") {
+                j$("input:visible[id*='"+checkboxName+"']").each(function() {
+                    j$(this).attr("checked", true);
+                });
+                j$("[id*='"+linkName+"']").html("Unselect All");
+            } else {
+                j$("input:visible[id*='"+checkboxName+"']").each(function() {
+                    j$(this).attr("checked", false);
+                });
+                j$("[id*='"+linkName+"']").html("Select All");
+            }                
+        }
+        
+        function hideButtons()
+        {
+            document.getElementById('btnNew').style.display = 'none'; 
+            document.getElementById('btnSave').style.display = 'none'; 
+            document.getElementById('btnCancel').style.display = 'none'; 
+        }
+        
+    </script>
+    
+</apex:page>

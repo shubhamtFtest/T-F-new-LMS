@@ -1,0 +1,55 @@
+<apex:page Controller="DatabaseCleansingController" tabStyle="Setting__c">
+
+    <apex:form id="frm">
+    
+    
+    
+    <apex:pageBlock id="pbSettingItems" title="Database Cleansing Items">
+        <apex:pageBlockButtons location="top">
+            <apex:commandButton action="{!addItem}" value="New Item"/>
+            <apex:commandButton action="{!RunAll}" value="Run All"/>
+        </apex:pageBlockButtons>
+        
+        <apex:pageBlockTable value="{!settingItems}" var="set">
+        <apex:column headerValue="">
+            <apex:commandButton value="Run" action="{!run}" rerender="hiddenBlock" rendered="{!set.Checkbox_1__c}" >
+            <apex:param name="setItemId"
+                value="{!set.Id}"
+                assignTo="{!setItemId}"/>
+        	</apex:commandButton>
+            </apex:column>
+			<apex:column headerValue="">            
+            <apex:outputLink value="/apex/setting_item?m=e&id={!set.Id}&retURL=/apex/DatabaseCleansing?id={!set.Setting__c}&cancelURL=/apex/DatabaseCleansing?id={!set.Setting__c}">
+             Edit   
+            </apex:outputLink>   
+         </apex:column> 
+         <apex:column headerValue="Enabled">
+	        <apex:outputField value="{!set.Checkbox_1__c}"/>
+         </apex:column>   
+            
+		<apex:column headerValue="Number">
+            <apex:outputLink value="/{!set.Id}?retURL=/apex/DatabaseCleansing?id={!set.Setting__c}">
+             {!set.Name}   
+            </apex:outputLink>   
+         </apex:column>   
+		<apex:column headerValue="API Object Name">
+	        <apex:outputText value="{!set.Text_1__c}"/>
+         </apex:column> 
+            <apex:column headerValue="Delete After # Days">
+	        <apex:outputText value="{!set.Text_3__c}"/>
+         </apex:column> 
+           <apex:column headerValue="SOQL Where">
+	        <apex:outputText value="{!IF( LEN(set.Text_2__c) > 100,LEFT(set.Text_2__c,97) & '...', set.Text_2__c)}"/>
+         </apex:column>    
+	    </apex:pageBlockTable>
+
+
+         
+
+    </apex:pageBlock>
+	<apex:pageBlock id="hiddenBlock" rendered="false"></apex:pageBlock>
+   
+
+    </apex:form>
+
+</apex:page>

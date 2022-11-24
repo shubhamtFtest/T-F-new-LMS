@@ -1,0 +1,35 @@
+<aura:component implements="forceCommunity:searchInterface" controller="CustomSearchController">
+    <aura:attribute name="searchText" type="String" default=""/>
+    <aura:attribute type="Object[]" name="recordIds" />
+    <aura:attribute name="record" type="Object"/>
+    <aura:attribute name="simpleRecord" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+    
+    <aura:attribute name="spinner" type="boolean" default="FALSE"/>
+    
+    <!--loading spinner start-->
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- Loading spinner end-->   
+    <div class="slds-form-element slds-lookup" data-select="single">
+        <div class="slds-form-element__control">
+            <div class="slds-input-has-icon slds-input-has-icon--right">
+                <lightning:buttonIcon iconName="utility:search"  variant="bare" onclick="{! c.handleClick }" alternativeText="Search" class="slds-input__icon" />
+               <ui:inputText value="{!v.searchText}"   class="slds-lookup__search-input slds-input" placeholder="Search" />
+            </div>
+        </div>
+    </div>
+    
+    <aura:iteration items="{!v.recordIds}" var="ids">
+        <div class="slds-page-header" role="banner">
+            <a onclick="{!c.selectRecord}" class="slds-text-heading--label" data-id="{!ids.Id}">{!ids.Name}</a>
+        </div>
+    </aura:iteration>
+</aura:component>

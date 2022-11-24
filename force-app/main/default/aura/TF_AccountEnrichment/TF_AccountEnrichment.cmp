@@ -1,0 +1,69 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="TF_AccountEnrichmentApexController">
+    <!--Declare Event Handlers--> 
+    <aura:handler name="init" action="{!c.calloutCtrl}" value="{!this}"/>
+     
+    <!--Declare Attributes-->
+    <aura:attribute name="Spinner" type="boolean" default="true"/>
+    <aura:attribute name="statusOk" type="boolean" default="false"/>
+    <aura:attribute name="checkRetry" type="boolean" default="false"/>
+    <aura:attribute name="objectList" type="List" />
+    <aura:attribute name="ringgoldId" type="String" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="tableCols" type="List"/>
+    <aura:attribute name="draftValues" type="List" default="[]"/>
+     <!-- Component -->
+    <aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+       <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+         <span class="slds-assistive-text">Loading</span>
+         <div class="slds-spinner__dot-a"></div>
+         <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+ </aura:if>
+    <lightning:layout multipleRows="true">
+    <lightning:layoutItem size="6" padding="around-small">
+    <div class="img " >
+        <img style="height: 100px;" src="{!$Resource.SalesforceLogo}"   />
+    </div>
+    </lightning:layoutItem>
+    <lightning:layoutItem size="6" padding="around-small">
+    <div class="img1" >
+        <img style="height: 100px;" src="{!$Resource.RinggoldLogo }"   /> 
+        <div class="slds-text-align_right">
+            Ringgold Id : {!v.ringgoldId}
+        </div>
+    </div>
+    </lightning:layoutItem>
+    </lightning:layout> 
+    <div class="slds-list_horizontal slds-wrap">
+    	
+       <lightning:button variant="base" label="Check All" title="Check All" onclick="{! c.checkAllObject}" class="right-align"/>
+    </div> 
+     <aura:if isTrue="{!v.statusOk}">
+    <div class="slds-notify slds-notify_toast slds-theme_success">
+            <span class="slds-assistive-text">success</span>
+            <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small slds-align_absolute-center">Account Enrichment Done</h2>              
+            </div><br/>
+        </div>
+    </aura:if>
+    <div style="width: 100%;" class="slds-form-element">
+  <lightning:datatable suppressBottomBar = "false" aura:id="dataTableP1"
+                keyField="fieldAPIName"
+                data="{! v.objectList }"
+                columns="{! v.tableCols}"
+                draftValues="{! v.draftValues }"
+                hideCheckboxColumn="true"
+                onsave="{! c.updateAccountFields }"
+                oncancel = "{!c.clearDraftValues}"/>
+               
+</div> 
+    <aura:if isTrue="{!v.checkRetry}">
+    <lightning:button
+                    label="Retry"
+                    variant="brand"
+                    onclick="{!c.calloutCtrl}"
+            />
+     </aura:if>
+</aura:component>

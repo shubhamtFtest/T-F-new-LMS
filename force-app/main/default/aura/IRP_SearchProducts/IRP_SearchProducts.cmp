@@ -1,0 +1,78 @@
+<!-- IRP_CloneOpportunity -->
+<aura:component controller="TF_IndiaRePrintCtr" implements="force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickAction" access="global">
+    <aura:attribute name="recordId" type="string"/>
+    <!-- CREATE ATTRIBUTE/VARIABLE-->
+    <aura:attribute name="searchResult" type="List" />
+    <aura:attribute name="searchKeyword" type="String" />
+    <aura:attribute name="Message" type="boolean" default="false" />
+    <!-- SHOW LOADING SPINNER--> 
+    <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    
+    <div class="slds-m-around_medium">
+        <!-- SEARCH INPUT AND SEARCH BUTTON--> 
+        <lightning:layout>
+            <lightning:layoutItem size="6" padding="around-small">
+                <lightning:input value="{!v.searchKeyword}"
+                                 placeholder="search Accounts.."
+                                 aura:id="searchField"
+                                 />
+            </lightning:layoutItem>
+            <lightning:layoutItem size="2" padding="around-small">
+                <lightning:button onclick="{!c.Search}"
+                                  variant="brand"
+                                  label="Search"
+                                  iconName="utility:search"/> 
+            </lightning:layoutItem>
+        </lightning:layout>
+                
+        <!-- ERROR MESSAGE IF NOT RECORDS FOUND--> 
+        <aura:if isTrue="{!v.Message}">
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small">No Records Found...</h2>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        
+        <!-- TABLE CONTENT--> 
+        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+            <thead>
+                <tr class="slds-text-title_caps">
+                    <th scope="col">
+                        <div class="slds-truncate" title="S.no">S.No</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="S.no">OpportunityId</div>
+                    </th>                    
+                    <th scope="col">
+                        <div class="slds-truncate" title="Opportunity Name">Opportunity Name</div>
+                    </th>
+                    <th scope="col">
+                        <div class="slds-truncate" title="Stage">Stage</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody> 
+                <!--### display all records of searchResult attribute by aura:iteration ###-->
+                <aura:iteration items="{!v.searchResult}" var="opp" indexVar="count">
+                    <tr>
+                        <td>
+                            <div class="slds-truncate">{!count + 1}</div>
+                        </td>
+                        <td>
+                            <div class="slds-truncate">{!opp.Opportunity.Id}</div>
+                        </td>
+                        <td>
+                            <div class="slds-truncate">{!opp.Opportunity.Name}</div>
+                        </td>                        
+                        <td>
+                            <div class="slds-truncate">{!opp.Opportunity.StageName}</div>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>  
+</aura:component>

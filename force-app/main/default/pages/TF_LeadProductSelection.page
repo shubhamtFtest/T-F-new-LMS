@@ -1,0 +1,17 @@
+<!-- When placing on a standard page, set width = 100%, height = 25, scrollbars = NO, label = YES -->
+<!--
+Created by Jeff Lup - 2014.11.19 - CHG0060297
+-->
+
+<apex:page standardController="Lead" extensions="TF_LeadProductSelectionController">
+    <apex:form >
+        <apex:outputLink value="/{!tfProductId}" target="_parent" rendered="{!isDisplayMode}" >{!tfProductName}</apex:outputLink>
+        <apex:outputText value="&nbsp;&nbsp;" escape="false" rendered="{!isDisplayMode}" />
+        <apex:commandLink action="{!changeProduct}" value="[Change]" rendered="{!isDisplayMode}"/>
+        <apex:selectList value="{!tfProductId}" size="1" id="dmSalesTeam" rendered="{!isEditMode}">
+           <apex:selectOptions value="{!tfProducts}"/>
+        </apex:selectList>
+        <apex:commandButton value="Save" action="{!updateProduct}" rendered="{!isEditMode}"/>
+        <apex:commandButton value="Cancel" action="{!cancel}" rendered="{!isEditMode}" />
+    </apex:form>
+</apex:page>

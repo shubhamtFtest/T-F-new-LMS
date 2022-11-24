@@ -1,0 +1,823 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+<head>
+<title>Page not found</title>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript for bootstrap -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<!-- Font Awsome -->
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"/>
+<!--To allow @media-->
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+  /*Added by Tom to remove the 'description' label on the knowledge article detail page.*/
+.test-id__field-label{
+    display: none!important;
+}
+
+@font-face {
+    font-family: 'tf-icon-font';
+    src: url("{!URLFOR($Resource.TFFonts, '/taylor-francis-style-guide-icons/fonts/tf-icon-font.eot')}");  /* IE9*/
+    src: url("{!URLFOR($Resource.TFFonts, 'taylor-francis-style-guide-icons/fonts/tf-icon-font.eot?#iefix')}") format('embedded-opentype'), /* IE6-IE8 */
+    url("{!URLFOR($Resource.TFFonts, 'taylor-francis-style-guide-icons/fonts/tf-icon-font.woff')}") format('woff');  /* Modern browsers*/
+    
+   
+}
+.library-tf-icon-font{
+    font-family: "tf-icon-font";
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.icon-acquisition-history:before { content: "\e92f"; }
+.icon-arrow-down:before { content: "\e939"; }
+.icon-arrow-left:before { content: "\e93b"; }
+.icon-arrow-right:before { content: "\e93c"; }
+.icon-arrow-up:before { content: "\e93a"; }
+.icon-calendar:before { content: "\e90e"; }
+.icon-cancel:before { content: "\e926"; }
+.icon-cancel-circle:before { content: "\e928"; }
+.icon-check:before { content: "\e925"; }
+.icon-check-circle:before { content: "\e927"; }
+.icon-citation:before { content: "\e910"; }
+.icon-dashboard:before { content: "\e92d"; }
+.icon-data-requests:before { content: "\e915"; }
+.icon-delete:before { content: "\e913"; }
+.icon-down:before { content: "\e921"; }
+.icon-download:before { content: "\e917"; }
+.icon-edit:before { content: "\e907"; }
+.icon-email:before { content: "\e90f"; }
+.icon-entitlements:before { content: "\e92e"; }
+.icon-error:before { content: "\e92a"; }
+.icon-external-link:before { content: "\e92c"; }
+.icon-facebook:before { content: "\e900"; }
+.icon-filter:before { content: "\e937"; }
+.icon-help-faq:before { content: "\e935"; }
+.icon-image:before { content: "\e92b"; }
+.icon-info:before { content: "\e929"; }
+.icon-institution:before { content: "\e934"; }
+.icon-ip:before { content: "\e904"; }
+.icon-left:before { content: "\e923"; }
+.icon-licenses:before { content: "\e90c"; }
+.icon-link:before { content: "\e93d"; }
+.icon-logout:before { content: "\e936"; }
+.icon-manage-institution:before { content: "\e905"; }
+.icon-manage-users:before { content: "\e906"; }
+.icon-marc-records1:before { content: "\e914"; }
+.icon-news-recommendations:before { content: "\e930"; }
+.icon-notifications:before { content: "\e933"; }
+.icon-open-access:before { content: "\e90a"; }
+.icon-organisations:before { content: "\e916"; }
+.icon-pages:before { content: "\e908"; }
+.icon-password:before { content: "\e911"; }
+.icon-pinterest:before { content: "\e903"; }
+.icon-pointer:before { content: "\e909"; }
+.icon-processing:before { content: "\e912"; }
+.icon-product-bundle:before { content: "\e90d"; }
+.icon-reporting:before { content: "\e931"; }
+.icon-right:before { content: "\e924"; }
+.icon-search:before { content: "\e920"; }
+.icon-settings:before { content: "\e932"; }
+.icon-site-admin:before { content: "\e90b"; }
+.icon-sort:before { content: "\e938"; }
+.icon-twitter:before { content: "\e901"; }
+.icon-up:before { content: "\e922"; }
+.icon-user:before { content: "\e91f"; }
+.icon-youtube:before { content: "\e902"; }
+
+.forceCommunityTopArticleItem .article-title{
+    font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:13px!important;
+}
+.siteforceNapiliFooter #askCommunity {
+    display: none;
+}
+.selfServiceUserProfileMenu
+{
+display : none;
+}
+
+.selfServiceArticleLayout.zoom .article-head {
+    font-size: 1.5em;
+    font-family: Lato!important;
+    font-weight: 300!important;
+}
+
+.forceCommunityGlobalNavigation {
+    /*display: none;*/
+}
+.siteforceServiceBody .cHeaderOverlay {
+    height: 400px!important;
+    background: rgba(0, 0, 0, 0);
+}
+.forceCommunitySearchBox {
+    text-align: left;
+    /*opacity: 0.5;*/
+    position: absolute;
+    top: 30px;
+    /*background-color: RGB(230, 230, 230);*/
+    /*outline: 0.1px solid white;*/
+}
+.forceCommunitySearchBox .search-input-group{
+    Border:1px solid White;
+}
+.forceCommunitySearchBox .search-input-group:focus{
+    Border:0px solid White;
+}
+.forceCommunitySearchBox .search-button {
+        background-color: transparent;
+}
+
+.forceCommunitySearchBox .search-field {
+    /*background-color: transparent!important;*/
+    color: white!important;
+    font-size: 5rem!important;
+    background-color:black!important;
+}
+
+.forceCommunitySearchBox .curtain-blur{
+    
+}
+.truncate, .uiTabset .tabHeader {
+    overflow: visible;
+    white-space: nowrap;
+}
+
+
+.slds-text-body_small, .slds-text-body--small {
+    font-size: 1rem;
+}
+
+.topicHierarchy-top {
+    font-size: 1rem;
+    font-weight: normal!important;
+    text-transform: uppercase;
+    font-family: Montserrat;
+}
+
+.forceCommunityTopArticleItem .article-title {
+    font-size: 1rem!important;
+    margin: 0;
+    word-wrap: break-word;
+    display: block;
+}
+
+.forceCommunityTopArticleListForTopic .topicHeaderLink {
+    text-transform: uppercase;
+    font-weight: normal!important;
+    color: #333;
+}
+
+.selfServiceArticleListItem .article-head {
+    font-size: 1rem!important;
+    line-height: 1.5;
+    font-weight: normal!important;
+}
+
+.selfServiceTopicArticleList .selfServiceArticleListItem .article-summary {
+    font-size: 1rem!important;
+    font-weight: 300;
+}
+
+.selfServiceTopicRelatedArticle .headerLabel {
+    font-size: 1.25rem;
+    font-weight: normal!important;
+}
+
+.forceCommunityHeadline .headlineTitle {
+    font-size: 28px;
+    font-weight: normal!important;
+}
+
+.selfServiceArticleListItem .footer {
+    color: #696969;
+    font-size: .8125em;
+    margin-top: 14px;
+    height: 15px;
+    display : none!important;
+}
+
+.uiInput--select.select, .uiInput--select .select, .uiInput--select .uiPopupTrigger a {
+    font-size: 1rem!important;
+    font-weight: 300!important;
+    font-family: Lato!important;
+    border-style: solid!important;
+    border-color: RGB(230, 230, 230)!important;
+}
+
+.uiInput--input .input, .uiInput--input.input {
+        font-size: 1rem!important;
+    font-weight: 300!important;
+    font-family: Lato!important;
+    border-style: solid;
+    border-color: RGB(230, 230, 230);
+}
+
+.uiInput--textarea .textarea, .uiInput--textarea.textarea {
+        font-size: 1rem!important;
+    font-weight: 300!important;
+    font-family: Lato!important;
+    border-style: solid!important;
+    border-color: RGB(230, 230, 230)!important;
+}
+.uiInput--input.input:focus, .uiInput--input .input:focus, .uiInput--input.input:active, .uiInput--input .input:active{
+    box-shadow:transparent;
+}
+a{
+    padding:0 0 0 0;
+    margin:0 auto;
+    width:100%;   
+    display:block;
+    height:100%;
+}
+.FooterLinksHeader{
+    color:#FFFFFF;
+    font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size:15px;
+    font-weight:600;
+    line-height:20px;
+    margin-top:20px;
+    margin-bottom:15px;
+}
+.footerLinks{
+    color:#ffffff;
+    font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size:13px;
+    font-weight:300;
+    line-height:20px;
+    margin-top:15px;
+    
+}
+.footerLinks a{
+    color:#ffffff!important;
+    text-decoration:none!important;
+}
+
+.Registrationdetails{
+    color: rgb(146, 142, 142);
+    font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 18.4667px;
+    margin:0 auto;   
+    padding-top: 20px;
+    border-top-color: rgba(146, 142, 142, 0.3);
+    border-top-style: solid;
+    border-top-width: 2px;
+    box-sizing: border-box;   
+    text-size-adjust:100%;
+}
+
+.header{
+    padding-bottom: 30px;
+    padding-top: 30px;
+    
+}
+.Mobileheader{
+    padding-bottom: 10px;
+    padding-top: 10px;
+    
+}
+
+.slds-form-element__label {
+    font-family: Lato!important;
+    font-size: 1rem!important;
+    line-height: 1.5em!important;
+    font-weight: 300!important;
+}
+
+.slds-textarea {
+    font-family: Lato!important;
+    font-size: 1rem!important;
+    line-height: 1.5em!important;
+    border-style: solid!important;
+    border-color: RGB(230, 230, 230)!important;
+}
+.forceCommunitySearchBox{
+    top:0;    
+}
+.Flex1row{
+    padding-top:72px;
+    padding-bottom:72px;
+    display:flex;
+    justify-content:space-between;
+}
+.Flex2row{
+    display:flex;
+    flex-direction:row;
+    width:100%;
+}
+.routledge-image {
+    background-image:url('{!$Resource.Community_routledge_image}');
+    background-size: auto auto;
+    background-size: contain;
+    background-repeat : no-repeat;
+    width: 200px;
+    height: 55px;
+    display: inline-block;     
+}
+.crc-press-image {
+    background-image:url('{!$Resource.Community_crc_image}');
+    background-repeat : no-repeat;
+    background-size: auto auto;
+    background-size: contain;
+    width: 215px;
+    height: 60px;
+    display: inline-block;   
+    
+}
+.cogent-image{
+    background-image:url('{!$Resource.Community_cogent_image}');
+    background-repeat : no-repeat;
+    background-size: auto auto;
+    background-size: contain;
+    width: 200px;
+    height: 38px;
+    display: inline-block;
+    
+}
+.tandf-image{
+    background-image:url('{!$Resource.Community_tnf_image}');
+    background-repeat : no-repeat;
+    background-size: auto auto;
+    background-size: contain;
+    width: 220px;
+    height: 38px;
+    display: inline-block;    
+}
+.routledge-image-sm {  
+   width:50%;
+    height: 34px;      
+    margin:32px 0 30px 0;
+}
+.crc-press-image-sm {
+   width:50%;
+    height: 36px;      
+    margin:0 32px 30px 0px;   
+    
+}
+.cogent-image-sm{
+   width:50%;
+    height: 20px;      
+    margin:35px 0 35px 15px;  
+    
+}
+.tandf-image-sm{
+    width:50%;
+    height: 24px;      
+         
+}
+.toprow{
+    margin-top:50px;
+    margin-bottom:50px;
+    
+    
+}
+.bottomrow{
+    margin-bottom:50px;
+   
+}
+
+input::-webkit-input-placeholder {
+    color: white !important;
+    font-size:15px;
+}
+ 
+input:-moz-placeholder { /* Firefox 18- */
+    color: white !important;  
+    font-size:15px;
+}
+ 
+input::-moz-placeholder {  /* Firefox 19+ */
+    color: white !important;  
+    font-size:15px;
+}
+ 
+input:-ms-input-placeholder {  
+    color: white !important;  
+    font-size:20px;
+}
+
+.uiInput--default .form-element__label {
+    font-family: Lato;
+    font-size: 1rem;
+    line-height: 1.5em;
+    font-weight: 300;
+}
+.Menubar{
+    background-color:#FFFFFF;
+    margin:0 auto;   
+    min-height:25px;
+    font-family: Lato!important;
+    font-size: 1rem!important;
+    line-height: 1.5em!important;
+    font-weight: 700!important;
+    padding:0 0 0 0;
+   
+}
+.Menubar a{
+    
+}
+.Sitemap{
+     color:White;
+}
+
+
+
+.forcePageBlockSectionView.full .test-id__field-value {
+    font-size: 1.5em!important;
+    font-weight: 300!important;
+}
+
+.selfServiceArticleLayout.zoom .article-head {
+    font-size: 1.5em!important;
+    font-family: Lato!important;
+    font-weight: 700!important;
+}
+
+.selfServiceArticleLayout .article-summary{
+    
+     font-size: 1.5em!important;
+    font-family: Lato!important;
+    font-weight: 300!important;   
+}
+
+
+.selfServiceArticleLayout .meta {
+display: none;
+}
+.row{
+    margin-left:0px;
+    margin-right:0px;
+}
+.social-list{    
+    overflow: auto;
+
+}
+.Social-links {
+    font-size:32px!important;
+    display:inline-block;
+}
+.social-col{
+    padding-left:0px;
+}
+
+/*Hide the title and url field on the knowledge article page*/
+article.content .forcePageBlockSectionRow ~ .forcePageBlockSectionRow{
+    display:none;
+}
+.MainHeading{
+    background-color: white; 
+    color: Black;    
+    font-size:1.5em;
+    padding-left:10px!important;
+    padding-right:10px;
+    text-decoration:none!important;
+}
+.MainHeading span{
+    
+    font-weight:200;
+    text-align: left;
+    font-family: 'Open Sans','Helvetica Neue',Helvetica,Arial,sans-serif; 
+    
+}
+.body-search{
+    height:48px!important;
+}
+.search-wrapper{
+    height:48px!important;
+}
+.search-container{
+    height:48px!important;
+}
+.search-input-group{
+    height:48px!important;
+}
+.search-input-group{
+    border:0px solid white!important;
+    padding:0,0,0,0!important;
+}
+.search-field-wrapper{
+    border:1px solid white!important;
+}
+.search-button{
+    margin-top:20px;
+}
+.MainLogoDiv{
+    width:12%;
+    
+}
+.MainLogoDivMobile{
+    width:16%;
+    padding-top:6px;
+        
+}
+.MainLogoDivTablet{
+width:8%;
+margin-top: 6px;
+}
+.MainLogoPlaceHolder{
+    background-image:url('{!$Resource.TFLogo_Community}');    
+    background-size: contain; 
+    background-repeat : no-repeat;  
+    min-height:34px;
+    display: inline-block;      
+    
+}
+.MainLogoPlaceHolderMobile{
+    background-image:url('{!$Resource.Community_error_logo_mobile}');
+    background-size: contain; 
+    background-repeat : no-repeat;  
+    min-height:25px;
+    display: inline-block; 
+
+}
+.topicHeaderLink{
+    padding-top:7px;
+}
+.mainlogo{
+     text-decoration:none!important;
+     border-left:2px solid black;
+    
+}
+@media screen and (min-width : 720px)
+{
+  .MainHeading
+  {
+    font-size:2em;
+  }
+}
+@media screen and (max-width : 721px)
+{
+  .MainHeading
+  {
+    font-size:1em;
+  }
+    .siteforceServiceBody .cHeaderPanel .cHeaderOverlay{
+        Max-height:100px;       
+    }
+   
+}
+a:-webkit-any-link{
+    text-decoration:none!important;
+}
+.option-attribute-list{
+    display:none!important;
+}
+.slds-tile__detail{
+    display:none!important;
+}
+.mainErrorContent{
+    background-color:#e6e6e6;
+    width:100%;
+    padding-top:54px;
+    padding-bottom:162px;
+}
+.Wrapper {
+    
+    min-height:200px;
+    background-color:#ffffff;
+    padding-top:42px;
+    padding-bottom:42px;
+}
+.ErrorHead{
+    font-size:15px;
+    font-weight:700px!important;
+}
+.errorh4{
+    color:#928e8e;
+}
+</style>
+
+</head>
+<body>
+ <div class="content">
+    <div class="row header hidden-xs">        
+        <div class="col-md-2 hidden-xs hidden-sm MainLogoDiv"><a class="MainLogoPlaceHolder" href="https://www.taylorfrancis.com"></a></div>
+        <div class="col-xs-5 hidden-md hidden-lg hidden-sm MainLogoDivMobile"><a class="MainLogoPlaceHolderMobile" href="https://www.taylorfrancis.com"></a></div>
+        <div class="col-sm-2 hidden-xs hidden-md hidden-lg MainLogoDivTablet"><a class="MainLogoPlaceHolderMobile" href="https://www.taylorfrancis.com"></a></div>
+        
+        <div class="col-md-10 hidden-xs hidden-sm mainlogo MainHeading">Help Center</div>
+        <div class="col-xs-10 hidden-md hidden-lg hidden-sm mainlogo MainHeading">Help Center</div>
+        <div class="col-sm-10 hidden-md hidden-lg hidden-xs mainlogo MainHeading">Help Center</div>
+    </div>
+    <div class="row Mobileheader hidden-md hidden-lg hidden-sm">        
+        <div class="col-md-2 hidden-xs hidden-sm MainLogoDiv"><a class="MainLogoPlaceHolder" href="https://www.taylorfrancis.com"></a></div>
+        <div class="col-xs-5 hidden-md hidden-lg hidden-sm MainLogoDivMobile"><a class="MainLogoPlaceHolderMobile" href="https://www.taylorfrancis.com"></a></div>
+        <div class="col-sm-2 hidden-xs hidden-md hidden-lg MainLogoDivTablet"><a class="MainLogoPlaceHolderMobile" href="https://www.taylorfrancis.com"></a></div>
+        
+        <div class="col-md-10 hidden-xs hidden-sm mainlogo MainHeading">Help Center</div>
+        <div class="col-xs-10 hidden-md hidden-lg hidden-sm mainlogo MainHeading" style="border:0px solid black;padding-top:10px;">| Help Center</div>
+        <div class="col-sm-10 hidden-md hidden-lg hidden-xs mainlogo MainHeading">Help Center</div>
+    </div>
+</div>
+
+
+<div class="mainErrorContent container">   
+        <div class="Row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6 Wrapper">
+                <div class="Row">
+                    <div class="col-md-8">
+                        <div class="Row"><div class="col-md-12 ErrorHead"><p><b>Error 404</b></p></div></div>
+                        <div class="Row"><div class="col-md-12"><h2>Sorry, we can't seem to find the page you're looking for.</h2></div></div>
+                        <div class="Row"><div class="col-md-12 clearfix errorh4"><h4>The link you requested might be broken or no longer exists.</h4></div></div>
+                        <div class="Row"><div class="col-md-12 clearfix errorh4"><h4>If you require further assistance, please email our Support team </h4></div></div>
+                        <div class="Row"><div class="col-md-12 clearfix errorh4"><h4><a href="support@taylorfrancis.com" target="_blank">support@taylorfrancis.com</a> </h4></div></div>
+                        <div class="Row"><div class="col-md-12 clearfix errorh4"><h4>or start at our home page.</h4></div></div>
+                        <div class="Row"><div class="col-md-3"><a class="btn btn-primary" href="https://www.taylorfrancis.com/">Back to home</a></div><div class="col-md-9"></div></div>
+                                                                        
+                    </div>
+                    <div class="col-md-4"><apex:image id="BookImage" value="{!$Resource.Book_icon_For_Community_Error_Page}"/></div>        
+                </div>
+            </div>
+            <div class="col-md-3"></div>
+            
+        </div>
+    
+</div>
+    
+
+
+
+
+<div style="background-color: rgb(0, 136, 163);">
+    <div class="container">
+        <div class="row Flex1row hidden-xs hidden-sm">        
+                    <div class="col-md-3 routledge-image">
+                        <a href="https://www.routledge.com/" target="_blank"></a>
+                    </div>
+                    <div class="col-md-3 cogent-image">
+                        <a href="https://www.cogentoa.com/" target="_blank"></a>
+                    </div>
+                    <div class="col-md-3 crc-press-image">
+                        <a href="https://www.crcpress.com/" target="_blank"></a>
+                    </div>
+                    <div class="col-md-3 tandf-image">
+                        <a href="http://www.tandfonline.com/" target="_blank"></a>
+                    </div>
+
+        </div>
+        <div class="row Flex2row hidden-lg hidden-md">        
+                    <div class="col-sm-6 routledge-image routledge-image-sm">
+                        <a href="https://www.routledge.com/" target="_blank"></a>
+                    </div>
+                    <div class="col-sm-6 cogent-image cogent-image-sm">
+                        <a href="https://www.cogentoa.com/" target="_blank"></a>
+                    </div>
+        </div>
+        <div class="row Flex2row hidden-lg hidden-md">        
+
+                    <div class="col-sm-6 crc-press-image crc-press-image-sm">
+                        <a href="https://www.crcpress.com/" target="_blank"></a>
+                    </div>
+                    <div class="col-sm-6 tandf-image tandf-image-sm">
+                        <a href="http://www.tandfonline.com/" target="_blank"></a>
+                    </div>
+
+        </div>
+    </div>
+</div>
+<div style="background-color: rgb(51, 51, 51);">
+    <div class="container">
+        <div class="row footerLinks" style="background-color: rgb(51, 51, 51);">
+            <div class="col-md-12">
+                <a href="https://www.taylorfrancis.com/" target="_blank"><img id="test4" src="https://taylorandfrancis--c.eu18.content.force.com/servlet/servlet.ImageServer?id=0151n000002sKMJ&oid=00D0Y0000035Iji"/></a>
+            </div>
+        </div>
+        <div class="row" style="background-color: rgb(51, 51, 51);color:white;">
+                    <div class="col-md-2">
+                        <div class="row FooterLinksHeader">
+                            <div class="col-md-12">
+                                Help and Info
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <a target="_blank" href="http://taylorandfrancis.com/customer-privacy/">Privacy Policy</a>                                
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <a target="_blank" href="http://www.taylorfrancis.com/cookie-policy">Cookie Policy</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="row FooterLinksHeader">
+                            <div class="col-md-12">
+
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <a target="_blank" href="http://www.taylorfrancis.com/terms-and-conditions">Terms &amp; Conditions</a>
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <!--<a href="https://help.taylorfrancis.com/librarians_institutions/s/contactsupport">Contact Us</a>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="row FooterLinksHeader">
+                            <div class="col-md-12">
+                                Journals
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <a href="http://www.tandfonline.com" target="_blank">Taylor &amp; Francis Online</a>
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <a href="https://www.cogentoa.com" target="_blank">CogentOA</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="row FooterLinksHeader">
+                            <div class="col-md-12">
+                                Corporate
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <a href="http://taylorandfrancis.com" target="_blank">Taylor &amp; Francis Group</a>
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="row FooterLinksHeader">
+                            <div class="col-md-12">
+                                Help and Contact
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <a target="_blank" href="https://help.taylorfrancis.com/students_researchers">Students/Researchers</a>
+                            </div>
+                        </div>
+                        <div class="row footerLinks">
+                            <div class="col-md-12">
+                                <a class="footerHyperLinks" target="_blank" href="https://help.taylorfrancis.com/librarians_institutions">Librarians/Institutions</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="row FooterLinksHeader">
+                            <div class="col-md-12">
+                                Connect with us
+                            </div>
+                        </div>
+                        <div class="row footerLinks hidden-xs hidden-sm">                       
+                                    <div class="col-md-3 social-col"><a href="https://www.facebook.com/TaylorandFrancisGroup/" target="_blank"><i class="library-tf-icon-font icon-facebook Social-links"></i></a></div>
+                                    <div class="col-md-3 social-col"><a href="https://twitter.com/tandfnewsroom?lang=en" target="_blank"><i class="library-tf-icon-font icon-twitter Social-links"></i></a></div>
+                                    <div class="col-md-3 social-col"><a href="https://www.youtube.com/user/TaylorandFrancis" target="_blank"><i class="library-tf-icon-font icon-youtube Social-links"></i></a></div>
+                                    <div class="col-md-3 social-col"><a href="https://uk.pinterest.com/tandfpins/" target="_blank"><i class="library-tf-icon-font icon-pinterest Social-links"></i></a></div>                                
+                        </div>
+                        <div class="row footerLinks hidden-lg hidden-md hidden-sm">                       
+                                    <div class="col-xs-2 social-col"><a href="https://www.facebook.com/TaylorandFrancisGroup/" target="_blank"><i class="library-tf-icon-font icon-facebook Social-links "></i></a></div>
+                                    <div class="col-xs-2 social-col"><a href="https://twitter.com/tandfnewsroom?lang=en" target="_blank"><i class="library-tf-icon-font icon-twitter Social-links "></i></a></div>
+                                    <div class="col-xs-2 social-col"><a href="https://www.youtube.com/user/TaylorandFrancis" target="_blank"><i class="library-tf-icon-font icon-youtube Social-links "></i></a></div>
+                                    <div class="col-xs-2 social-col"><a href="https://uk.pinterest.com/tandfpins/" target="_blank"><i class="library-tf-icon-font icon-pinterest Social-links "></i></a></div>  
+                                    
+                        </div>
+                        <div class="row footerLinks hidden-lg hidden-md hidden-xs">                       
+                                    <div class="col-sm-1 social-col"><a href="https://www.facebook.com/TaylorandFrancisGroup/" target="_blank"><i class="library-tf-icon-font icon-facebook Social-links "></i></a></div>
+                                    <div class="col-sm-1 social-col"><a href="https://twitter.com/tandfnewsroom?lang=en" target="_blank"><i class="library-tf-icon-font icon-twitter Social-links "></i></a></div>
+                                    <div class="col-sm-1 social-col"><a href="https://www.youtube.com/user/TaylorandFrancis" target="_blank"><i class="library-tf-icon-font icon-youtube Social-links "></i></a></div>
+                                    <div class="col-sm-1 social-col"><a href="https://uk.pinterest.com/tandfpins/" target="_blank"><i class="library-tf-icon-font icon-pinterest Social-links "></i></a></div>  
+                                    
+                        </div>
+                    </div>
+
+        </div>
+       <div class="row" style="background-color: rgb(51, 51, 51);">       
+                <div class="row footerLinks">
+                    <div class="col-md-10 Registrationdetails">Registered in England &amp; Wales No. 3099067<br/>5 Howick Place | London | SW1P 1WG</div>
+                    <div class="col-md-2 Registrationdetails">© 2018 Informa UK Limited</div>                            
+                </div>
+        </div>
+    </div>
+</div>
+</body>
+<site:previewAsAdmin />
+</apex:page>

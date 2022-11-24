@@ -1,0 +1,42 @@
+<aura:component controller="ArticleFeedback_ctr" implements="flexipage:availableForAllPageTypes,force:hasRecordId,forceCommunity:availableForAllPageTypes" >
+    
+    <aura:attribute name="parentId" type="Id" default="{!v.recordId}" />
+    <aura:attribute name="feedback" type="string" default= "" />
+    <aura:attribute name="name" type="string" default= "" />
+    <aura:attribute name="email" type="string" default= "" />
+    <aura:attribute name="buttonClicked" type="boolean" default= "false" />
+    <aura:attribute name="voteOutcome" type="string" />
+    <aura:attribute name="disableYesButton" type="boolean" default="false" />
+    <aura:attribute name="disableNoButton" type="boolean" default="false" />
+    <aura:attribute name="showFeedbackSubmit" type="Boolean" default="false" />
+    <aura:attribute name="showVoting" type="Boolean" default="true" />
+    
+    <aura:if isTrue="{!v.showVoting}">
+        <div class="textValue">
+            Did this document help?
+            &nbsp;
+            
+            <lightning:button aura:id="yesButton" disabled="{!v.disableYesButton}" variant="brand" label="Yes" title="Submit" onclick="{!c.onButtonClick}"/>
+            
+            
+            <lightning:button aura:id="noButton" disabled="{!v.disableNoButton}" variant="brand" label="No" title="Submit" onclick="{!c.onButtonClick}"/>
+            
+        </div>
+    </aura:if>
+    <br/>
+    
+    <aura:if isTrue="{!v.showFeedbackSubmit}">
+        <div class="textValue">
+            Thank you for your feedback. 
+            <br/>
+            If you have additional comments please submit them below.           
+            &nbsp;
+            <lightning:button variant="brand" label="Submit Feedback" title="Submit" onclick="{!c.createArticleFeedbackFunction}"/>
+        </div>
+        <lightning:input class = "textValue" type="text" name="name" label="Name" value="{!v.name}"/>
+        <lightning:input class = "textValue" type="email" name="email" label="Email" value="{!v.email}"/>
+        <lightning:textarea class = "textValue" name="articleFeedback" label="Comments" value="{!v.feedback}"/>    
+        
+    </aura:if>
+    
+</aura:component>

@@ -1,0 +1,152 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="TF_PPDProcessController">
+	<aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg']" />
+    <aura:attribute name="multiple" type="Boolean" default="true" />
+    <aura:attribute name="disabled" type="Boolean" default="true" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="typeOfCollection" type="String" default="Manual Curation"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="IsSpinner" type="Boolean" default="false" />
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="fileSize" type="String" />
+    <aura:attribute name="labelTitle" type="String" default="Select banner image" />
+    <aura:attribute name="saveTitle" type="String" default="Save banner image" />
+    <aura:attribute name="fileNameRule" type="String" default="Note: file will be saved as businessId_banner.jpg/png!" />
+    <aura:attribute name="validBannerImageName" type="String" />
+    <aura:attribute name="validCoverImageName" type="String" />
+    <aura:attribute name="selectedImageType" type="String" default="banner"/>
+    <aura:attribute name="isImageAlreadyExist" type="String" default="false"/>
+    <aura:attribute name="ShowModal" type="Boolean" default="false"/>
+    <aura:attribute name="files" type="ContentDocument[]"/>
+    <aura:attribute name="filesIds" type="list"/>
+    <aura:attribute name="image" type="String"/>
+    
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    
+    <aura:if isTrue="{!v.ShowModal}">
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close" variant="bare" onclick="{! c.HideMe }" 
+                                          alternativeText="Close" class="slds-modal__close" />      
+                 <lightning:formattedText value="Image already exists, Are you sure you want to replace the existing Image?" class="filenameRule"></lightning:formattedText> 
+                    <div class="slds-m-top_medium">                    
+                                <lightning:button variant="brand" name="Cancel" label="Cancel" onclick="{! c.HideMe }" />
+                           
+                                <lightning:button variant="brand" type="submit" name="Upload" label="Replace" onclick="{!c.handleReplaceImage}" />
+                            </div>
+                </header>
+            </div>
+        </div>         
+    </aura:if> 
+    
+    
+    <div class="c-container" >
+        
+        <lightning:layout>
+            <lightning:layoutItem padding="around-medium" size="4">
+         <lightning:select aura:id="Imgselect" name="select" label="Select type of image" onchange="{! c.onChange }">  
+                <option value="img_banner">Banner Image</option>
+                <option value="img_cover">Cover Image</option>
+                  </lightning:select>
+         <br></br>
+   <!--<lightning:fileUpload label="Upload Image"
+        name="fileUploader"
+        multiple="false"
+        accept="{!v.filetype}"
+        recordId="{!v.recordId}"
+        onuploadfinished="{!c.handleUploadFinished}" />-->
+           
+           <aura:if isTrue="{!v.IsRecordLocked=='true'}">  
+          <lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}"
+                             type="file"
+                             name="file"
+                             accept="{!v.filetype}"
+                             label="{!v.labelTitle}"
+                             multiple="false"/>
+                </aura:if>
+                 </lightning:layoutItem>
+           </lightning:layout>
+        <!-- <lightning:formattedText value="{!v.fileName}" class="filenameRule"></lightning:formattedText>-->
+        
+        <br></br>
+        <div class="slds-p-bottom_medium">
+            <lightning:formattedText value="{!v.fileNameRule}" class="filenameRule"/>
+        </div>
+        <br></br>
+      <!--  <lightning:formattedText value="{!v.fileName}" class="filenameRule"/>-->
+     
+       <!-- <lightning:button variant="brand" onclick="{!c.doSave}" label="{!v.saveTitle}" iconName="utility:save" iconPosition="left" class="saveButton"/>-->
+        
+      <div class="slds-form--compound">
+            <table class="slds-table slds-table--bordered">  
+                <!-- hide the table header if file is empty -->
+                <aura:if isTrue="{!not(empty(v.files))}">
+                    <thead>  
+                        <tr>  
+                            <th>Title</th>  
+                            <th>File Type</th>  
+                            <th></th>                     
+                        </tr>  
+                    </thead>  
+                </aura:if>
+                <tbody>
+                    <aura:iteration items="{!v.files}" var="f">  
+                        <tr>  
+                            <td>
+                                <a href="javascript:void(0)" id="{!f.Id}" onclick="{!c.previewFile}">
+                                    {!f.Title}
+                                </a>
+                            </td>  
+                            <td>{!f.FileType}</td>      
+                            <td>
+                                <a href="javascript:void(0)" id="{!f.Id}" onclick="{!c.deleteSelectedFile}">
+                                    <lightning:icon size="x-small" iconName="utility:delete" alternativeText="Delete" />
+                                </a>
+                            </td>
+                        </tr>  
+                    </aura:iteration>  
+                </tbody>  
+            </table>  
+            <!-- show spinner logo when needed -->
+          
+        </div> 
+        
+        <div class="slds">
+            <div class="slds-page-header">Uploaded Files</div>
+             <aura:if isTrue="{!v.IsRecordLocked=='true'}"> 
+           <!-- <div style="pointer-events:none;">-->
+                 <!--<aura:html aura:id="imgDiv" tag="img"/>-->
+            <lightning:layout multipleRows="true">	
+                <aura:iteration items="{!v.filesIds}" var="f">	                
+                    <lightning:layoutItem padding="around-large" size="6" smallDeviceSize="12" mediumDeviceSize="6" class="disableClick">
+                        <lightning:fileCard fileId="{!f.ContentDocumentId}" description="{!f.ContentDocument.title}" />
+                   
+                    </lightning:layoutItem>
+                </aura:iteration>	 
+            </lightning:layout>
+           <!-- </div>-->
+            </aura:if>
+            
+             <aura:if isTrue="{!v.IsRecordLocked=='false'}"> 
+                 <div style="pointer-events:none;">
+                      <!-- <aura:html aura:id="imgDiv" tag="img"/>-->
+            <lightning:layout multipleRows="true">	
+                <aura:iteration items="{!v.filesIds}" var="f">	                
+                    <lightning:layoutItem padding="around-large" size="6" smallDeviceSize="12" mediumDeviceSize="6" class="disableClick">
+                        <lightning:fileCard fileId="{!f.ContentDocumentId}" description="{!f.ContentDocument.title}" />
+                  
+                    </lightning:layoutItem>
+                </aura:iteration>	 
+            </lightning:layout> 
+                 </div>
+            </aura:if>
+            
+        </div>
+    </div>
+</aura:component>

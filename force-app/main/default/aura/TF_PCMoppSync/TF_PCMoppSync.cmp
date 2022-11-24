@@ -1,0 +1,45 @@
+<aura:component Controller="PCMoppSyncController" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global">
+  <aura:html tag="style">
+        .slds-modal__container{ 
+        height : auto; width: 100%; max-width: 700vh; 
+        } 
+        .modal-body{ 
+        height : 70vh !important; 
+        max-height: 70vh !important; 
+        } 
+        .slds-modal__footer{ 
+        display: inline !important; 
+        }
+        .uiModal--horizontalForm .modal-container{
+        height : auto; width: 100%; max-width: 700vh; 
+        }
+        .uiModal--medium .modal-container {
+        height : auto; width: 100%; max-width: 700vh; 
+        }
+    </aura:html>
+    <!--shalini: Changes start to use pcmImplicitFilter SAL-4494-->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="implicitFltrValues" type="Object[]"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+
+  <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div> 
+            </div>
+        </div>
+    </aura:if>
+    <!--shalini: Changes end to use pcmImplicitFilter SAL-4494-->
+    
+    <lightning:tabset variant="horizontal" selectedTabId="previewTab" >
+        <lightning:tab label="Product Search" id="productTab" onactive="">
+            <c:PCMSearchScreen hideCheckboxColumn="False" consumer = 'BPC' implicitFltrValues= "{!v.implicitFltrValues}"/>
+        </lightning:tab>
+        <lightning:tab label="Preview" id="previewTab" onactive="">
+            <c:TF_PCMoppPreviewScreen RecordId="{!v.recordId}"/>
+        </lightning:tab>
+</lightning:tabset>
+</aura:component>

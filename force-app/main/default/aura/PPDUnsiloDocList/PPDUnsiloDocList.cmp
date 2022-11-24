@@ -1,0 +1,219 @@
+<aura:component controller="TF_ProcessUnsiloresponse">
+    <!-- attributes -->
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="collectionType" type="String" default="Manual Curation"/>
+    <aura:attribute name="additionType" type="String" default=""/>
+    <aura:attribute name="sortedBy" type="String"/>
+    <aura:attribute name="sortedDirection" type="String"/>
+    <aura:attribute name="data" type="List"/>
+    <aura:attribute name="fullData" type="List"/>
+    <aura:attribute name="invalidFullData" type="List"/>
+    <aura:attribute name="pageSize" type="Integer" default="15"/>
+    <aura:attribute name="queryLimit" type="Integer" default="1500"/>
+    <aura:attribute name="searchQueryLimit" type="Integer" default="9000"/>
+    <aura:attribute name="pagesPerQuery" type="Integer" default="100"/>
+    <aura:attribute name="start" type="Integer" /> 
+    <aura:attribute name="end" type="Integer"/> 
+    <aura:attribute name="totalSize" type="Integer"/> 
+    <aura:attribute name="recordCount" type="Integer"/> 
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="searchQueryText" type="String"/>
+    <aura:attribute name="draftValues" type="Object" default="[]"/>
+    <aura:attribute name="allSelected" type="Object" />
+    <aura:attribute name="radioValue" type="String" default="option1"/>
+    
+    
+    <!-- New Pagination and sorting attributes --> 
+    <aura:attribute type="Boolean" name="sortAsc" />
+    <aura:attribute type="Integer" name="pageNumber" default="1" />
+    <aura:attribute type="Integer" name="totalMaxPage"	default="1" />
+    <aura:attribute type="Integer" name="maxPage"	default="1" />
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute type="String" name="snsMessageId" />
+    <aura:attribute type="String" name="showingSearch" default = "false" />
+    <aura:attribute type="String" name="showingAll" default = "true" />
+    <aura:attribute type="Boolean" name="hideCheckbox" default = "true" />
+    <aura:attribute type="String" name="s3Url" />
+    <aura:attribute name="IsRecordLocked" type="String"/>
+    <aura:attribute name="isValidDone" type="String" default="false"/>
+    <aura:attribute name="nxtClked" type="String" default="false"/>
+    <aura:attribute name="prevClked" type="String" default="false"/>
+    <aura:attribute type="Integer" name="pstn"	default="0" />
+    <aura:attribute type="Integer" name="nexPstn"	default="0" />
+    <aura:attribute type="Integer" name="prvPstn"	default="0" />
+    <aura:attribute type="Integer" name="lastPgLmt"	default="0" />
+    <aura:attribute type="String" name="paginationEvt" default = "First"/>
+    <aura:attribute type="String" name="calledEvent" default = ""/>
+    <aura:attribute name="selectedRows" type="List" default="[]"/>
+    <aura:attribute type="Integer" name="prevPageNum" default="1" />
+    <aura:attribute type="Boolean" name="disableDelSelected" default = "true" />
+    <aura:attribute type="Integer" name="selectedRowCount" default="0" />
+    
+    <aura:attribute type="String" name="showingSelectiveDel" default = "false" />
+    <aura:attribute type="String" name="showingSelectiveReorder" default = "false" />
+    <aura:attribute type="String" name="showingReorder" default = "false" />
+    <aura:attribute type="String" name="showingProceed" default = "true" />
+    <aura:attribute type="String" name="showingConsent" default = "false" />
+    
+    <aura:attribute name="isCollectionFree" type="Boolean"/>
+    
+    <aura:attribute name="radioOptions" type="List" default="[
+                                                             {'label': 'Delete All', 'value': 'option1'},
+                                                             {'label': 'Delete Selected (UNSILO content cannot be deleted selectively)', 'value': 'option2'},
+                                                             {'label': 'Reorder Content', 'value': 'option3'}
+                                                             ]"/>
+    
+    
+    <!--attributes related to validation-->
+    <aura:attribute name="allLineItms" type="Object"/>
+    <aura:attribute name="totalRecs" type="Integer" default = "0"/>
+    <aura:attribute name="processedRecs" type="Integer" default = "0"/>
+    <aura:attribute name="pstnv" type="Integer" default = "0"/>
+    <aura:attribute type="String" name="showingValidation" default = "false" />
+    <aura:attribute name="showManage" type="String" default="false"/>
+    <aura:attribute name="PCMSearchDetails" type="List"/>
+    
+    
+    
+    <!-- handlers-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler event="c:PPDContentSearchEvent" action="{!c.searchContentHandler}"/>
+    <aura:handler event="c:PPDRefreshListEvent" action="{!c.refreshChild}" />
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+    <aura:registerEvent name="disableOrEnableApprovalButton" type="c:PPDGenericEvent"/>
+    <aura:registerEvent name="PPDTotalPriceRefreshEvent" type="c:PPDTotalPriceRefreshEvent"/>
+    <aura:handler event="c:PPDGenericEvent" action="{!c.validateAllLineItmEvt}"/>
+    <aura:registerEvent name="showValidationProgressBar" type="c:PPDProgressEvent"/>
+    <aura:handler event="c:PPDValidateEvent" action="{!c.validateAllLineItm}"/>
+    <aura:handler event="c:PPDPCMSearchEvent" action="{!c.getPcmSearchDetails}"/>
+    <!--start change - Geetika for PCH-3886 -->
+    <aura:handler event="c:PPDRecordEditRefreshEvent" action="{! c.init}" />
+    <!--end change - Geetika for PCH-3886 -->
+    
+    <!-- spinner -->
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    <!-- the container element determine the height of the datatable -->
+    <div>
+        <lightning:layout>
+            <lightning:layoutItem size="4" padding="around-small">
+                <aura:if isTrue="{!v.collectionType=='Manual Curation'}">
+                    <aura:if isTrue="{!v.IsRecordLocked=='true'}">
+                        <aura:if isTrue="{!v.showManage=='false'}">
+                            <lightning:button label="Manage" variant="brand" onclick="{!c.showManage}" disabled="{!empty(v.data)}"/>
+                        </aura:if>
+                        <aura:if isTrue="{!v.showManage=='true'}">
+                            <lightning:radioGroup name="radioGroup"
+                                                  label="Select Action"
+                                                  options="{! v.radioOptions }"
+                                                  value="{! v.radioValue }"
+                                                  type="radio"
+                                                  onchange="{!c.manageActionChange}"/>
+                            <br/>
+                            <lightning:button label="Back" variant="brand" onclick="{!c.exitManage}"/>
+                            <aura:if isTrue="{!and(v.showingProceed=='true', v.showingConsent=='false')}">
+                                <lightning:button label="Proceed" variant="brand" onclick="{!c.proceedManageAction}"/>
+                            </aura:if>
+                            <aura:if isTrue="{!and(v.showingReorder=='true', v.showingConsent=='false')}">
+                                <lightning:button label="Reorder" variant="brand" onclick="{!c.proceedReorderAction}"/>
+                            </aura:if>
+                            
+                        </aura:if>
+                        <aura:if isTrue="{!and(v.showingSelectiveDel=='true', v.showingConsent=='false')}">
+                            <lightning:button label="Back" variant="brand" onclick="{!c.exitManage}"/>
+                            <lightning:button label="Delete Selected" variant="brand" onclick="{!c.showMultiSelectMsg}" disabled="{!empty(v.data)}"/>  
+                        </aura:if>
+                        <aura:if isTrue="{!and(v.showingSelectiveReorder=='true', v.showingConsent=='false')}">
+                            <lightning:button label="Back" variant="brand" onclick="{!c.exitReOrderManage}"/>
+                            <lightning:button label="Move selected to top" variant="brand" onclick="{!c.showMultiSelectReorderMsg}" disabled="{!empty(v.data)}"/>  
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!v.showingValidation=='true'}">
+                            <lightning:button label="Show All" variant="brand" onclick="{!c.showAllContent}"/>   
+                        </aura:if>
+                        <div padding="around-medium" class="slds-box hideCmp" aura:id="dispMsg">
+                            <p class="slds-p-horizontal_small">
+                                Are you sure you want to delete all the records in the collection ?
+                            </p>
+                            <lightning:button label="Cancel" variant="brand" onclick="{!c.hideMsg}"/>
+                            <lightning:button label="Ok" variant="brand" onclick="{!c.deleteAllUnsiloRecords}"/>
+                        </div>
+                        <div padding="around-medium" class="slds-box hideCmp" aura:id="dispMultiMsg">
+                            <p class="slds-p-horizontal_small">
+                                Are you sure you want to delete {!v.selectedRowCount} selected records ?
+                            </p>
+                            <lightning:button label="Cancel" variant="brand" onclick="{!c.hideMultiMsg}"/>
+                            <lightning:button label="Ok" variant="brand" onclick="{!c.deleteSelectedContent}"/>
+                        </div>
+                        
+                        <div padding="around-medium" class="slds-box hideCmp" aura:id="dispMultiReorderMsg">
+                            <p class="slds-p-horizontal_small">
+                                Are you sure you want to move {!v.selectedRowCount} selected records to top?
+                            </p>
+                            <lightning:button label="Cancel" variant="brand" onclick="{!c.hideMultiReorderMsg}"/>
+                            <lightning:button label="Ok" variant="brand" onclick="{!c.moveSelectedContent}"/>
+                        </div>
+                    </aura:if>
+                    <aura:set attribute="else">
+                         <aura:if isTrue="{!and(v.IsRecordLocked=='true' , v.showingValidation=='false')}">
+                        <lightning:button label="Delete Selected" variant="brand" onclick="{!c.showMultiSelectMsg}" disabled="{!empty(v.data)}"/>
+                        <lightning:button label="Delete All" variant="brand" onclick="{!c.showMsg}" disabled="{!empty(v.data)}"/>
+                        </aura:if>
+                        <aura:if isTrue="{!v.showingValidation=='true'}">
+                            <lightning:button label="Show All" variant="brand" onclick="{!c.showAllContent}"/>   
+                        </aura:if>
+                        <div padding="around-medium" class="slds-box hideCmp" aura:id="dispMultiMsg">
+                            <p class="slds-p-horizontal_small">
+                                Are you sure you want to delete {!v.selectedRowCount} selected records ?
+                            </p>
+                            <lightning:button label="Cancel" variant="brand" onclick="{!c.hideMultiMsgDynamic}"/>
+                            <lightning:button label="Ok" variant="brand" onclick="{!c.deleteSelectedContent}"/>
+                        </div>
+                        <div padding="around-medium" class="slds-box hideCmp" aura:id="dispMsg">
+                            <p class="slds-p-horizontal_small">
+                                Are you sure you want to add all {!v.recordCount} records ?
+                            </p>
+                            <lightning:button label="Cancel" variant="brand" onclick="{!c.hideMsgDynamic}"/>
+                            <lightning:button label="Ok" variant="brand" onclick="{!c.deleteAllUnsiloRecords}"/>
+                        </div>
+                    </aura:set>
+                </aura:if>
+                <aura:if isTrue="{!v.showingValidation=='true'}">
+                    <p class="slds-p-horizontal_small">
+                        <br/>
+                        <b>Showing invalid content:</b>
+                    </p>
+                </aura:if>
+                <p>Number of records : {!v.recordCount}</p>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="4" padding="around-small">
+                <c:PPDUnsiloDocSearchBar recordId="{! v.recordId }" calledFrom="{! v.additionType }"/>
+            </lightning:layoutItem>
+            <lightning:layoutItem size="4" padding="around-small">
+                <div class="right">
+                    <c:PPDPagination prevPageNumber= "{!v.prevPageNum}" currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" nextClicked="{!v.nxtClked}" prevClicked="{!v.prevClked}" />
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+    <div>
+        
+        <lightning:datatable
+                             aura:id="contentTable"
+                             columns="{! v.columns }"
+                             data="{! v.data }"
+                             keyField="id"
+                             hideCheckboxColumn="{! v.hideCheckbox }"
+                             onsave="{! c.handleSaveEdition }"
+                             onsort="{!c.sortColumn}"
+                             sortedBy="{!v.sortedBy}"
+                             selectedRows="{!v.selectedRows}"
+                             sortedDirection="{!v.sortedDirection}"
+                             onrowselection ="{!c.rowSelected}"
+                             
+                             />
+    </div>        
+    
+</aura:component>

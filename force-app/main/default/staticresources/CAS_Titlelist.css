@@ -1,0 +1,134 @@
+/*---	
+	
+	Copyright (c) 2004 Taylor & Francis Group.
+	XHTML CSS Selectors 	
+	
+	****** Revision:		1.0
+	****** Date:			16/04/04
+	****** Author:			Rob McMordie
+
+	This Cascading Style Sheet defines the styles needed for the title list script.
+	They were previously stored in local.css files.
+
+	*******************************************
+	
+			1. HEADER SETTINGS
+			2. HEADER LINK SETTINGS
+			3. TEXT SETTINGS
+			4. TEXT LINK SETTINGS
+
+	*******************************************
+	
+---*/
+
+/* --- HEADER --- */
+
+.featureHeading
+{
+	background-color : #43A6DA;
+	background-repeat : no-repeat;
+	background-image : url("http://www.taylorandfrancis.com/common/images/default/small_flash.gif");
+}
+
+.featureHeadingShadow
+{
+	background-color : #65B6DC;
+}
+
+/* --- HEADER LINKS --- */
+
+.whitelink
+{ 
+	font-family: arial, helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: white;
+	text-decoration:none;
+ }
+ 
+.whitelink:hover
+{ 
+	font-family: arial, helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: white;
+	text-decoration:underline;
+ }
+
+/* --- TEXT --- */
+
+.author
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 10px;
+	font-weight : normal;
+	color : #000000;
+}	
+
+.bookdetails
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 10px;
+	font-weight : normal;
+	color : #000000;
+}
+
+.booktitle
+{
+	font-family : Arial, Helvetica, sans-serif;
+	font-size : 11px;
+	font-style : normal;
+	font-weight : bold;
+	color : #000000;
+}
+
+.whitetext
+{ 
+	font-family: arial, helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: normal;
+	color: white;
+	text-decoration:none;
+}
+
+/* --- TEXT LINK --- */
+
+.LgJacket
+{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 10px;
+	font-style : normal;
+	font-weight : normal;
+	color : #336699;
+	text-decoration:none;
+}
+
+.LgJacket:hover
+{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 10px;
+	font-style : normal;
+	font-weight : normal;
+	color : #336699;
+	text-decoration:underline;
+}
+
+.morelink
+{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 10px;
+	font-style : normal;
+	font-weight : normal;
+	color : #336699;
+	text-decoration:none;
+}
+
+.morelink:hover
+{
+	font-family :  Arial, Helvetica, sans-serif;
+	font-size : 10px;
+	font-style : normal;
+	font-weight : normal;
+	color : #336699;
+	text-decoration:underline;
+}

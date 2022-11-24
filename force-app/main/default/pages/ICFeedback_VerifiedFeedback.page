@@ -1,0 +1,15 @@
+<apex:page controller="CASFeedbackVerifiedController"
+    showHeader="false"
+    standardStylesheets="true"
+    action="{!isValidId}">
+    <apex:composition template="ICSiteTemplate">
+        <apex:define name="body">
+        
+        <h1 style="color: #80B4E4">Thank you!</h1>
+        
+        <p>Our sales team has already received your feedback for this product. If you have any further textbook needs, please contact <b><i>{!OpportunityOwner}</i></b> at <a href="mailto:{!OpportunityOwnerEmail}">{!OpportunityOwnerEmail}</a>.</p>
+        <p>For more information about our books, special offers or subject based selections please visit <a href="http://www.taylorandfrancis.com/">http://www.taylorandfrancis.com</a></p>
+
+        </apex:define>
+    </apex:composition>
+</apex:page>

@@ -1,0 +1,17 @@
+<apex:page standardController="Lead">
+
+	<script src="/soap/ajax/8.0/connection.js"></script>
+	<script src="/desktop/desktopApi.js"></script>
+
+    <script type="text/javascript">
+
+		var desktop = new DesktopApi(); 
+		if (desktop.desktopPageWindow) { 
+			window.parent.location.href = "/{!Lead.Id}/e?clone=1&00N300000013Spb=&00N300000013Spg=&00N60000001JLOz=&00N60000001JLP4=&00N60000001JvJT=&isdtp=mn&nooverride=1&retURL=/{!Lead.Id}";
+		}
+		else { 
+			window.parent.location.href = "/{!Lead.Id}/e?clone=1&00N300000013Spb=&00N300000013Spg=&00N60000001JLOz&00N60000001JLP4=&00N60000001JvJT=&nooverride=1&retURL=/{!Lead.Id}"; 
+		} 
+
+    </script>
+</apex:page>

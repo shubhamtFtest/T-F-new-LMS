@@ -1,0 +1,360 @@
+<apex:page standardController="SBQQ__Quote__c" renderAs="PDF">
+
+<table width="100%">
+    <tbody>
+        <tr>
+            <td></td>
+            <td><p style="font-size: 16pt; color: #293d60; text-align: right;">Quotation</p></td>
+        </tr>
+        
+        <tr>
+            <td width="55%"><p><apex:image url="{!$Resource.TaylorFrancisLogo}"/></p></td>
+            <td width="45%">
+                <table align="right">
+                    <tr>
+                        <td style="text-align: right; font-size: 12pt;"></td>
+                        <td style="text-align: right; font-size: 12pt;"><strong>Quote #:</strong>&#160;{!SBQQ__Quote__c.Name}</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right; font-size: 12pt;"></td>
+                        <td style="text-align: right; font-size: 12pt;"><strong>Date:</strong>&#160;<apex:outputText value="{0,date,dd' 'MMMMM' 'yyyy}"> <apex:param value="{!SBQQ__Quote__c.CreatedDate}" /> </apex:outputText></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right; font-size: 12pt;"></td>
+                        <td style="text-align: right; font-size: 12pt;"><strong>Expires:</strong>&#160;<apex:outputText value="{0,date,dd' 'MMMMM' 'yyyy}"> <apex:param value="{!SBQQ__Quote__c.SBQQ__ExpirationDate__c}" /> </apex:outputText></td>
+                    </tr>  
+                    <tr>
+                        <td></td>
+                        <td><span style="font-size: 16pt;"><strong><br/>NOT A TAX INVOICE</strong></span></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <tr></tr>
+        
+        <tr>
+            <td width="55%"><br/>
+            <p><span style="font-size: 16pt;"><strong>Informa UK Limited</strong></span><br />
+     
+            <!--<p><span style="font-size: 12pt;">1st Floor, 2-4 Oyster Lane<br />
+            Byfleet, Surrey KT14 7DU<br />
+            UK</span><br />
+            <span style="font-size:  12pt;">&#160;</span></p>
+            -->
+            <span style="font-size: 12pt;">5 Howick Place<br/> 
+               London, SW1P 1WG <br/>
+               UK <br/> </span>
+            </p>
+            </td>
+            <td width="45%">
+            <!--<p><span style="font-size:  12pt;">Phone: +44 (0) 207 0174555<br />
+            Fax: +44 (0) 207 0174743</span><br />
+            <span style="font-size:  12pt;">Email: database@informa.com</span></p>
+            -->
+            <p><span style="font-size:  12pt;">Phone: +44 (0) 207 0175544<br />
+            Fax: +44 (0) 207 0175198</span><br />
+            <span style="font-size:  12pt;">Email: subscriptions@tandf.co.uk</span></p>
+
+            </td>
+        </tr>
+    </tbody>
+</table>
+<table width="100%">
+    <tbody>
+        <tr>
+            
+            <td width="55%;">
+            <span style="font-size: 12pt;"><strong>Ship To</strong></span><br />
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.SBQQ__ShippingName__c != null,SBQQ__Quote__c.SBQQ__ShippingName__c,'')}</span>
+            <apex:outputText escape="false" styleClass="dataCell" rendered="{!(SBQQ__Quote__c.SBQQ__ShippingName__c!=null && 
+            (SBQQ__Quote__c.Ship_to_Organization__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingStreet__c!=null
+            || SBQQ__Quote__c.Ship_To_Street_2__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCity__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingState__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingPostalCode__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCountry__c!=null ) 
+            )}" value=",<br/>" />
+
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.Ship_to_Organization__c != null,SBQQ__Quote__c.Ship_to_Organization__c ,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.Ship_to_Organization__c!=null && 
+            (SBQQ__Quote__c.SBQQ__ShippingStreet__c!=null
+            || SBQQ__Quote__c.Ship_To_Street_2__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCity__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingState__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingPostalCode__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCountry__c!=null) 
+            )}" value=",<br/>" />
+            
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.SBQQ__ShippingStreet__c != null,SBQQ__Quote__c.SBQQ__ShippingStreet__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__ShippingStreet__c!=null &&
+            (SBQQ__Quote__c.Ship_To_Street_2__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCity__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingState__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingPostalCode__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCountry__c!=null) 
+            )}" value=",<br/>" />
+           
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.Ship_To_Street_2__c != null,SBQQ__Quote__c.Ship_To_Street_2__c ,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.Ship_To_Street_2__c!=null &&
+            (SBQQ__Quote__c.SBQQ__ShippingCity__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingState__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingPostalCode__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCountry__c!=null) 
+            )}" value=",<br/>" />
+            
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.SBQQ__ShippingCity__c!= null,SBQQ__Quote__c.SBQQ__ShippingCity__c,'')}</span> 
+             <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__ShippingCity__c!=null &&
+            (SBQQ__Quote__c.SBQQ__ShippingState__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingPostalCode__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCountry__c!=null) 
+            )}" value=",<br/>" />
+            
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.SBQQ__ShippingState__c != null,SBQQ__Quote__c.SBQQ__ShippingState__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__ShippingState__c!=null &&
+            (SBQQ__Quote__c.SBQQ__ShippingPostalCode__c!=null
+            || SBQQ__Quote__c.SBQQ__ShippingCountry__c!=null) 
+            )}" value=",<br/>" />
+            
+            <span style="font-size: 12pt;">{!IF(SBQQ__Quote__c.SBQQ__ShippingPostalCode__c != null,SBQQ__Quote__c.SBQQ__ShippingPostalCode__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__ShippingPostalCode__c!=null &&
+             SBQQ__Quote__c.SBQQ__ShippingCountry__c!=null
+            )}" value=",<br/>" />
+            
+            <span style="font-size: 12pt;">{!IF(SBQQ__Quote__c.SBQQ__ShippingCountry__c != null,SBQQ__Quote__c.SBQQ__ShippingCountry__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__ShippingCountry__c!=null)}" value="<br />" />
+            </td>
+           
+            
+            
+            <td width="45%;"><span style="font-size: 12pt;" >
+            <strong>Bill To</strong></span><br />
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.Payer_Contact_Name__c != null,SBQQ__Quote__c.Payer_Contact_Name__c,'')}</span>   
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.Payer_Contact_Name__c!=null &&
+            (SBQQ__Quote__c.Payer_Organization_Name__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingStreet__c!=null
+            ||SBQQ__Quote__c.Bill_To_Street_2__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCity__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingState__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingPostalCode__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCountry__c !=null))}" value=",<br />" />
+            
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.Payer_Organization_Name__c != null,SBQQ__Quote__c.Payer_Organization_Name__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.Payer_Organization_Name__c!=null &&
+            (SBQQ__Quote__c.SBQQ__BillingStreet__c!=null
+            ||SBQQ__Quote__c.Bill_To_Street_2__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCity__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingState__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingPostalCode__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCountry__c !=null))}" value=",<br />" />            
+            
+            <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.SBQQ__BillingStreet__c != null,SBQQ__Quote__c.SBQQ__BillingStreet__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__BillingStreet__c!=null &&
+            (SBQQ__Quote__c.Bill_To_Street_2__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCity__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingState__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingPostalCode__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCountry__c !=null))}" value=",<br />" />    
+                       
+             <span style="font-family:Arial Unicode MS;font-size:12pt;">{!IF(SBQQ__Quote__c.Bill_To_Street_2__c != null,SBQQ__Quote__c.Bill_To_Street_2__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.Bill_To_Street_2__c!=null &&
+            (SBQQ__Quote__c.SBQQ__BillingCity__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingState__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingPostalCode__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCountry__c !=null))}" value=",<br />" /> 
+                            
+            <span style="font-family:Arial Unicode MS;font-size: 12pt;">{!IF(SBQQ__Quote__c.SBQQ__BillingCity__c != null,SBQQ__Quote__c.SBQQ__BillingCity__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__BillingCity__c!=null &&
+            (SBQQ__Quote__c.SBQQ__BillingState__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingPostalCode__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCountry__c !=null))}" value=",<br />" /> 
+                        
+            <span style="font-family:Arial Unicode MS;font-size: 12pt;">{!IF(SBQQ__Quote__c.SBQQ__BillingState__c != null,SBQQ__Quote__c.SBQQ__BillingState__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__BillingState__c!=null &&
+            (SBQQ__Quote__c.SBQQ__BillingPostalCode__c!=null
+            ||SBQQ__Quote__c.SBQQ__BillingCountry__c !=null))}" value=",<br />" />             
+            <span style="font-size: 12pt;">{!IF(SBQQ__Quote__c.SBQQ__BillingPostalCode__c != null,SBQQ__Quote__c.SBQQ__BillingPostalCode__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__BillingPostalCode__c!=null &&
+             SBQQ__Quote__c.SBQQ__BillingCountry__c !=null)}" value=",<br />" />             
+            
+            <span style="font-size: 12pt;">{!IF(SBQQ__Quote__c.SBQQ__BillingCountry__c != null,SBQQ__Quote__c.SBQQ__BillingCountry__c,'')}</span>
+            <apex:outputText escape="false" rendered="{!(SBQQ__Quote__c.SBQQ__BillingCountry__c !=null)}" value="<br />" />
+            </td>
+            
+        </tr>
+    </tbody>
+</table>
+<br/>
+<!--<table style="border: thin solid black; border-collapse: collapse;" width="100%">
+    <tbody>
+        <tr>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 12pt;"><strong>     
+Primary Contact Name</strong></span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 12pt;"><strong>Primary Contact's email id</strong></span></td>
+        </tr>
+    </tbody>
+    <tbody>
+        <tr>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 12pt;">{!SBQQ__Quote__c.Primary_Contact_Name__c}</span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 12pt;">{!SBQQ__Quote__c.Primary_Contact_s_email_id__c}</span></td>
+        </tr>
+    </tbody>
+</table>-->
+
+<table>
+<tr><td><p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial,sans-serif; font-size: 12px;"><strong> Article Title: </strong><span style="font-family:Arial Unicode MS">{!SBQQ__Quote__c.Article_Title__c}</span></p></td></tr>
+<tr><td><p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial, sans-serif; font-size: 12px;"><strong>DOI/MS ID: </strong><span style="font-family:Arial Unicode MS">{!SBQQ__Quote__c.DOI__c}</span></p></td></tr>
+<tr><td><p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial, sans-serif; font-size: 12px;"><strong>Journal: </strong><span style="font-family:Arial Unicode MS">{!SBQQ__Quote__c.sbqq__LineItems__r[0].Parent_Product__r.Name}</span></p></td></tr>
+<tr><td><p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial, sans-serif; font-size: 12px;"><strong>Primary Contact Name: </strong><span style="font-family:Arial Unicode MS">{!SBQQ__Quote__c.Primary_Contact_Name__c}</span></p></td></tr>
+</table>
+<br/>  
+<table style="border: thin solid black; border-collapse: collapse;" width="100%">
+    <tbody>
+        <tr>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;"><strong>Qty</strong></span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;"><strong>Prod. Code</strong></span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black; width: 15%;"><span style="font-size: 10pt;"><strong>Service Name</strong></span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;"><strong>Original Price</strong></span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;"><strong>Discount Amount</strong></span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;"><strong>Disc. (%)</strong></span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black; width: 15%;"><span style="font-size: 10pt;"><strong>Discount Details</strong></span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;"><strong>Discounted Price</strong></span></td>
+        </tr>
+    </tbody>
+    
+    <tbody>
+        <apex:repeat var="quoteline" value="{!SBQQ__Quote__c.sbqq__LineItems__r}">
+        <tr>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;">{!quoteline.SBQQ__Quantity__c}</span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;">{!quoteline.Parent_Product__r.Name}</span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black; width: 15%;"><span style="font-size: 10pt;">{!quoteline.Product_Type__c}</span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;">
+                    <apex:outputText id="listPricecurrency" value="{!SBQQ__Quote__c.CurrencyIsoCode}"/>
+                    &nbsp;
+                    <apex:outputText id="listPrice" value="{0,number,0.00}"> 
+                        <apex:param value="{!quoteline.SBQQ__ListPrice__c}"/> 
+                    </apex:outputText>
+                </span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;">
+                  <span style="font-size: 10pt;"> 
+                    <apex:pageBlock rendered="{!quoteline.SBQQ__TotalDiscountAmount__c != 0}">
+                      <apex:outputText id="totalDisocuntCurrency" value="{!SBQQ__Quote__c.CurrencyIsoCode}"/>
+                      &nbsp;
+                      <apex:outputText id="totalDisocunt" value="{0,number,0.00}"> 
+                        <apex:param value="{!quoteline.SBQQ__TotalDiscountAmount__c}"/> 
+                      </apex:outputText>    
+                    </apex:pageBlock>   
+                </span>
+            </td> 
+          <!--  <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;">  {!IF(quoteline.SBQQ__TotalDiscountAmount__c = 0,'',quoteline.SBQQ__TotalDiscountAmount__c)} </span></td> -->
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;"> {!IF(quoteline.SBQQ__TotalDiscountRate__c = 0,'',quoteline.SBQQ__TotalDiscountRate__c)} </span></td>
+            <!-- <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;">{!quoteline.Discount_Display_Name__c}</span></td>
+          <!--  <apex:outputText value="{0, number, 00.00}">
+            <apex:param value="{!quoteline.SBQQ__TotalDiscountRate__c}" />
+            </apex:outputText>
+            </span></td> -->
+            
+            <!--<td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;">
+            <apex:outputText rendered="{!CONTAINS(quoteline.Best_Discount_Rule__c,'Country')}">Country Waiver</apex:outputText>
+            <apex:outputText rendered="{!NOT(CONTAINS(quoteline.Best_Discount_Rule__c,'Country'))}">{!quoteline.Best_Discount_Rule__c}</apex:outputText>
+            </span></td>-->
+            
+            <!--<td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black; width: 15%;"><span style="font-size: 10pt;">
+            <apex:outputText rendered="{!IF(quoteline.Best_Discount_Rule__c == 'NESLI' || quoteline.Best_Discount_Rule__c == 'VSNU' || quoteline.Best_Discount_Rule__c == 'Prepay',true,false)}">{!quoteline.Best_Discount_Rule__c} - {!SBQQ__Quote__c.SBQQ__Account__r.Name}</apex:outputText>
+            <apex:outputText rendered="{!IF(quoteline.Best_Discount_Rule__c == 'Society',true,false)}">{!quoteline.Best_Discount_Rule__c} - {!quoteline.Best_Discount_Society__c}</apex:outputText>
+            <apex:outputText rendered="{!IF(AND(CONTAINS(quoteline.Best_Discount_Rule__c,'Country'),quoteline.Best_Discount_Rule__c != ''),true,false)}">Country</apex:outputText>
+            </span></td>-->
+            
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black; width: 15%;"><span style="font-size: 10pt;">{!quoteline.Discount_Display_Name__c}</span></td>
+            <td align="center" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;">
+                    <apex:outputText id="NetPricecurrency" value="{!SBQQ__Quote__c.CurrencyIsoCode}"/>
+                    &nbsp;
+                    <apex:outputText id="NetPrice" value="{0,number,0.00}"> 
+                        <apex:param value="{!quoteline.SBQQ__NetTotal__c}"/> 
+                    </apex:outputText>
+                </span></td>
+        </tr>
+        </apex:repeat>
+        
+        <tr>
+            <td></td>
+            <td></td>
+            <td style="width: 15%;"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="text-align: right; font-size: 10pt; width: 15%;"><strong>TOTAL (excluding applicable taxes):  </strong></td>
+            <td align="right" style="border-collapse: collapse; text-align: center; border: thin solid black;"><span style="font-size: 10pt;">
+                    <apex:outputText id="NetAmountcurrency" value="{!SBQQ__Quote__c.CurrencyIsoCode}"/>
+                    &nbsp;
+                    <apex:outputText id="NetAmount" value="{0,number,0.00}"> 
+                        <apex:param value="{!SBQQ__Quote__c.SBQQ__NetAmount__c}"/> 
+                    </apex:outputText>
+
+                </span></td>
+        </tr>
+    </tbody>
+</table>
+<!--
+<table border="0" style="width: 100%;">
+    <tbody>
+        <tr>
+            <td style="width: 20%;">
+            <p>&#160;</p>
+
+            <p><span style="font-size: 12pt;"><strong>Signature:</strong></span></p>
+            </td>
+            <td style="width: 30%; border-color: black; border-bottom-style: solid;">
+            <p>&#160;</p>
+            </td>
+            <td style="width: 20%;">
+            <p>&#160;</p>
+
+            <p><span style="font-size: 12pt;"><strong>&#160; &#160; &#160; &#160; Effective Date:</strong></span></p>
+            </td>
+            <td style="width: 30%;">
+            <p>&#160;</p>
+
+            <p><span style="font-size: 12pt;">______/______/______</span></p>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            <p>&#160;</p>
+
+            <p><span style="font-size: 12pt;"><strong>Name (Print):</strong></span></p>
+            </td>
+            <td style="border-color: black; border-bottom-style: solid;">
+            <p>&#160;</p>
+            </td>
+            <td>
+            <p>&#160;</p>
+
+            <p><span style="font-size: 12pt;"><strong>&#160; &#160; &#160; &#160; Title:</strong></span></p>
+            </td>
+            <td style="border-color: black; border-bottom-style: solid;">&#160;</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>&#160;</p>
+
+<p>&#160;</p>
+
+<p><span style="font-size: 12pt;">Please sign and email to database@informa.com or fax to +44 (0) 207 0174743</span></p>
+
+<p>&#160;</p>
+-->
+<div style="page-break-after:always;"><p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial, sans-serif; font-size: 14px;"><strong><u>NOTE</u>:</strong> <span style="font-family:Arial Unicode MS">The price shown on this quote has been calculated using the information supplied to us and is subject to  approval where required.</span><br> <span style="font-family:Arial Unicode MS">Please note that this is exclusive of any tax which may be applicable.</span> </br></p></div>
+<strong>Terms and Conditions</strong>
+<p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial, sans-serif; font-size: 14px;"><span style="font-family:Arial Unicode MS">The personal information shown on this letter, and/or provided by you, will be held on a database and may be shared with companies in the Informa Group in the UK and internationally. If you do not wish your details to be available to companies in the Informa Group,  please email optout@tandf.co.uk</span></p>
+
+<!--
+<p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial, sans-serif; font-size: 14px;">Database Manager, Informa UK, Cobb House, 1st Floor, 2-4 Oyster Lane, Byfleet, Surrey, KT14 7DU Telephone: +44 (0) 207 0174555. Fax: +44 (0) 207 0174743. E-mail: database@informa.com</p>
+<p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial, sans-serif; font-size: 14px;">Occasionally your details may be obtained from, or made available to, external companies for marketing purposes. If you do not wish your details to be made available to external companies, please write to the Database Manager, Informa UK, Cobb House, 1st Floor, 2-4 Oyster Lane,</p>
+<p style="margin: 10px 0px 0px; padding: 0px; font-family: Arial, sans-serif; font-size: 14px;">Byfleet, Surrey, KT14 7DU Telephone: +44 (0) 207 0174555. Fax: +44 (0) 207 0174743. E-mail: database@informa.com</p>
+<p>&#160;</p>
+<p style="font-size: 14px; text-align: center;">THANK YOU FOR YOUR BUSINESS!</p>
+-->
+</apex:page>

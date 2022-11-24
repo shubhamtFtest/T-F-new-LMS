@@ -1,0 +1,336 @@
+<aura:component controller="TF_IndiaRePrintAddProducts" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction">
+    <aura:attribute name="oppRecordId" type="String" />
+    <aura:attribute name="products" type="TF_IndiaRePrintAddProducts.SearchResult[]"/>
+    <aura:attribute name="showSearchData" type="boolean" default="false"/>
+    <aura:attribute name="isOpenAddOppProductModal" type="boolean" default="false"/>
+    <aura:attribute name="productName" type="String"/>
+    <aura:attribute name="isbn" type="String" default="" />
+    <aura:attribute name="selectedProductIds" type="List"/>
+    <aura:attribute name="isSending" type="boolean" />
+    <aura:attribute name="selTabId" type="String" default="searchTab" /> 
+    <aura:attribute name="requiredQuantity" type="Integer" default="1"/>
+    
+    <aura:attribute name="requiredVersionType" type="String" default="Paperback"/>
+    <aura:attribute name="globalISBN" type="String" />
+    <aura:attribute name="inrISBN" type="String" />
+    <!-- Start CSV Import Attributes -->
+    <aura:attribute name="defaultHeader" type="String[]" default="['ISBN', 'Quantity', 'Binding']"/>
+    <aura:attribute name="header" type="String[]" default="[]"/>
+    <aura:attribute name="showLoadingSpinner" type="boolean" default="false" />
+    <aura:attribute name="showSearchSpinner" type="boolean" default="false" />
+    <aura:attribute name="showSelectSpinner" type="boolean" default="false" />
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="disableCSVImportBtn" type="Boolean" default="true"/>
+    <!-- End CSV Import Attributes -->
+    <!-- Start Event Handling -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <!-- End Event Handling -->
+      <!--Dup PopUp-->
+       
+
+    <aura:attribute name="productId" type="string" default="false"/>
+    <aura:attribute name="iscontinueclicked" type="boolean" default="false"/>
+    <aura:attribute name="issinglerec" type="boolean" default="false"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="Dupdata" type="Object"/>
+    <aura:attribute name="otherproposaldata" type="Object"/>
+    <aura:attribute name="isOpenSec" type="boolean" default="false"/>
+
+
+   <!--Dup PopUp-->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div id="addproductmodal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeAddOppProductModal }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Product Search</h2>
+                </header>
+                <div class="demo-only slds-grid" style="background: rgb(244, 246, 249); padding: 1rem;">
+                    <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap">
+                        <div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+                            <div class="slds-panel__section slds-border_bottom" id="searchBox">
+                                <div class="slds-form-element">                                                                    
+                                    <div aura:id="data-entry">
+                                        <lightning:tabset variant="default" selectedTabId="{!v.selTabId}" >
+                                            <lightning:tab label="Product Search" id="searchTab" onactive="{! c.handleTabActive }">
+                                                <lightning:layout multipleRows="true">
+                                                    <lightning:layoutItem padding="around-small" size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3">
+                                                        <lightning:input  aura:id="productName" type="text"  placeholder="Search by products" value="{!v.productName}"/>
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem padding="around-small" size="12" smallDeviceSize="6" mediumDeviceSize="4" largeDeviceSize="3">
+                                                        <lightning:input  aura:id="isbn" type="text"  placeholder="Search by ISBN" value="{!v.isbn}"/>
+                                                    </lightning:layoutItem>
+                                                    <lightning:layoutItem padding="around-small" size="12" smallDeviceSize="6" mediumDeviceSize="12" largeDeviceSize="3">
+                                                        <div class="slds-panel__section" align="center">
+                                                            <lightning:button variant="brand" label="Search" onclick="{!c.searchProducts}" />
+                                                            <lightning:button variant="brand" label="Reset" onclick="{!c.resetProducts}" />
+                                                        </div> 
+                                                    </lightning:layoutItem>                                        
+                                                </lightning:layout>
+                                                
+                                                <lightning:layout>
+                                                    <lightning:layoutItem padding="around-small" size="12" smallDeviceSize="6" mediumDeviceSize="12" largeDeviceSize="3" flexibility="auto">
+                                                        <aura:if isTrue="{!v.showSearchSpinner}">
+                                                            <div class="slds-text-body_small slds-text-color_error">Searching... 
+                                                                <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="Loading"/>'
+                                                            </div>
+                                                        </aura:if>
+                                                        <p>
+                                                            <lightning:formattedRichText aura:id="msgApiFailedText"></lightning:formattedRichText>
+                                                        </p>
+                                                    </lightning:layoutItem>
+                                                </lightning:layout>                                               
+                                                <p>&nbsp;</p>
+                                                <table class="slds-table slds-table--bordered slds-table--striped slds-table--cell-buffer slds-table--fixed-layout">
+                                                    <thead>
+                                                        <tr class="slds-text-heading--label">
+                                                            <th scope="col" width="5%"><div class="slds-truncate" title="Index">#</div></th>
+                                                            <th scope="col"><div class="slds-truncate" title="Product Name">Product Name</div></th>
+                                                            <th scope="col"><div class="slds-truncate" title="Product Code">Product Code</div></th>
+                                                            <th scope="col"><div class="slds-truncate" title="Version Type">Version Type</div></th>
+                                                            <th scope="col"><div class="slds-truncate" title="Price">Price</div></th>
+                                                            <th scope="col"><div class="slds-truncate" title="Quantity">Quantity</div></th>
+                                                            <th scope="col"><div class="slds-truncate" title="Required Version Type">Required Version Type</div></th>
+                                                            <th scope="col"><div class="slds-truncate" title="action"></div></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <aura:if isTrue="{!not(empty(v.products))}">
+                                                            <aura:iteration items="{!v.products}" var ="prod">
+                                                                <tr>
+                                                                    <td><div class="slds-truncate" title="index"><ui:inputCheckbox text="{!prod.Product2.Id}" aura:id="boxPack" value=""/></div></td>
+                                                                    <td><div class="slds-truncate" title="accountId">{!prod.productName}</div></td>
+                                                                    <td><div class="slds-truncate" title="{!prod.productCode}">{!prod.productCode}</div></td>                                                                   
+                                                                    <td><div class="slds-truncate" title="Version Type">{!prod.versionType}</div></td>
+                                                                    <aura:if isTrue="{!prod.currencyIsoCode}">
+                                                                        <td><div class="slds-truncate" title="CurrencyIsoCode">{!prod.unitPrice} ({!prod.currencyIsoCode})</div></td>
+                                                                        <aura:set attribute="else">
+                                                                            <td><div class="slds-truncate" title="CurrencyIsoCode">{!prod.unitPrice}</div></td>
+                                                                        </aura:set>
+                                                                    </aura:if> 
+                                                                    <td>
+                                                                        <div class="slds-truncate" title="Quantity">
+                                                                            <lightning:input name="qty" aura:id="qty" type="number" max="500" value="{!v.requiredQuantity}" onchange="{!c.onChangeRequiredQuantity}"/>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="slds-truncate" title="Required Version Type">
+                                                                            <lightning:select name="versionType" aura:id="versionType" onchange="{!c.onChangeRequiredVersionType}">
+                                                                                <option value="Paperback">Paperback</option>
+                                                                                <option value="Hardback">Hardback</option>
+                                                                            </lightning:select>                                          
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="slds-truncate" title="">
+                                                                            <aura:if isTrue="{!prod.pbId}">
+                                                                                <!-- if product exist in price book-->
+                                                                                <lightning:button value="{!prod.productId}" variant="brand" label="Select" title="Select" onclick="{! c.selectOpportunityLineItem }" />
+                                                                                <aura:set attribute="else">
+                                                                                    <lightning:button value="{!prod.productId}" variant="brand" label="Select" title="Select" onclick="{! c.selectOpportunityLineItem }" />
+                                                                                </aura:set>
+                                                                            </aura:if>                                                                             
+                                                                            <aura:if isTrue="{!v.showSelectSpinner}">           
+                                                                                    <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="Loading"/>
+                                                                            </aura:if> 
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </aura:iteration>                                                           
+                                                        </aura:if>
+                                                    </tbody>
+                                                </table>                   
+                                            </lightning:tab>             
+                                            <lightning:tab label="Import Products" id="importTab" onactive="{! c.handleTabActive }">
+                                                <lightning:layoutItem size="12" smallDeviceSize="6" mediumDeviceSize="12" largeDeviceSize="3" padding="horizontal-small">
+                                                    <div class="page-section page-header"></div>
+                                                    <lightning:input aura:id="file" 
+                                                                     onchange="{!c.handleFilesChange}" 
+                                                                     type="file" 
+                                                                     name="file" 
+                                                                     accept=".csv"
+                                                                     multiple="false"/>
+                                                    <div style="margin-top:10px;" class="slds-text-color_red">{!v.fileName} </div>                                                   
+                                                    <!--use aura:if for show-hide the loading spinner image--> 
+                                                    <aura:if isTrue="{!v.showLoadingSpinner}">
+                                                        <div class="slds-text-body_small slds-text-color_error">Uploading... 
+                                                            <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="Loading"/>
+                                                        </div>
+                                                    </aura:if>                                          
+                                                    <lightning:button variant="brand" label="Import Products" title="Import Products" onclick="{! c.importCsv}" disabled="{!v.disableCSVImportBtn}" />      
+                                                </lightning:layoutItem>
+                                            </lightning:tab>      
+                                        </lightning:tabset>
+                                        <aura:if isTrue="{!v.isOpen}">
+                                            
+                                            <!--###### MODAL BOX Start######--> 
+                                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                                <div class="slds-modal__container" style="max-height: 120%;">
+                                                    <!-- ###### MODAL BOX HEADER Start ######-->
+                                                    <header class="slds-modal__header">
+                                                        <lightning:buttonIcon iconName="utility:close"
+                                                                              onclick="{! c.closeModel }"
+                                                                              alternativeText="close"
+                                                                              variant="bare-inverse"
+                                                                              class="slds-modal__close"/>
+                                                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Duplicate Isbns Found</h2>
+       
+                                                    </header>
+                                                    <!--###### MODAL BOX BODY Part Start######-->
+                                                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                                            <p style="color:red;">Please make Sure That Uploaded List Must Not Contain Same Isbn with same Quantity and Binding! </p></div>
+
+                                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                            <thead>
+                                                                <tr class="slds-text-title_caps">
+                                                                    <th scope="col">
+                                                                        <div class="slds-truncate" title="Name">ISBN</div>
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        <div class="slds-truncate" title="Name">Quantity</div>
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        <div class="slds-truncate" title="Name">Binding</div>
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <aura:iteration items="{!v.Dupdata}" var="obj">
+                                                                    <tr>
+                                                                        <th scope="row">
+                                                                            <div class="slds-truncate" title="{!obj.ISBN}">
+                                                                                {!obj.ISBN}
+                                                                            </div>
+                                                                        </th> 
+                                                                         <th scope="row">
+                                                                            <div class="slds-truncate" title="{!obj.Quantity}">
+                                                                                {!obj.Quantity}
+                                                                            </div>
+                                                                        </th> 
+                                                                         <th scope="row">
+                                                                            <div class="slds-truncate" title="{!obj.Binding}">
+                                                                                {!obj.Binding}
+                                                                            </div>
+                                                                        </th> 
+                                                                    </tr>
+                                                                </aura:iteration>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <!--###### MODAL BOX FOOTER Part Start ######-->
+                                                    <footer class="slds-modal__footer">
+                                                        <lightning:button variant="neutral" 
+                                                                          label="Cancel"
+                                                                          title="Cancel"
+                                                                          onclick="{! c.closeModel }"/>
+                                                    </footer>
+                                                </div>
+                                            </section>
+                                            <div class="slds-backdrop slds-backdrop_open"></div>
+                                        </aura:if>                       
+                                        
+                                        
+                                <aura:if isTrue="{!v.isOpenSec}">
+                                    
+                                            <!--###### MODAL BOX Start######--> 
+                                            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                                                <div class="slds-modal__container" style="max-height: 120%;">
+                                                    <!-- ###### MODAL BOX HEADER Start ######-->
+                                                    <header class="slds-modal__header">
+                                                        <lightning:buttonIcon iconName="utility:close"
+                                                                              onclick="{! c.closeModelsec }"
+                                                                              alternativeText="close"
+                                                                              variant="bare-inverse"
+                                                                              class="slds-modal__close"/>
+                                                        <aura:if isTrue="{!!empty(v.otherproposaldata)}">                        
+                                                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                                                                Duplicate Isbns Found In Active Proposals</h2>    
+                                                            <aura:set attribute="else">
+                                                                <h2>Press Continue!</h2>    
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </header>
+                                                    <!--###### MODAL BOX BODY Part Start######-->
+                                                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                                        
+                                                        <aura:if isTrue="{!!empty(v.otherproposaldata)}">   
+                                                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                                            <p style="color:red;">Please click Continue if you still want to Continue to Add the ISBN or click Cancel if you want to remove It Before Adding in the Proposal.  </p></div>
+
+                                                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                                                            <thead>
+                                                                <tr class="slds-text-title_caps">
+                                                                    <th scope="col">
+                                                                        <div class="slds-truncate" title="Name">Proposal Id</div>
+                                                                    </th>
+                                                                    <th scope="col">
+                                                                        <div class="slds-truncate" title="Name">ISBNS</div>
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <aura:iteration items="{!v.otherproposaldata}" var="obj">
+                                                                    <tr>
+                                                                        <th scope="row">
+                                                                            <div class="slds-truncate" title="{!obj.Ids}">
+                                                                                {!obj.Ids}
+                                                                            </div>
+                                                                        </th> 
+                                                                         <th scope="row">
+                                                                            <div class="slds-truncate" title="{!obj.productCode}">
+                                                                                {!obj.productCode}
+                                                                            </div>
+                                                                        </th> 
+                                                                          
+                                                                    </tr>
+                                                                </aura:iteration>
+                                                            </tbody>
+                                                        </table>
+                                                              <aura:set attribute="else">
+                                                                                                                              <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+                                                            <p style="color:green;">Please click Continue if you  want to Continue to Add the ISBN or click Cancel if you want to remove It Before Adding in the Proposal.  </p></div>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </div>
+                                                    <!--###### MODAL BOX FOOTER Part Start ######-->
+                                                    <footer class="slds-modal__footer">
+                                                        <lightning:button variant="neutral" 
+                                                                          label="Cancel"
+                                                                          title="Cancel"
+                                                                          onclick="{! c.closeModelsec }"/>
+                                                        <lightning:button variant="brand" 
+                                                                          title="Continue"
+                                                                          label="Continue"
+                                                                          onclick="{! c.continueAdd }"
+                                                                          aura:id="disablebuttonid"/>
+
+                                                       
+                                                    </footer>
+                                                </div>
+                                            </section>
+                                            <div class="slds-backdrop slds-backdrop_open"></div>
+                                        </aura:if>                       
+                                        
+                                               
+                                        
+                                      
+                                    </div>
+                                </div>                     
+                            </div>                               
+                        </div>
+                    </div>
+                </div>            
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand" label="Close" title="Close" onclick="{! c.closeAddOppProductModal }"/>
+                </footer>
+            </div>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>    
+</aura:component>

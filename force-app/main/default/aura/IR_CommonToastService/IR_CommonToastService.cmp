@@ -1,0 +1,17 @@
+<!--
+ - Created by Sidhant on 9/20/19.
+ -->
+
+<aura:component description="CommonToastService">
+    <aura:method name="error" action="{!c.error}" description="Show error toast">
+        <aura:attribute name="msg" type="String" required="true" description="Toast message"/>
+    </aura:method>
+
+    <aura:method name="warning" action="{!c.warning}" description="Show warning toast">
+        <aura:attribute name="msg" type="String" required="true" description="Toast message"/>
+    </aura:method>
+
+    <aura:method name="success" action="{!c.success}" description="Show success toast">
+        <aura:attribute name="msg" type="String" required="true" description="Toast message"/>
+    </aura:method>
+</aura:component>

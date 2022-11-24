@@ -1,0 +1,4 @@
+<apex:component controller="DiscretionaryWaiverTemplateController" access="global">
+    <apex:attribute name="link" type="string"  default="www.google.com" description="test link" assignTo="{!documentlink}"/>
+    <apex:outputlink value="{!imageURL}" target="_blank">Download</apex:outputlink>
+</apex:component>

@@ -1,0 +1,306 @@
+<aura:component Controller="PCMOppSyncControllerDS">
+    <aura:attribute name="productListPCM" type="List"/>
+    <aura:attribute name="BundleLineItems" type="List"/>
+    <aura:attribute name="NewBundleLineItems" type="List"/>
+    <aura:attribute name="PricebkEntProductList" type="Object"/>
+    <aura:attribute name="poRefNumber" type="Object"/>
+    <aura:attribute name="activeTab" type="Boolean" default="false" />
+    <aura:attribute name="DeleteSyncProductDataWrapper" type="List" default="[]"/> 
+    <aura:attribute name="RecordId" type="String"/>
+    <aura:attribute name="ProductType" type="String" default="book"/>
+    <aura:attribute name="BundleProductId" type="String"/>
+    <aura:attribute name="newBundleLIPrice" type="Integer"/>
+    <aura:attribute name="selectedProdsLength" type="Integer"/>
+    <aura:attribute name="quoteCurrencyCode" type="String"/>
+    <aura:attribute name="BespokeBusinessId" type="String"/>
+    <aura:attribute name="salesType" type="String"/>
+    <aura:attribute name="productBundleName" type="String"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:attribute name="bundleSpinner" type="Boolean" default="false" />
+    <aura:attribute name="mySpinner_2" type="Boolean" default="false" />
+    <aura:attribute name="csvUploadedDataList" type="Object" />
+    <aura:attribute name="threshHoldVal" type="Integer" default="0"/>
+    <aura:attribute name="showFields" type="Boolean" default= "false" />
+    <aura:attribute name="refValue"  type="Integer"/>
+    <aura:attribute name="selectedProdCount" type="Integer"  />
+    <aura:attribute name="totalListPrice" type="Integer"  />
+    <aura:attribute name="totalsalePrice" type="Integer"  />
+    <aura:attribute name="productBundle" type="Product2" default="{'Name':'','Applicable_Customer_Types__c':'','Applicable_License_Types__c':'','Collection_Valid_From__c':'','List_Price__c':''}" />
+    <!-- Picklist Values Color Charges,FastTrack,Open Access Fee,Page Charges,Corporate,Government,RapidTrack,UNSDG,Rental,Evidence Based Selection,Automated Standing Order -->
+    <aura:attribute name="applicableLicenses" type="String[]" default="Perpetual,Subscription"/>
+    <aura:attribute name="applicableCustomers" type="String[]" default="Individual,Consortium"/>
+    <aura:attribute name="definitionModels" type="String[]" default="Static,Dynamic"/>
+    
+    <aura:attribute name="DuplicateProductsList" type="List" default="[]"/> 
+    <aura:attribute name="duplicateProductsMessage" type="String" />
+    <aura:attribute name="productRecordType" type="String" />
+    <aura:attribute name="duplicateProductsEntitled" type="Boolean" default="false" />
+    <aura:attribute name="isBespoke" type="Boolean" default="false"/>
+    
+    <aura:handler event="force:refreshView" action="{!c.init}" />
+    
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    <aura:handler event="c:PPDPCMSearchEvent" action="{!c.addProductUI}"/>
+    <aura:registerEvent name="showBundleData" type="c:ShowBundleItemsEvent"/>
+    <aura:handler event="c:RefreshPCMOppComp" action="{!c.refreshComp}"/>    
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div> 
+            </div>
+        </div>
+    </aura:if>
+    
+    <lightning:layout>
+        <aura:if isTrue="{!v.showFields}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="scrollable slds-modal slds-fade-in-open slds-modal_small"  >
+                
+                <div class="slds-modal__container slds-modal_small" >
+                    
+                    <header class="slds-modal__header" style="width:50rem">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Due to the high number of items being added to this quote, a Static bundle will be created</h2>
+                    </header>
+                    <div  style="height:36rem;width:50rem" class="scrollable slds-modal__content slds-p-around_medium slds-modal_small" id="modal-content-id-1">
+                        <aura:if isTrue="{!v.bundleSpinner}">
+                            <div aura:id="spinnerId" class="slds-spinner_container">
+                                <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                                    <span class="slds-assistive-text">Loading</span>
+                                    <div class="slds-spinner__dot-a"></div>
+                                    <div class="slds-spinner__dot-b"></div> 
+                                </div>
+                            </div>
+                        </aura:if>
+                        
+                        <lightning:recordEditForm  objectApiName="Product2" onsubmit="{!c.handleSubmit}" onsuccess="{!c.createBundleMethod}" onerror = "{!c.handleError}" recordTypeId="{!v.productRecordType}">
+                            <lightning:badge label="Details" class="align"/>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_2-of-4"> 
+                                    <lightning:inputField fieldName="Name" value="{!v.productBundleName}" required="true"/>
+                                    <lightning:inputField fieldName="List_Price__c" value="{!v.totalListPrice}" readonly="true"/>
+                                    <lightning:inputField fieldName="Applicable_Customer_Types__c" required="true"/>
+                                    
+                                    <!--lightning:inputField fieldName="Collection_Valid_From__c" required="true"/-->
+                                </div>
+                                <div class="slds-col slds-size_2-of-4">
+                                    
+                                    <lightning:inputField fieldName="Product_Type_Author_Facing__c"  value="Static" disabled="true" />
+                                    <lightning:inputField fieldName="Sales_Price__c" value="{!v.totalsalePrice}" required="true"/> 
+                                    <lightning:inputField fieldName="Applicable_License_Types__c" required="true"/>
+                                    
+                                    <!--lightning:inputField fieldName="Applicable_Channels__c" required="true"/-->
+                                    <!--lightning:inputField fieldName="businessId__c" value="BD.EBOOK" readonly="true" required="true"/>
+                                    <lightning:inputField fieldName="copyrightyear__c" required="true"/-->
+                                    <!--lightning:inputField fieldName="Sales_Channels__c" required="true"/-->
+                                </div>   
+                            </div>
+                            <div style="margin-left:45%">
+                                <lightning:button class="slds-m-top_small" variant="brand" type="submit" name="Create" label="Create" />
+                            </div>
+                        </lightning:recordEditForm>
+                    </div>
+                    <footer  style="width:50rem" class="slds-modal__footer">
+                        
+                        <lightning:button variant="neutral" label="Cancel" title="Cancel"  onclick="{! c.closeModel }"/>
+                        
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </lightning:layout>
+    
+    <!--SFAL-20 added by shubham Kumar-->
+    <lightning:layout>
+        <aura:if isTrue="{!v.duplicateProductsEntitled}">
+            <!-- Modal/Popup Box starts here-->
+            <div style="margin-left:10%;margin-top:20%">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="scrollable slds-modal slds-fade-in-open slds-modal_small"  >
+                    
+                    <div class="slds-modal__container slds-modal_large" >
+                        <!-- Modal/Popup Box Header Starts here-->
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close"
+                                                  onclick="{! c.closeModel }"
+                                                  alternativeText="close"
+                                                  variant="bare-inverse"
+                                                  class="slds-modal__close"/>
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Confirmation</h2>
+                        </header>
+                        <!--Modal/Popup Box Body Starts here-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <p>
+                                <b>
+                                    {!v.duplicateProductsMessage}
+                                </b>
+                            </p>
+                        </div>
+                        <!--Modal/Popup Box Footer Starts here-->
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral"
+                                              label="NO"
+                                              title="NO"
+                                              onclick="{!c.handleConfirmDialogNo}"/>
+                            <lightning:button variant="brand"
+                                              label="YES"
+                                              title="YES"
+                                              onclick="{!c.handleConfirmDialogYes}"/>
+                        </footer>
+                    </div>
+                </section>
+            </div>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </lightning:layout>
+    <!--Till here-->
+    
+    <div class="c-container" style="width:100%;overflow:auto;transform: rotateX(180deg);">
+        <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal" style=" transform: rotateX(180deg);overflow:auto;">
+            <thead>
+                <tr class="slds-text-title_caps">
+                    <th scope="col" data-id="isbn">
+                        <div class="slds-truncate" title="Action" data-id="delaction">
+                            Action
+                        </div>
+                    </th>
+                    <!--SFAL20-->
+                    <th scope="col" data-id="isbn">
+                        <div class="slds-truncate" title="Action" data-id="delaction">
+                            Existing Entitlement
+                        </div>
+                    </th>
+                    <!--Till Here-->
+                    <th scope="col" data-id="isbn">
+                        <div class="slds-truncate" title="ISBN" data-id="isbn">
+                            ISBN
+                        </div>
+                    </th>
+                    <th scope="col" data-id="title">
+                        <div class="slds-truncate titlewidth" title="Title" data-id="title">
+                            Title
+                        </div>
+                    </th>
+                    <th scope="col" data-id="author">
+                        <div class="slds-truncate" title="Author" data-id="author">
+                            Author
+                        </div>
+                    </th>
+                    <th scope="col" data-id="listPrice">
+                        <div class="slds-truncate" title="List Price" data-id="originalListPrice">
+                            List Price
+                        </div>
+                    </th>
+                    
+                    <th scope="col" data-id="listPrice">
+                        <div class="slds-truncate" title="Sales Price" data-id="UnitPrice">
+                            Sales Price
+                        </div>
+                    </th>
+                    <th scope="col" data-id="poNum">
+                        <div class="slds-truncate" title="Line Ref No." data-id="poReferense">
+                            P.O. REF NO.
+                        </div>
+                    </th>
+                    <th scope="col" data-id="isbn">
+                        <div class="slds-truncate" title="Action" data-id="delaction">
+                            Bundle   
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="tableBody">
+                <aura:iteration items="{!v.productListPCM}" var="priceBk" indexVar="prodIndex">
+                    <aura:if isTrue="{!not(empty(priceBk.PCMProductName))}">
+                        
+                        
+                        <tr class="slds-hint-parent">
+                            <td data-label="delaction">
+                                <div class="slds-truncate" title="">
+                                    <lightning:button variant="destructive" iconName="utility:close" label="" title="Remove" value="{!prodIndex}" onclick="{!c.removeAddedProduct}" />
+                                    
+                                </div> 
+                            </td>
+                            <!--SFAL20-->
+                            <td data-label="Existing Entitlement">
+                                <aura:if isTrue="{!(priceBk.isDuplicate)}">
+                                    <div style="margin-left:35%">
+                                        <lightning:icon iconName="utility:success" alternativeText="Duplicate" title="Duplicate" />
+                                    </div>
+                                </aura:if>
+                            </td>
+                            <!--Till here-->
+                            <td data-label="ISBN">
+                                <div class="slds-truncate" title="{!priceBk.PCMISBN}">{!priceBk.PCMISBN}</div>
+                            </td>
+                            <td data-label="Title">
+                                <div class="slds-truncate" title="{!priceBk.productName}" >
+                                    <div class="slds-truncate titleLeft titlewidth" title="{!priceBk.PCMProductName}">{!priceBk.PCMProductName}</div>
+                                </div>
+                            </td>
+                            <td data-label="Author">
+                                <div class="slds-truncate" title="{!priceBk.PCMAuthor}">{!priceBk.PCMAuthor}</div>
+                            </td>
+                            <td data-label="List Price" style = "width: 10%;">
+                                <div class="slds-truncate" title="{!priceBk.OriginalListPrice}">
+                                    <lightning:input type="number" name="input6" value="{!priceBk.OriginalListPrice}" disabled="true"/>
+                                </div>
+                            </td>
+                            <td data-label="Sales Price" style = "width: 10%;">
+                                <div class="slds-truncate" title="{!priceBk.UnitPrice}">
+                                    <lightning:input type="number" name="input4" value="{!priceBk.UnitPrice}"/>
+                                </div>
+                            </td>
+                            <td data-label="P.O. Ref No.">
+                                <div class="slds-truncate" title="{!priceBk.PONumber}">
+                                    <lightning:input type="text" name="input5" value="{!priceBk.PONumber}"/>
+                                </div>
+                            </td> 
+                            <td data-label="Bundle">
+                                <aura:if isTrue="{!(priceBk.Bundled)}">
+                                    <div style="margin-top: 9%;">
+                                        <aura:if isTrue="{!(priceBk.isBundleActive)}">
+                                            <lightning:button variant="brand" type="{!priceBk.iscollection}" name="{!priceBk.PCMUUID}" title="{!priceBk.isBespokeQLI}" label="BundleItem" onclick="{!c.showBundleItems}" class="slds-m-left_x-small"/> 
+                                            <aura:set attribute="else">
+                                                <lightning:button variant="brand" type="{!priceBk.iscollection}" name="{!priceBk.SalesforceProductId}" title="{!priceBk.isBespokeQLI}" label="BundleItem" onclick="{!c.showBundleItems}" class="slds-m-left_x-small"/> 
+                                            </aura:set>
+                                        </aura:if>
+                                    </div>
+                                </aura:if>
+                            </td>
+                        </tr>
+                        <aura:set attribute="else">
+                            False
+                        </aura:set>
+                    </aura:if>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>
+    
+    <lightning:layout>
+        <lightning:layoutItem>
+            <div style="padding-top:5%">
+                <lightning:button variant="destructive" 
+                                  label="Remove all products"
+                                  title="Remove all products"
+                                  onclick="{! c.deleteDataToQuote }"/>
+                <lightning:button variant="brand" 
+                                  label="Save"
+                                  title="Save"
+                                  onclick="{!c.checkForEntitlements}"/>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <lightning:layout>
+        <lightning:layoutItem>
+            <lightning:input name="file1" aura:id="file" type="file" accept=".csv" onchange="{! c.handleUploadFinished }"/>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

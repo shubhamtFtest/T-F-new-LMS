@@ -1,0 +1,124 @@
+<aura:component Controller="PCMOppSyncControllerDS" implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,force:hasRecordId" access="global">
+    <aura:if isTrue="{!v.isBespokeCollection}">
+        <aura:html tag="style">
+            .slds-modal__container{
+            height : auto; width: 100%; max-width: 700vh;
+            }
+            .modal-body{
+            height : 70vh !important;
+            max-height: 70vh !important;
+            }
+            .slds-modal__footer{
+            display: inline !important;
+            }
+            .uiModal--horizontalForm .modal-container{
+            height : auto; width: 100%; max-width: 700vh;
+            }
+            .uiModal--medium .modal-container {
+            height : auto; width: 100%; max-width: 700vh;
+            }
+        </aura:html>
+    </aura:if>
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="prodRecordTypeId" type="String"/>
+    <aura:attribute name="newBespokeCollectionId" type="String"/>
+    <aura:attribute name="implicitFltrValues" type="Object[]"/>
+    <aura:attribute name="mySpinner" type="Boolean" default="false" />
+    <aura:attribute name="isBespokeCollection" type="Boolean" default="false"/>
+    <aura:attribute name="ShowNewEditRecordModal" type="Boolean" default="true"/>
+    <aura:attribute name="bespokeBusinessId" type="String"/>
+    <aura:attribute name="uuID" type="String"/>
+    <aura:attribute name="activeTab" type="Boolean" default="false" />
+    <aura:attribute name="prodCustomName" type="String"/>
+    <!-- aura:attribute name="nowTime" type="String"/ -->
+    <aura:attribute name="updatedFromDate" type="Date"/>
+    <aura:attribute name="updatedToDate" type="Date"/>
+    <aura:attribute name="updatedFromDateTime" type="DateTime"/>
+    <aura:attribute name="updatedToDateTime" type="DateTime"/>
+    <aura:attribute name="validFromDate" type="DateTime"/>
+    <aura:attribute name="copyRightYear" type="String"/>
+    
+    
+    <aura:handler name="showBundleData" event="c:ShowBundleItemsEvent" action="{!c.handleComponentEvent}"/>
+    <aura:handler name="init" action="{!c.init}" value="{!this}" />
+    
+    <aura:if isTrue="{!v.mySpinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.isBespokeCollection}">
+        <lightning:tabset variant="horizontal" selectedTabId="prodSearchTabId" >
+            <lightning:tab label="Product Search" id="prodSearchTabId" onactive="">
+                <c:PCMSearchScreen hideCheckboxColumn="false" consumer='OPC' implicitFltrValues="{!v.implicitFltrValues}" isBespoke="{!v.isBespokeCollection}" bespokeProductId="{!v.newBespokeCollectionId}"/>
+            </lightning:tab>
+            <lightning:tab label="Preview" id="previewTabId" onactive="">
+                <c:PCMOppPreviewScreen RecordId="{!v.recordId}" isBespoke="{!v.isBespokeCollection}"/>
+            </lightning:tab>
+            <aura:if isTrue = "{!v.activeTab}">
+                <lightning:tab label="Bundle Information" id="bundleItems" onactive="">
+                    <c:DisplayBundleInformation uuId="{!v.uuID}" isBespokeQLI = "{!v.isBespokeQLI}" inSalesforce="{!v.inSalesforce}"/>
+                </lightning:tab>
+            </aura:if>
+        </lightning:tabset>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.ShowNewEditRecordModal}">
+        <lightning:messages aura:id="ProdMessage"/>
+        <lightning:recordEditForm objectApiName="Product2"
+                                  aura:id="myRecordForm"
+                                  recordTypeId="{!v.prodRecordTypeId}"
+                                  onsuccess="{!c.handleSuccess}"
+                                  onerror="{!c.handleError}">
+            <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning:inputField aura:id="newProductField" fieldName="Name" required="true" value="{!v.prodCustomName}"/>
+                    
+                    <lightning:input type="date" 
+                                     label="Collection updatedFrom" 
+                                     Name="Collection_updateddFrom__c" 
+                                     aura:id="Collection_updateddFrom__c"
+                                     value="{!v.updatedFromDate}"
+                                     onchange="{!c.handleFromDate}"
+                                     required="true"
+                                     dateStyle="short"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="Collection_updatedFrom__c" value="{!v.updatedFromDateTime}" disabled="true" variant="label-hidden" class="none"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="Applicable_License_Types__c" required="true"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="businessId__c" value="{!v.bespokeBusinessId}" disabled="true" variant="label-hidden" class="none"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="Applicable_Channels__c" value="UBX_Delivery" disabled="true" variant="label-hidden" class="none"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="Collection_Valid_From__c" class="slds-hidden" value="{!v.validFromDate}" />
+                </div>
+                
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning:inputField aura:id="newProductField" fieldName="Product_Type_Author_Facing__c" value="Rule based" disabled="true"/>
+                    <!-- lightning:inputField aura:id="newProductField" fieldName="Collection_Valid_To__c"/ -->
+                    <lightning:input type="date" 
+                                     label="Collection updatedTo" 
+                                     Name="Collection_updateddTo__c" 
+                                     aura:id="Collection_updateddTo__c"
+                                     value="{!v.updatedToDate}"
+                                     onchange="{!c.handleToDate}"
+                                     required="true"
+                                     dateStyle="short"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="Collection_updatedTo__c" value="{!v.updatedToDateTime}" disabled="true" variant="label-hidden" class="none"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="Applicable_Customer_Types__c" required="true"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="Sales_Channels__c" value="UBX_Sales" disabled="true" variant="label-hidden" class="none"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="Collection_Subject_Area__c" value="MIXED" disabled="true" variant="label-hidden" class="none"/>
+                    <lightning:inputField aura:id="newProductField" fieldName="copyrightyear__c" class="slds-hidden" value="{!v.copyRightYear}" />
+                    <!-- lightning:inputField aura:id="newProductField" fieldName="IsActive" value="{!true}" disabled="true" variant="label-hidden" class="none"/ -->
+                    <lightning:inputField aura:id="newProductField" fieldName="Family" value="Collection" disabled="true" variant="label-hidden" class="none"/>
+                </div>
+            </div>
+            <div class="slds-m-top_medium">
+                <!--lightning:button variant="brand" name="Cancel" label="Cancel" onclick="{!c.handlemyRecordFormCancel}" /-->
+                <lightning:button variant="brand" type="submit" name="create" label="Create" onclick="{!c.handlemyRecordFormSubmit}" />
+            </div>
+        </lightning:recordEditForm>
+    </aura:if>
+</aura:component>

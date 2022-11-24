@@ -1,0 +1,17 @@
+<apex:page controller="ContactSearchController" >
+    <apex:includeLightning />
+
+    <div id="lightning" />
+
+    <script>
+    //   var urlParams = new URLSearchParams(window.location.search);
+        $Lightning.use("c:SearchAppContainer", function() {
+          $Lightning.createComponent("c:ContactSearchComponent",
+          {   },
+          "lightning",
+          function(cmp) {
+            
+          });
+        });
+    </script>
+</apex:page>

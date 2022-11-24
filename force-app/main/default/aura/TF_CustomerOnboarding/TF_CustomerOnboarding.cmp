@@ -1,0 +1,70 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader,force:appHostable" controller="TF_CustomerOnboardingApexController">
+    <aura:attribute name="selTabId" type="string" default="1" />
+    <aura:attribute name="currentTabId" type="string" default="1" />
+    <aura:attribute name="goBack" type="boolean" default="false" />
+    <aura:attribute name="enrichmentDone" type="String" default="false" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="ringgoldId" type="String" default= "null"/>
+    <aura:attribute name="showErrors" type="boolean" default="false"/>
+    <aura:attribute name="nextClicked" type="boolean" default="false"/>
+    <aura:attribute name="errorMsg" type="String"/>
+    <aura:attribute name="noErrors" type="boolean" default="true"/>
+    <aura:attribute name="accEnrichmentTab" type="boolean" default="false"/>
+    <aura:attribute name="searchRinggoldTab" type="boolean" default="true"/>
+	<aura:attribute name="accountRecord" type="Account" />
+    <aura:handler name="init" action="{!c.init}" value="{!this}"/>
+    <aura:if isTrue="{!v.showErrors}">
+        <!-- Show the message to ui -->
+        <div class="slds-notify slds-notify_toast slds-theme_info">
+            <span class="slds-assistive-text">error</span>
+            <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small slds-align_absolute-center" >{!v.errorMsg} </h2>      
+            </div><br/>
+        </div>
+    </aura:if>
+    
+    
+    <aura:if isTrue="{!v.noErrors}">
+     <lightning:tabset selectedTabId="{!v.selTabId}"  onselect  = "{!c.disableTabSwitch}">
+         
+        <lightning:tab label="Select RinggoldId" id="1" >
+            <aura:if isTrue = "{!v.currentTabId == '1'}">
+            <c:TF_SearchRinggold recordId="{!v.recordId}" aura:id='searchRG' />
+            </aura:if>
+        </lightning:tab>
+        
+        <lightning:tab label="Account Enrichment" id="2" >
+            <aura:if isTrue = "{!v.currentTabId == '2'}">
+            <c:TF_AccountEnrichment recordId="{!v.recordId}" ringgoldId="{!v.ringgoldId}" aura:id='accEnrichment'/>
+            </aura:if>
+        </lightning:tab>
+         <lightning:tab label="Address Validation" id="3">
+             <aura:if isTrue = "{!v.currentTabId == '3'}">
+            <c:AddressVerification recordId="{!v.recordId}" aura:id='addressValidation'/>
+             </aura:if>
+        </lightning:tab>
+         <lightning:tab  id="4">
+            <div class="slds-notify slds-notify_toast slds-theme_info ">
+            <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small slds-align_absolute-center">{!v.errorMsg}</h2>              
+            </div><br/>
+        </div>
+        </lightning:tab>
+        
+        <div class="slds-align_absolute-center">
+          <!--disabled the back button on first Tab-->    
+        <lightning:button disabled="{!v.selTabId == '1'}" variant="neutral" label="Back" onclick="{!c.back}" />
+      
+        <lightning:button disabled="{!v.selTabId == '3'}" variant="brand" label="Next" onclick="{!c.next}" />
+    	</div>
+        
+          <br/>
+         <aura:if isTrue="{!v.searchRinggoldTab}">
+          <div class="slds-align_absolute-center">
+             <lightning:button variant="brand" label="Skip Ringgold Selection" onclick="{!c.continueWithoutEnrichment}" />
+		  </div>
+      </aura:if>
+     
+    </lightning:tabset>
+   </aura:if>  
+</aura:component>

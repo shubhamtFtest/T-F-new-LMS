@@ -1,0 +1,51 @@
+<aura:component controller="TF_PPDProcessController" implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global">
+    <!-- Attributs -->
+    <aura:attribute name="typeOfCollection" type="String"/>	
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="busId" type="String"/>
+    <aura:attribute name="collectionName" type="String"/>
+    <aura:attribute name="activeAccordion" type="String"/>
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="IsBusinessIdExist" type="String"/>
+    <aura:attribute name="IsCollectionNameExist" type="String"/>
+    <aura:attribute name="consumer" type="String" default="All"/>
+    <aura:attribute name="hideCheckboxColumn" type="Boolean" default="True"/>
+    <aura:attribute name="IsClonedRecord" type="Boolean" default="false"/>
+    <aura:attribute name="implicitFltrValues" type="Object[]" access="global"/>
+	<aura:attribute name="disableDownload" type="Boolean" default="false"/>
+    
+    
+    <!-- Handlers -->  
+     <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler name="PPDProductSearchEvent" event="c:PPDProductSearchEvent" action="{!c.setAttributeValue}" phase="capture"  />
+    <aura:handler name="change" value="{!v.activeAccordion}" action="{!c.setAttributeValue}"/>
+     <aura:registerEvent name="validateBusinessId" type="c:PPDBusinessIdCheckEvent"/>
+    <!--<aura:registerEvent name="validateCollectionName" type="c:PPDCollectionNameCheckEvent"/>-->
+    <aura:handler event="c:PPDRecordEditRefreshEvent" action="{! c.init}" />
+    
+    
+    <!-- spinner -->
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    
+    <!-- body -->
+    <lightning:accordion aura:id="accordion" activeSectionName="{#v.activeAccordion}" >
+        <!-- <lightning:accordionSection name="criteria" label="Basic Search"> 
+            <c:PPDContentSelectionCriteria typeOfCollection = "{#v.typeOfCollection}" activeAccordion="{!v.activeAccordion}" />
+        </lightning:accordionSection>-->
+        
+        <!-- Button to download eBooks in OPC-->
+        <aura:if isTrue="{!v.consumer == 'OPC_External'}">
+            <lightning:button label="eBook Catalogue" variant="brand" 
+                              onclick="{!c.downloadCatalogue}" iconName="utility:download"
+                              disabled="{! v.disableDownload}" class = "formatDownloadButton" />
+        </aura:if>
+        <lightning:accordionSection name="AdvancedSearch" label="Search"> 
+            <c:PPDProductSearchLandingPage consumer="{! v.consumer}" recordId="{! v.recordId }" activeAccordion="{!v.activeAccordion}" implicitFltrValues="{! v.implicitFltrValues}"/>					
+        </lightning:accordionSection>
+        <lightning:accordionSection name="result" label="Search Result" >                 
+            <c:PPDContentSelectionResult consumer="{! v.consumer}" recordId="{! v.recordId }" hideCheckboxColumn="{! v.hideCheckboxColumn}" typeOfCollection = "{#v.typeOfCollection}" activeAccordion="{!v.activeAccordion}" calledFrom ='ContentSelection' />
+        </lightning:accordionSection>
+    </lightning:accordion>
+</aura:component>

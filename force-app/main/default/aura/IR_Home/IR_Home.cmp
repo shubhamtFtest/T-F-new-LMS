@@ -1,0 +1,36 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="IR_Controller" >
+   	<!-- Invoke handler Toast handler-->
+    <c:IR_CommonServerAction aura:id="server" />
+    <c:IR_CommonToastService aura:id="toast" />
+    
+    <!-- All the Aura Attributes-->
+    <aura:attribute name="PrintorderList" type="List" default="[]" access="private" />
+    <aura:attribute name="columns" type="List" default="[]" access="private" />
+    <aura:attribute name="sortedDirection" type="String" default="asc"/>
+    <aura:attribute name="sortedBy" type="String" default="Name"/>
+    <aura:attribute name="secLink" type="String" default="Name"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />  
+    
+    <!-- List Of All the Print Orders -->
+    <lightning:layoutItem size="12" padding="around-small">
+        <div  class="slds-text-align_left tableshow" style="width: 100%;">
+            <aura:if isTrue="{!v.PrintorderList.length > 0}">
+                <lightning:datatable class="wideCell"
+                                     columns="{! v.columns }"
+                                     data="{!v.PrintorderList}"
+                                     keyField="Id"
+                                     hideCheckboxColumn="true"
+                                     resizeColumnDisabled="true" 
+                                     sortedBy="{!v.sortedBy}"  
+                                     onsort="{!c.updateColumnSorting}"
+                                     sortedDirection="{!v.sortedDirection}"
+                                     />
+                <!--If there are No Print Orders -->
+                <aura:set attribute="else">
+                    <b> No Record Found</b>
+                </aura:set>
+            </aura:if>
+        </div>                    
+    </lightning:layoutItem>
+    
+</aura:component>

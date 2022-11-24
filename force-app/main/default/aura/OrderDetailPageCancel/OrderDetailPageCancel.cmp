@@ -1,0 +1,580 @@
+<!--Created By: Piyush Jain
+    Modified by: Shalini Singh(13-07-2021) to show credit Note story(ticket SAL-3501)
+    Description: After clicking on order number cmp to show all details of a single order  -->
+<aura:component controller="OrderHubCustomerDetailCancelCntrl"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.onInitPage}" />
+    <aura:attribute name="orderNum" type="String" default="" />
+    <aura:attribute name="accId" type="String" />
+    <aura:attribute name="currency" type="String" />
+    <aura:attribute name="orderDetailsFetchd" type="Object" />
+    <aura:attribute name="orderedItems" type="Object[]" description="orders fetched from JSON" />
+    <aura:attribute name="Spinner" type="boolean" default="false" />
+    <aura:attribute name="orderCancel" type="boolean" default="false" />
+    <aura:attribute name="showOrderdetailPage" type="Boolean" default="false" />
+    <aura:attribute name="showForm" type="Boolean" default="false" />
+    <aura:attribute name="addressType" type="String"
+        description="whether we want to use shipping address or billing address for a given Channel. there is a mapping in setting object" />
+    <aura:attribute name="billingadd" type="String" default="billingAddress" />
+    <aura:attribute name="shippingadd" type="String" default="shippingAddress" />
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    
+    <!--Shalini: Regarding credit note(ticket SAL-3501)-->
+    <aura:attribute name="originalOrdId" type="string" />
+    <aura:attribute name="originalOrdUrl" type="string" />
+    <aura:attribute name="isOriginalOrdPresentInSF" type="boolean" default="false"/>
+    <aura:attribute name="cancelReason" type="String" description="use to store order cancel reason"/>
+    <aura:attribute Name="ordCancellationReasonList" type="List" />
+    <aura:attribute name="isOriginalOrderOnHub" type="boolean" default="true" />
+    <!--Shalini: Changes end regarding credit note(ticket SAL-3501)-->
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container CustSpinnerBackgrnd">
+            <div class="slds-spinner--brand slds-spinner slds-spinner--large slds-is-relative CustSpinnerBackgrnd"
+                role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a CustSpinnerBackgrnd"></div>
+                <div class="slds-spinner__dot-b CustSpinnerBackgrnd"></div>
+            </div>
+        </div>
+    </aura:if>
+    <div class="slds-border-bottom">
+        <lightning:button label="GET ORDERS FOR CUSTOMERS" title="GET ORDERS FOR CUSTOMERS" onclick="{! c.backclicked }"
+            iconName="utility:back" iconPosition="left" variant="brand" />
+        
+    </div>
+    <!-- custCardBackGrnd  -->
+    <article class="slds-card slds-tile slds-m-around--medium">
+        <div class="container slds-card__header">
+            <div class="container-grid">
+            	<h1 class="slds-text-heading_medium"><b> Order Details </b></h1>
+            </div>
+        </div><br/>
+        
+        <!--Shalini: Regarding credit note(ticket SAL-3501) -->
+        <aura:if isTrue="{!v.isOriginalOrderOnHub}">
+            <div style="float:right; padding-right: 2%">
+                <lightning:layout>
+                    <lightning:layoutItem>
+                        <aura:if isTrue="{!v.orderCancel}">
+                            <lightning:button label="Cancel Order" title="Cancel Order"
+                                              disabled="true"/>
+                            <aura:set attribute="else">
+                                
+                                <lightning:layout>
+                                    <lightning:layoutItem>
+                                        <lightning:select aura:id="cancelReasons" name="select" label="Cancellation Reason" required="true" value="{!v.cancelReason}" messageWhenValueMissing="Cancellation reason is required">
+                                            <option value="">--None--</option>
+                                            <aura:iteration items="{!v.ordCancellationReasonList}" var="val">
+                                                <option value="{!val}">{!val}</option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem>
+                                        <div style="padding-top:20%">
+                                            <lightning:button label="Cancel Order" title="Cancel Order" onclick="{! c.openModel }"
+                                                              variant="destructive"/>
+                                        </div>
+                                    </lightning:layoutItem>
+                                </lightning:layout>
+                            </aura:set>
+                        </aura:if>    
+                    </lightning:layoutItem>  
+                    <lightning:layoutItem>
+                        <aura:if isTrue="{!v.isOriginalOrdPresentInSF}">
+                            <div title="Original Order SF">
+                                <a href="{!v.originalOrdUrl}"
+                                   target="_blank"
+                                   title="Click to see order details in SF">
+                                    <h4 class="slds-text-heading_small"><b> Original Order SF </b></h4>
+                                </a>
+                            </div>
+                        </aura:if>
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+            <aura:set attribute="else">
+                <h2 class="slds-text-heading_small" style="float:right; color:red; padding-right:2%"><b>This isn't an original order on Hub you can't cancel it.</b></h2>
+            </aura:set>
+        </aura:if>
+        <br/><br/>
+        <!--Shalini: Changes end regarding credit note(ticket SAL-3501) -->
+            
+        
+        <div class="slds-card__body container-body">
+            <!-- FISRT BOX custwhiteBackground-->
+            <div class="slds-box slds-m-around--large">
+                <table>
+                    <tr class="slds-grid slds-col slds-size_1-of-1 slds-m-bottom_medium">
+                        <div class="slds-col slds-grid slds-size_1-of-4">
+                            <td class="custlabel slds-col slds-size_2-of-5">
+                                Customer Name
+                            </td>
+                            <td class="slds-col slds-size_2-of-5 slds-m-left--small"
+                                title="{!v.orderDetailsFetchd.AccountName}" style="word-wrap: break-word;">
+                                {!v.orderDetailsFetchd.AccountName}
+                            </td>
+                            <td class="slds-col slds-size_1-of-5"></td>
+                        </div>
+
+                        <div class="slds-col slds-grid slds-size_1-of-4">
+                            <td class="custlabel slds-col slds-size_2-of-5 slds-p-left_medium">
+                                <!--style="font-size: initial;" -->
+                                Payment Method
+                            </td>
+                            <td class="slds-col slds-size_2-of-5"
+                                title="{!v.orderDetailsFetchd.invoices[0].payments[0].paymentMethod}"
+                                style="word-wrap: break-word;">
+                                {!v.orderDetailsFetchd.invoices[0].payments[0].paymentMethod}
+                            </td>
+
+                            <td class="slds-col slds-size_1-of-5"></td>
+                        </div>
+
+                        <div class="slds-col slds-grid slds-size_1-of-4">
+                            <td class="custlabel slds-col slds-size_2-of-5 slds-m-left--small">
+                                Order Number
+                            </td>
+                            <td class="slds-col slds-size_2-of-5 slds-m-left--small"
+                                title="{!v.orderDetailsFetchd.orderNumber}" style="word-wrap: break-word;">
+                                {!v.orderDetailsFetchd.orderNumber}
+                            </td>
+                            <td class="slds-col slds-size_1-of-5"></td>
+                        </div>
+                        <div class="slds-col slds-grid slds-size_1-of-4">
+                            <td class="custlabel slds-col slds-size_2-of-5 slds-m-left--small">
+                                Customer Order Reference
+                            </td>
+                            <td class="slds-col slds-size_2-of-5 slds-m-left--small"
+                                title="{!v.orderDetailsFetchd.externalOrderRef}" style="word-wrap: break-word;">
+                                {!v.orderDetailsFetchd.externalOrderRef}
+                            </td>
+                            <td class="slds-col slds-size_1-of-5"></td>
+                        </div>
+                    </tr>
+                    <tr class="slds-grid slds-col slds-size_1-of-1 slds-m-bottom_medium">
+                        <div class="slds-col slds-grid slds-size_1-of-4">
+                            <td class="custlabel slds-col slds-size_2-of-5">
+                                Order Placed
+                            </td>
+                            <td class="slds-col slds-size_2-of-5 slds-m-left--small"
+                                title="{!v.orderDetailsFetchd.orderDate}" style="word-wrap: break-word;">
+                                {!v.orderDetailsFetchd.orderDate}
+                            </td>
+                            <td class="slds-col slds-size_1-of-5"></td>
+                        </div>
+
+                        <div class="slds-col slds-grid slds-size_1-of-4">
+                            <td class="custlabel slds-col slds-size_2-of-5 slds-p-left_medium">
+                                Order Channel
+                            </td>
+                            <td class="slds-col slds-size_2-of-5" title="{!v.orderDetailsFetchd.channel}"
+                                style="word-wrap: break-word;">
+                                {!v.orderDetailsFetchd.channel}
+                            </td>
+                            <td class="slds-col slds-size_1-of-5"></td>
+                        </div>
+                        <div class="slds-col slds-grid slds-size_1-of-4">
+                            <td class="custlabel slds-col slds-size_2-of-5 slds-m-left--small">
+                                Invoice No.
+                            </td>
+                            <td class="slds-col slds-size_2-of-5 slds-m-left--small"
+                                title="{!v.orderDetailsFetchd.invoices[0].externalInvoiceRef}"
+                                style="word-wrap: break-word;">
+                                {!
+                                if(empty(v.orderDetailsFetchd.invoices[0].externalInvoiceRef),'
+                                ' ,v.orderDetailsFetchd.invoices[0].externalInvoiceRef ) }
+                            </td>
+                            <td class="slds-col slds-size_1-of-5"></td>
+                        </div>
+
+                        <td class="slds-col slds-grid slds-size_1-of-4">
+                            <div class="custlabel slds-col slds-size_2-of-5 slds-m-left--small">
+                                Order Status
+                            </div>
+                            <div class="slds-col slds-size_1-of-5 slds-m-left--small slds-m-right--small"
+                                style="text-align: center;">
+                                
+                                <!--<aura:if isTrue="{!v.orderCancel}">
+                                    <lightning:badge class="slds-badge slds-theme_error" label="CANCELLED" />
+                                     <aura:set attribute="else">
+                                         <lightning:badge label="{!v.orderDetailsFetchd.orderStatus}" />
+                                     </aura:set>
+                                </aura:if>-->
+                                <lightning:badge label="{!v.orderDetailsFetchd.orderStatus}" />
+                                 </div>
+                            <div class="slds-col slds-size_2-of-5"></div>
+                        </td>
+                    </tr>
+
+                    <!-- Shalini: Regarding credit note(ticket SAL-3501)-->
+                    <tr class="slds-grid slds-col slds-size_1-of-1 slds-m-bottom_medium">
+                        <div class="slds-col slds-grid slds-size_1-of-4">
+                            <td class="custlabel slds-col slds-size_2-of-5">
+                                Order Type
+                            </td>
+                            <td class="slds-col slds-size_2-of-5 slds-m-left--small"
+                                title="{!v.orderDetailsFetchd.orderType}" style="word-wrap: break-word;">
+                                {!v.orderDetailsFetchd.orderType}
+                            </td>
+                            <td class="slds-col slds-size_1-of-5"></td>
+                        </div>
+                    </tr>
+                    <!-- Shalini: Changes end regarding credit note(ticket SAL-3501)--> 
+                    
+                    <!-- line -->
+                    <tr class="slds-grid slds-col slds-size_1-of-1 slds-p-bottom--medium">
+                        <td class="slds-col slds-size_1-of-1 slds-border_top slds-m-top--small"></td>
+                    </tr>
+
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_3-of-8">
+                            <div class="slds-text-title_caps">Shipping Details</div>
+                        </td>
+                        <td class="slds-col slds-size_5-of-8"></td>
+                    </tr>
+
+                    <tr
+                        class="slds-grid slds-col slds-size_1-of-1 slds-m-top--large slds-m-left--medium slds-m-bottom--xx-small">
+                        <td class="slds-col slds-size_2-of-8 custlabel">
+                            Name
+                        </td>
+                        <td class="slds-col slds-size_2-of-8 custlabel">
+                            SAP BP Number
+                        </td>
+                        <td class="slds-col slds-size_2-of-8 custlabel">
+                            Order email
+                        </td>
+                        <td class="slds-col slds-size_2-of-8 custlabel">
+                            Shipping Address
+                        </td>
+                    </tr>
+                    <tr class="slds-grid slds-col slds-size_1-of-1 slds-m-left--medium slds-m-bottom--large">
+                        <td class="slds-col slds-size_2-of-8">
+                            {!v.orderDetailsFetchd.shippingAddress.addressContactName}
+                        </td>
+                        <td class="slds-col slds-size_2-of-8">
+                            {!v.orderDetailsFetchd.shippingAddress.businessPartnerNo}
+                        </td>
+                        <td class="slds-col slds-size_2-of-8">
+                            {!v.orderDetailsFetchd.shippingAddress.addressContactEmail}
+                        </td>
+                        <!-- <td class="slds-col slds-size_2-of-8"> -->
+                        <td class="slds-grid slds-grid_vertical slds-size_2-of-8">
+                    <tr class="slds-col">
+                        {!v.orderDetailsFetchd.shippingAddress.addressLine1},
+                    </tr>
+                    <tr class="slds-col">
+                        {!v.orderDetailsFetchd.shippingAddress.addressLine2},
+                    </tr>
+                    <tr class="slds-col">
+                        {!v.orderDetailsFetchd.shippingAddress.addressLocality},
+                        {!v.orderDetailsFetchd.shippingAddress.postalCode}
+                    </tr>
+                    <tr class="slds-col">
+                        {!v.orderDetailsFetchd.shippingAddress.addressRegion},
+                        {!v.orderDetailsFetchd.shippingAddress.addressCountry}
+                    </tr>
+                    </td>
+
+                    <!-- </td> -->
+                    </tr>
+
+                    <!-- line -->
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_1-of-1 slds-border_top"></td>
+                    </tr>
+
+                    <!-- line -->
+                    <!--  Billing Details -->
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_3-of-8">
+                            <div class="slds-text-title_caps slds-m-top--large">
+                                Billing Details
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_5-of-8"></td>
+                    </tr>
+                    <!--  Billing Details -->
+
+                    <tr
+                        class="slds-grid slds-col slds-size_1-of-1 slds-m-top--large slds-m-left--medium slds-m-bottom--xx-small">
+                        <td class="slds-col slds-size_2-of-8 custlabel">
+                            Name
+                        </td>
+                        <td class="slds-col slds-size_2-of-8 custlabel">
+                            SAP BP Number
+                        </td>
+                        <td class="slds-col slds-size_2-of-8 custlabel">
+                            Order email
+                        </td>
+                        <td class="slds-col slds-size_2-of-8 custlabel">
+                            Billing Address
+                        </td>
+                    </tr>
+                    <tr class="slds-grid slds-col slds-size_1-of-1 slds-m-left--medium slds-m-bottom--large">
+                        <td class="slds-col slds-size_2-of-8">
+                            {!v.orderDetailsFetchd.billingAddress.addressContactName}
+                        </td>
+                        <td class="slds-col slds-size_2-of-8">
+                            {!v.orderDetailsFetchd.billingAddress.businessPartnerNo}
+                        </td>
+                        <td class="slds-col slds-size_2-of-8">
+                            {!v.orderDetailsFetchd.billingAddress.addressContactEmail}
+                        </td>
+                        <td class="slds-col slds-size_2-of-8">
+                        <td class="slds-grid slds-grid_vertical slds-size_1-of-1">
+                    <tr class="slds-col">
+                        <aura:if isTrue="{!!empty(v.orderDetailsFetchd.billingAddress.addressLine1)}">
+                            {!v.orderDetailsFetchd.billingAddress.addressLine1},
+                        </aura:if>
+                    </tr>
+                    <tr class="slds-col">
+                        <aura:if isTrue="{!!empty(v.orderDetailsFetchd.billingAddress.addressLine2)}">
+                            {!v.orderDetailsFetchd.billingAddress.addressLine2},
+                        </aura:if>
+                    </tr>
+                    <tr class="slds-col">
+                        <aura:if isTrue="{!!empty(v.orderDetailsFetchd.billingAddress.addressLocality)}">
+                            {!v.orderDetailsFetchd.billingAddress.addressLocality},
+                        </aura:if>
+                        <aura:if isTrue="{!!empty(v.orderDetailsFetchd.billingAddress.postalCode)}">
+                            {!v.orderDetailsFetchd.billingAddress.postalCode}
+                        </aura:if>
+                    </tr>
+                    <tr class="slds-col">
+                        <aura:if isTrue="{!!empty(v.orderDetailsFetchd.billingAddress.addressRegion)}">
+                            {!v.orderDetailsFetchd.billingAddress.addressRegion},
+                        </aura:if>
+
+                        <aura:if isTrue="{!!empty(v.orderDetailsFetchd.billingAddress.addressCountry)}">
+                            {!v.orderDetailsFetchd.billingAddress.addressCountry}
+                        </aura:if>
+                    </tr>
+                    </td>
+                    </td>
+                    </tr>
+                    <!--  -->
+                    <!-- line -->
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_2-of-8 slds-border_top"></td>
+                        <td class="slds-col slds-size_2-of-8 slds-border_top"></td>
+                        <td class="slds-col slds-size_2-of-8 slds-border_top"></td>
+                        <td class="slds-col slds-size_2-of-8 slds-border_top"></td>
+                    </tr>
+                    <!-- line -->
+                    <!--  Amount Details -->
+                    <tr class="slds-m-bottom--medium slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_5-of-7"></td>
+                        <td class="slds-col slds-size_2-of-7">
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-text-title_caps slds-float_right slds-m-top--large">
+                                Amount :-
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_1-of-2"></td>
+                    </tr>
+                    </td>
+                    </tr>
+                    <!--  Amount Details -->
+
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_5-of-7"></td>
+                        <td class="slds-col slds-size_2-of-7">
+                            <div class="">
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                List Price:
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                <lightning:formattedNumber
+                                    value="{! add( if( empty(v.orderDetailsFetchd.subTotalPrice),0,v.orderDetailsFetchd.subTotalPrice ),if(empty(v.orderDetailsFetchd.totalDiscountAmount),0,v.orderDetailsFetchd.totalDiscountAmount) )}"
+                                    style="currency" currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                Discount:
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                <lightning:formattedNumber
+                                    value="{!if(empty(v.orderDetailsFetchd.totalDiscountAmount),0,v.orderDetailsFetchd.totalDiscountAmount)}"
+                                    style="currency" currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                Subtotal:
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                <lightning:formattedNumber
+                                    value="{!if(empty(v.orderDetailsFetchd.subTotalPrice),0,v.orderDetailsFetchd.subTotalPrice)}"
+                                    style="currency" currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                Taxes:
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                <!-- {! (v.currency=='USD')? '$' : '£' }{!v.orderDetailsFetchd.totalTax} -->
+                                <lightning:formattedNumber
+                                    value="{!if(empty(v.orderDetailsFetchd.totalTax),0,v.orderDetailsFetchd.totalTax)}"
+                                    style="currency" currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="slds-grid slds-col slds-size_1-of-1"></tr>
+                    <tr class="slds-grid slds-col slds-size_1-of-1">
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                <b>Total</b>
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_1-of-2">
+                            <div class="slds-float_right">
+                                <lightning:formattedNumber value="{!v.orderDetailsFetchd.orderPrice}" style="currency"
+                                    currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                            </div>
+                        </td>
+                    </tr>
+            </div>
+            </td>
+            </tr>
+            </table>
+        </div>
+        <!-- FISRT BOX -->
+
+        <!-- SECOND BOX custwhiteBackground-->
+        <div class="slds-box slds-m-around--large">
+            <table>
+                <aura:iteration items="{!v.orderedItems}" var="item">
+                    <tr class="slds-grid slds-col slds-size_1-of-1 slds-clearfix slds-m-bottom_small">
+                        <td class="slds-col slds-size_1-of-7 slds-grid slds-grid_vertical">
+                            <div class="slds-col custlabel">Product code</div>
+                            <div class="slds-col">{!item.productId}</div>
+                        </td>
+                        <td class="slds-grid slds-grid_vertical slds-col slds-size_2-of-7">
+                            <div class="slds-col">{!item.prodName}</div>
+                            <div class="slds-col" style="font-style: oblique; font-size: smaller;">
+                                <span style="color: gray;"> Edited by </span>{!item.prodAuthor}
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_2-of-7 slds-p-left--medium">
+                            <p>{!item.versionType}</p>
+                        </td>
+                        <td class="slds-grid slds-grid_vertical slds-col slds-size_1-of-7 slds-float_right">
+                            <div class="slds-col">
+                                <div class="slds-float_right">List Price:</div>
+                            </div>
+                            <div class="slds-col">
+                                <div class="slds-float_right">Discount:</div>
+                            </div>
+                            <div class="slds-col">
+                                <div class="slds-float_right">SubTotal:</div>
+                            </div>
+                            <div class="slds-col">
+                                <div class="slds-float_right">Taxes:</div>
+                            </div>
+                            <div class="slds-col">
+                                <div class="slds-float_right"><b>Total:</b></div>
+                            </div>
+                        </td>
+                        <td class="slds-col slds-size_1-of-7 slds-grid slds-grid_vertical slds-float_right">
+                            <div class="slds-col slds-float_right">
+                                <div class="slds-float_right">
+                                    <lightning:formattedNumber value="{!if(empty(item.price),0,item.price)}"
+                                        style="currency" currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                                </div>
+                            </div>
+                            <div class="slds-col slds-float_right">
+                                <div class="slds-float_right">
+                                    <lightning:formattedNumber
+                                        value="{!if(empty(item.discountAmount),0,item.discountAmount)}" style="currency"
+                                        currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                                </div>
+                            </div>
+                            <div class="slds-col slds-float_right">
+                                <div class="slds-float_right">
+                                    <lightning:formattedNumber
+                                        value="{!sub(if(empty(item.price),0,item.price),if(empty(item.discountAmount),0,item.discountAmount))}"
+                                        style="currency" currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                                </div>
+                            </div>
+                            <div class="slds-col slds-float_right">
+                                <div class="slds-float_right">
+                                    <lightning:formattedNumber value="{!if(empty(item.taxAmount),0,item.taxAmount)}"
+                                        style="currency" currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                                </div>
+                            </div>
+                            <div class="slds-col slds-float_right">
+                                <div class="slds-float_right">
+                                    <lightning:formattedNumber
+                                        value="{!if(empty(item.sellingPrice),0,item.sellingPrice)}" style="currency"
+                                        currencyCode="{!v.currency}" maximumFractionDigits="2" />
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </aura:iteration>
+            </table>
+        </div>
+        <!-- SECOND BOX -->
+        </div>
+    </article>
+    
+    
+     
+    
+    <!--Use aura:if tag to display/hide popup based on isModalOpen value-->  
+        <aura:if isTrue="{!v.isModalOpen}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Order Cancel</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        
+                        <p>Are you sure you want to <b>Cancel</b>?</p>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                        <lightning:button variant="brand"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{! c.cancelOrder }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+</aura:component>

@@ -1,0 +1,89 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="TF_ValidateIPRangeCalloutController">
+    
+    <!-- init method loads the data attribute values -->
+    <aura:handler name="init" action="{!c.getData}" value="{!this}"/>
+     
+    <!--Declare Attributes-->
+    <aura:attribute name="Spinner" type="boolean" default="true"/>
+    <aura:attribute name="objectList" type="List" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="ringgoldId" type="String" />
+    <aura:attribute name="thirdParty" type="boolean" default="false"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="showErrors" type="boolean" default="false"/>
+    <aura:attribute name="noErrors" type="boolean" default="false"/>
+    <aura:attribute name="allowReject" type="boolean" default="false"/>
+    <aura:attribute name="errorMsg" type="String"  />
+    <aura:attribute name="validateClicked" type="boolean" default="false"/>
+    <aura:attribute name="validateFailed" type="boolean" default="false"/>
+    
+    <!-- Component -->
+    <aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+       <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+         <span class="slds-assistive-text">Loading</span>
+         <div class="slds-spinner__dot-a"></div>
+         <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+ </aura:if>
+    <aura:if isTrue="{!v.showErrors}">
+        <!-- Show the message to ui -->
+        <div class="slds-notify slds-notify_toast slds-theme_error">
+            <span class="slds-assistive-text">error</span>
+            <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small slds-align_absolute-center">IP Records unavailable.</h2> 
+            </div>
+        </div>
+    </aura:if>
+    
+    		<div style="width: 80%;" class="slds-form-element slds-align_absolute-center">
+        	<table class="slds-table slds-table--bordered slds-table--striped ">
+             
+        		<thead>
+            		<tr>
+              		  <th scope="col"><span class="slds-truncate">Description</span></th>
+                      <th scope="col"><span class="slds-truncate">IP Range</span></th>
+                      <th scope="col"><span class="slds-truncate">Status</span></th>
+                      <th scope="col"><span class="slds-truncate">Error</span></th>
+           			</tr>
+        		</thead>
+        		<tbody>
+           			<aura:iteration items="{!v.objectList}" var="object">
+               		 <tr>
+                    	
+                    	<td>{!object.description}</td>
+                        <td>{!object.ipRange}</td>
+                         <aura:if isTrue="{!object.status == 'Not Verified'}">
+                             <td><img style="height: 20px;" src="{!$Resource.AddressNotYetVerified }"   /> </td>
+                         </aura:if>
+                         <aura:if isTrue="{!object.status == 'Success'}">
+                             <td><img style="height: 20px;" src="{!$Resource.Address_Verified_Image }"   /> </td>
+                         </aura:if>
+                         <aura:if isTrue="{!object.status == 'Failed'}">
+                             <td><img style="height: 20px;" src="{!$Resource.AddressVerificationFailed }"   /> </td>
+                         </aura:if>
+                        <aura:if isTrue="{!object.errorMsg != null}">
+                        	<td>IP already present for party Id :<a href="{!object.errorMsgURL}" target="_blank">{!object.errorMsg}</a></td>
+                        </aura:if> 
+                	</tr>
+            		</aura:iteration>
+        		</tbody>
+    		</table>
+    		</div><br/>
+        <br/>
+    <br/>
+    <aura:if isTrue="{!v.allowReject}">
+        <div class="slds-notify slds-notify_toast slds-theme_alert-texture">
+            <span class="slds-assistive-text">error</span>
+            <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small ">On click of the Reject And Merge button, the valid IPs and contacts associated with this Account will be linked to the account of the party ID mentioned in the error section, and this account request will be rejected.</h2>
+			</div>
+            <br/><br/>
+			</div>
+        <div class ="slds-align_absolute-center">            
+            <br/><lightning:button variant="brand" label="Reject And Merge" onclick="{!c.rejectRequest}" />
+		</div>
+
+    </aura:if>
+</aura:component>

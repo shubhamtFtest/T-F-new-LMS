@@ -1,0 +1,39 @@
+.THIS .custlabel {
+    color: grey;
+}
+
+.THIS .custwhiteBackground {
+    background-color: white;
+}
+
+.THIS .custCardBackGrnd {
+    background-color: grey;
+}
+
+.THIS .rcorners {
+    border-radius: 25px;
+    background: #CCEEF5;
+}
+
+.THIS .backBTn {
+    color: #202085;
+}
+.THIS .container{
+    width: 100%;
+    height:100%;
+    float: left;
+    display: flex;
+    align-items: center;
+    padding-left: 25px;
+    padding-right: 25px;
+}
+.THIS .container-grid{
+	width: 50%;
+    float:left;
+}
+.THIS .container-grid.right{
+    text-align: right;
+}
+.THIS .container-body{
+     margin-top: 60px;
+}

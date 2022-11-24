@@ -1,0 +1,197 @@
+<aura:component implements="force:appHostable,lightning:isUrlAddressable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
+                controller='OpportunitySearchController'
+                access="global" >
+    
+    <aura:attribute name="listSkillsOptions" type="List" default="[]"/>
+    <aura:attribute name="selectedSkillsItems" type="List" default="[]"/>
+    <aura:attribute name="AssignedRecordType" type="string" default=""/>
+    
+    <aura:attribute name="accID" type="String" />
+    <aura:attribute name="campusID" type="String" />
+    <aura:attribute name="deptID" type="String" />
+    <aura:attribute name="lstSearchCountry" type="List" />
+    
+     <aura:attribute name="totalPages" type="Integer" default="0" /> 
+    <aura:attribute name="pageNo" type="Integer" default="1" /> 
+    <aura:attribute name="recordPerPage" type="Integer" default="150" /> 
+    <aura:attribute name="defaultSearch" type="boolean" default="true" /> 
+    
+    
+    <aura:attribute name="opportunityData" type="OpportunityDataWrapper"/>
+    <aura:attribute name="columsToDisplay" type="List"/>
+    <aura:attribute name="sortedBy" type="string" default="Name" />
+    <aura:attribute name="sortedDirection" type="string" default="asc"/>
+    <aura:attribute name="isSending" type="boolean" />
+    <aura:attribute name="showDateFilters" type='boolean' />
+    <aura:attribute name="showFromDateError" type='boolean' />
+    <aura:attribute name="showToDateError" type='boolean' />
+    <aura:attribute name='recordIdToEdit' type='Id' />
+    <aura:attribute name="isOpenModal" type="boolean" default="true"/>
+    
+    <!-- Attribute Declration For Pagination Start -->
+    <aura:attribute name="PaginationList" type="OpportunityDataWrapper"/>
+    <aura:attribute name="startPage" type="Integer" />
+    <aura:attribute name="endPage" type="Integer"/>
+    <aura:attribute name="totalRecords" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer" default="150"/>
+    <!-- Attribute Declration For Pagination End-->
+    
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.reInit}" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit }"/>
+    
+    <div class="slds-form slds-form_compound">
+           <c:SpinnerCmp isSending='{!v.isSending}'/>
+        <lightning:card iconName='standard:opportunity'>
+            <aura:set attribute="title">
+                Search in Opportunity
+            </aura:set>
+            <aura:set attribute="actions">
+                <lightning:button variant="brand" label="Search" class='btn' onclick="{!c.doPerformSearch}" iconName='utility:search'/>
+                <lightning:button variant="destructive" label="Clear All" class='btn' onclick="{!c.doHandleClear}" iconName='utility:clear'/>
+            </aura:set>
+        </lightning:card>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col">
+                <fieldset class="slds-form-element">
+                    <div class="slds-form-element__group slds-m-left_x-small">
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size_1-of-3">
+                                <lightning:input type="text" label="Account Name" name="Account Name" aura:id="AccountName" />
+                            </div>
+                            <div class="slds-form-element slds-size_1-of-3">
+                                <lightning:input type="text" label="Department Name" class="departmentHelp" name="Department Name" aura:id="DepartmentName" />
+                            </div>
+                            <div class="slds-form-element slds-size_1-of-3">
+                                <lightning:input type="text" label="Campus Name" name="Campus Name" aura:id="CampusName" />
+                            </div>
+                        </div>
+                         <div class="slds-form-element__row">
+                             <div class="slds-form-element slds-size_1-of-3">
+                                 <lightning:select name="selectStage" aura:id="stageName" label="Select Stage" >
+                                     <option value="ALL">ALL</option>
+                                     <option value="Open">Open</option>
+                                     <option value="Closed">Closed</option>
+                                 </lightning:select>
+                             </div>
+                             <div class="slds-form-element slds-size_1-of-3">
+                                 <lightning:input type="text" label="Volume Year" name="Volume Year" aura:id="Volume Year" />  
+                             </div>
+                             <div class="slds-form-element slds-size_1-of-3">
+                                 <lightning:input type="text" label="Opportunity Owner" name="Opportunity Owner" aura:id="Opportunity Owner" />
+                             </div>
+                        </div>
+                        <div class="slds-form-element__row">
+                            <div class="slds-form-element slds-size_1-of-3">
+                                <lightning:select name="datePick" label="Select Date Range" aura:id="datePickList" onchange="{!c.handleonChange}" >
+                                    <option value="">--Select One --</option>
+                                    <option value="CreatedDate">Created Date</option>
+                                    <option value="LastModifiedDate">Last Modified Date</option>
+                                    <option value="CloseDate">Close Date</option>
+                                    <option value="Course_Start_Date__c">CourseStartDate</option>
+                                    
+                                </lightning:select>
+                            </div>
+                            <div class="slds-form-element slds-size_2-of-3">
+                                <aura:if isTrue="{!v.showDateFilters}">
+                                    <div class="slds-size_1-of-10 slds-p-right_small">
+                                        <lightning:input type="date" label="From" name="fromdate" aura:id="fromdate" required='true'
+                                                         messageWhenBadInput="You must Select From Date" />
+                                        <aura:if isTrue="{!v.showFromDateError}">
+                                            <ui:message title="Error" severity="error" closable="false">
+                                                You must Select From Date!
+                                            </ui:message>
+                                        </aura:if>
+                                    </div>
+                                    <div class="slds-size_1-of-10 slds-p-right_small">
+                                        <lightning:input type="date" label="To" name="toDate" aura:id="toDate" required='true' 
+                                                         messageWhenBadInput="You must Select To Date" />
+                                        <aura:if isTrue="{!v.showToDateError}">
+                                            <ui:message title="Error" severity="error" closable="false">
+                                                You must Select To Date!
+                                            </ui:message>
+                                        </aura:if>
+                                    </div>
+                                </aura:if>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="slds-col" >
+                 <lightning:dualListbox aura:id="selectOptions"
+                                               name="Skills"
+                                               sourceLabel="Available Record Types" 
+                                               selectedLabel="Selected Record Types" 
+                                               options="{! v.listSkillsOptions }"
+                                               value="{! v.selectedSkillsItems }"
+                                               onchange="{! c.handleChangeRecordType }"
+                                               variant ="label-hidden"
+                                               
+                                               />
+            </div>
+        </div>
+
+        <fieldset class="slds-form-element">
+            <div class="slds-form-element__group">
+                
+            </div>
+        </fieldset>
+        <fieldset class="slds-form-element">
+            <div class="slds-form-element__group slds-m-right_large ">
+                <div class="slds-form-element__row">
+                    <div class="slds-form-element slds-size_7-of-7">
+                             <lightning:datatable aura:id="oppDataDetails"
+                             data="{! v.PaginationList }" 
+                             columns="{! v.columsToDisplay }" 
+                             keyField="Id"
+                             hideCheckboxColumn="true"
+                             onsort="{!c.updateColumnSorting}"
+                             onrowselection="{!c.doHandleRowSelection}"
+                             />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    
+     <!--
+<div class="slds-size_1-of-10 slds-p-right_small">
+            	 <lightning:input type="text" label="Opportunity type" name="Opportunity type" aura:id="Opportunity type" /> 
+                 <ui:inputSelect  class="slds-select" label="Opportunity type" 
+                                        aura:id="Opportunity type"/>
+            </div> 
+-->
+    <div class="slds-m-right_none slds-m-left_none">
+     
+
+        <lightning:buttonGroup class="slds-m-around_medium" >
+            <lightning:button label="Previous" disabled="{!v.pageNo == 1}"  onclick="{!c.previousPage}" class="slds-button slds-button_brand"
+                              iconName='utility:back' />
+            &nbsp; &nbsp; &nbsp;
+            <lightning:button label="Next" disabled="{!v.pageNo >= v.totalPages}" onclick = "{!c.next}" class="slds-button slds-button_brand"
+                              iconName='utility:forward' iconPosition="right" />
+        </lightning:buttonGroup>
+        <aura:if isTrue='{!v.PaginationList.lenght == 0 }' >
+            <ui:message title="Information" severity="info" closable="true">
+                There are no Recent Opportunities!
+            </ui:message>
+        </aura:if>
+        <!-- open Create Idea modal -->
+        <aura:if isTrue="{!v.isOpenModal}">
+            <div role="dialog" tabindex="-1" aria-labelledby="header43" aura:id="Modalbox" class="slds-modal">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <div>
+                            <c:OpportunityEdit recordIdToEdit="{!v.recordIdToEdit}"></c:OpportunityEdit>
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button  type="button" class="slds-button slds-button--destructive " onclick="{!c.closeModal}">Cancel</button>&nbsp;&nbsp;
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop " aura:id="Modalbackdrop"></div>
+        </aura:if>
+        <!-- End --> 
+    </div>
+</aura:component>

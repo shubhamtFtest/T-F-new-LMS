@@ -1,0 +1,32 @@
+.THIS.c-container {
+    border: 1px solid #d8dde6;
+    margin-top:2px;
+    margin-bottom: 5px;
+    
+}
+.THIS .page-section {
+    border: solid 1px #ccc;
+    padding: 1rem;
+}
+.THIS .page-button {
+    padding-top: 1rem;
+}
+.THIS .page-header,
+.THIS .page-footer {
+    height: 50px;
+}
+.THIS .page-main {
+    background: #f8f8f8;
+}
+.THIS .page-left,
+.THIS .page-right {
+    background: #f0efef;
+}
+.THIS .page-table {
+    height: 200px;
+}
+
+.THIS .align {
+    margin:10px;
+    font-weight: bold;
+}

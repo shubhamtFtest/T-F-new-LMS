@@ -1,0 +1,54 @@
+<apex:page controller="AdminLoginCtr" >
+    <apex:form >
+        <apex:pageblock >
+            <apex:pageBlockSection columns="1">
+            
+            <apex:pageblockSectionItem >
+                    <apex:outputLabel ><b>Enter the org you want to log in</b></apex:outputLabel>
+                    <apex:selectList size="1" value="{!configId}" >              
+                        <apex:selectOptions value="{!items}"/>   
+                    </apex:selectList> 
+                    
+                </apex:pageblockSectionItem>
+                <apex:pageblockSectionItem > <apex:commandButton value="Next" action="{!next}" /> </apex:pageblockSectionItem>
+            </apex:pageBlockSection>
+                 
+           
+           
+            <apex:messages style="color: red; font-weight:bold;"/>
+            
+            <apex:pageBlockTable rendered="{!showuserList}" value="{!ActiveuserDetail}" var="u">
+                <apex:column headerValue="Id" value="{!u.id}"/>
+                <apex:column headerValue="FirstName" value="{!u.FirstName}"/>
+                <apex:column headerValue="LastName" value="{!u.LastName}"/>
+                <apex:column headerValue="Email" value="{!u.Email}"/>
+                <apex:column headerValue="Request Login">
+                    <apex:outputPanel > 
+                        <a href="#" onclick="activJS('{!u.id}')" style="text-decoration:none; color:darkblue;"> Request User </a>
+                    </apex:outputPanel> 
+                </apex:column>
+            </apex:pageBlockTable>   
+        </apex:pageblock>
+        
+        <apex:actionFunction name="activatefn" action="{!deactivate}"  rerender="tb,pbt">
+            <apex:param name="testId" value="" assignTo="{!requested_userid}"  />
+        </apex:actionFunction>
+        
+  </apex:form>
+  
+  <script> 
+     function activJS(Id)
+     {
+         if(confirm("Are you sure want to deactivate this user.")==true)
+         {
+             activatefn(Id);
+             return true;
+         }
+         else
+         {
+             return false;
+         }
+     }
+  </script>
+
+</apex:page>

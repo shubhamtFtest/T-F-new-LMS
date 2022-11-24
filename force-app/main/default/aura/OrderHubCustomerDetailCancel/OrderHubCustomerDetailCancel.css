@@ -1,0 +1,53 @@
+.THIS .accList {
+    background: white;
+}
+
+.THIS .slds-input__icon-group_right {
+    display: none;
+}
+
+.THIS .slds-input-has-icon .slds-input__icon:not(button) {
+    pointer-events: initial;
+}
+
+.THIS .custBorder {
+    border-style: ridge;
+    position: absolute;
+    /* left: 0; */
+    /* top: 0; */
+    z-index: 1111;
+    width: 100%;
+    margin-top: 51px;
+
+}
+
+.THIS .CustBackground {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: -1;
+}
+
+.THIS .CustBold {
+    font-weight: bold;
+}
+
+.THIS .CustPgtnBtnSelect {
+    background-color: rgb(0, 112, 210);
+    border-color: rgb(0, 112, 210);
+}
+
+.CustSpinnerBackgrnd.THIS {
+    background-color: #ededf3;
+}
+
+.THIS .slds-button.slds-button_outline-brand {
+    margin-left: 10px;
+    margin-top: 21px;
+    height: 32px;
+    width: 116px;
+}
+.THIS .slds-spinner_container {
+    position: fixed;
+    z-index: 1148;
+	}

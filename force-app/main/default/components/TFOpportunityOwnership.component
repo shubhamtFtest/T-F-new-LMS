@@ -1,0 +1,65 @@
+<!--Last modified by Hailey Niemand 2013.10.11 CHG0053825-->
+<!--Last Modified by Hailey Niemand 2013.12.19 CHG0055533-->
+<!--Last Modified by Hailey Niemand 2014.03.28 CHG0057681-->
+<!--Last Modified by Jeff Lup - 2014.06.18 - CHG0059168-->
+
+<apex:component controller="TFOpportunityOwnershipController" allowDml="true">
+    <apex:attribute name="opportunity" type="SObject" description="The opportunity for this association" required="true"/>
+    
+    <apex:form id="form">
+    
+    <script type="text/javascript">
+        function checkAll(cb)
+        {
+            var inputElem = document.getElementsByTagName("input");           
+            for(var i=0; i<inputElem.length; i++)
+            {    
+                if(inputElem[i].id.indexOf("checkedone")!=-1)                          
+                inputElem[i].checked = cb.checked;
+            }
+        }
+    </script>
+    
+    <apex:messages ></apex:messages>
+            <!--<apex:pageBlock id="consortMembers" title="Price Agreement Details"> CHG0053825 -->
+            <apex:pageBlock id="consortMembers" title="Deal Type and Participants">
+            <apex:pageBlockButtons location="Top">
+            <!--<apex:commandButton value="Save Membership Details" action="{!saveRecord}" status="saveStatus" disabled="{!NOT(isConsortium)}"/> CHG0053825 -->
+            <!--<apex:commandButton value="Save Details" action="{!saveRecord}" status="saveStatus" disabled="{!NOT(isConsortium)}"/> CHG0055533-->
+            <apex:commandButton value="Save Details" action="{!saveRecord}" oncomplete="parent.document.location.replace('/{!opp.id}');" status="saveStatus" disabled="{!NOT(isConsortium)}"/>                        
+                </apex:pageBlockButtons>
+            
+                <apex:pageBlockSection columns="1">
+                    <apex:pageBlockSectionItem >                        
+                        <apex:outputLabel value="Deal Type"></apex:outputLabel>
+                        <apex:outputPanel >
+                            <apex:selectList value="{!selectedDeal}" size="1" disabled="{!OR(NOT(isConsortium),opp.StageName='Closed Won')}"> <!-- CHG0057681 -->
+                                <apex:selectOptions value="{!dealOptions}"/>
+                                <apex:actionSupport event="onchange" rerender="members,btns" status="dealStatus" action="{!refreshMemberList}"/>
+                            </apex:selectList>
+                            <apex:actionStatus id="dealStatus" startText=" Working..." stopText=""/>
+                        </apex:outputPanel>
+                    </apex:pageBlockSectionItem>
+
+                    <apex:pageBlockSectionItem rendered="{!showCheckboxes}">
+                        <apex:outputLabel value="Select All" for="chkAll"/>
+                        <apex:inputCheckbox id="chkAll" onclick="checkAll(this)"/>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:outputPanel id="members" rendered="{!showCheckboxes}">                    
+                        <apex:selectCheckboxes value="{!selectedMembers}" layout="pageDirection" id="checkedone">
+                            <apex:selectOptions value="{!memberOptions}"/>
+                        </apex:selectCheckboxes>
+                    </apex:outputPanel>
+                </apex:pageBlockSection>   
+
+                <apex:pageBlockButtons location="bottom">
+                    <apex:outputPanel id="btns">
+                        <!--<apex:commandButton value="Save Membership Details" action="{!saveRecord}" status="saveStatus" disabled="{!NOT(isConsortium)}"/> CHG0053825 -->            
+                        <apex:commandButton value="Save Details" action="{!saveRecord}" status="saveStatus" disabled="{!NOT(isConsortium)}"/>  
+                    </apex:outputPanel>
+                    <apex:actionStatus id="saveStatus" startText=" Saving..." stopText=""/>
+                </apex:pageBlockButtons>
+            </apex:pageBlock>
+    </apex:form>
+</apex:component>

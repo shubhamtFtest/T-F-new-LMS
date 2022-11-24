@@ -1,0 +1,89 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="TF_ValidateUBXPlatformAccessApexCont">
+    
+    <!-- init method loads the data attribute values -->
+    <aura:handler name="init" action="{!c.calloutController}" value="{!this}"/>
+     
+    <!--Declare Attributes-->
+    <aura:attribute name="Spinner" type="boolean" default="true"/>
+    <aura:attribute name="objectList" type="Object" />
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="partyId" type="String" />
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="showErrors" type="boolean" default="false"/>
+    <aura:attribute name="noErrors" type="boolean" default="false"/>
+    
+    <!-- Component -->
+    <aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+       <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+         <span class="slds-assistive-text">Loading</span>
+         <div class="slds-spinner__dot-a"></div>
+         <div class="slds-spinner__dot-b"></div>
+       </div>
+    </div>
+ </aura:if>
+    <aura:if isTrue="{!v.showErrors}">
+        <!-- Show the message to ui -->
+        <div class="slds-notify slds-notify_toast slds-theme_error">
+            <span class="slds-assistive-text">error</span>
+            <div class="slds-notify__content">
+                <h2 class="slds-text-heading_small slds-align_absolute-center">Cannot fetch data.</h2> 
+            </div>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.noErrors}">
+    <div class = "slds-align_absolute-center">
+        <lightning:layout>
+    	<lightning:layoutItem size="12" padding="around-small">  
+    		<h5 class="slds-text-heading_small slds-align_absolute-center">Account Setup Status</h5>
+        </lightning:layoutItem>
+    </lightning:layout>
+    </div>
+    <div class = "slds-align_absolute-center">
+    <br/>
+    <lightning:layout multipleRows="true">
+    <lightning:layoutItem size="12" padding="around-small">
+    <div class="img slds-align_absolute-center" >
+        <aura:if isTrue="{!v.objectList.result}">
+        	<img style="height: 50px;" src="{!$Resource.Address_Verified_Image }"   />
+            <aura:set attribute="else">
+      			<img style="height: 50px;" src="{!$Resource.AddressVerificationFailed  }"   />
+    		</aura:set>
+        </aura:if>
+    </div>
+    </lightning:layoutItem>
+    </lightning:layout> 
+    </div>
+    <div class = "slds-align_absolute-center">
+    <lightning:layout>
+    	<lightning:layoutItem size="12" padding="around-small"> 
+    		<div style="width: 80%;" class="slds-form-element slds-align_absolute-center">
+        	<table class="slds-table slds-table--bordered slds-table--striped ">
+        
+        	<tbody>
+            
+                <tr>
+                    <td>IP Enabled</td>
+                    <td>{!v.objectList.hasIP}</td>
+                </tr>
+                <tr>
+                    <td>IDP Enabled</td>
+                    <td>{!v.objectList.hasIDP}</td>
+                </tr>
+                <tr>
+                    <td>MFA Enabled Users</td>
+                    <td>{!v.objectList.hasMFA}</td>
+                </tr>
+                <tr>
+                    <td>Has Valid Address</td>
+                    <td>{!v.objectList.hasValidBilling}</td>
+                </tr>
+            
+        	</tbody>      
+    		</table>
+    		</div>
+        </lightning:layoutItem>
+    </lightning:layout>
+    </div>
+    </aura:if>
+</aura:component>

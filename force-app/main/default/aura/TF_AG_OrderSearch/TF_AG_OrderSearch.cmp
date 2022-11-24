@@ -1,0 +1,488 @@
+<aura:component
+  controller="TF_AG_OrderSearchCtr"
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+>
+  <aura:attribute name="val" type="Integer" default="50" />
+  <aura:attribute name="minVal" type="Integer" default="1" />
+  <aura:attribute name="orderValueFrom" type="Integer" default="" />
+  <aura:attribute name="orderValueTo" type="Integer" default="" />
+  <aura:attribute name="allOrderDataWrapper" type="List" default="[]" />
+  <aura:attribute name="showOrderIDArrownUp" type="Boolean" default="false" />
+  <aura:attribute name="showOrderDateArrownUp" type="Boolean" default="false" />
+  <aura:attribute name="showPONumberArrownUp" type="Boolean" default="false" />
+    <aura:attribute name="showTrackingNoArrownUp" type="Boolean" default="false" />
+     <aura:attribute name="showOrderStatusArrownUp" type="Boolean" default="false" />
+  <aura:attribute
+    name="showOrderValueArrownUp"
+    type="Boolean"
+    default="false"
+  />
+  <aura:attribute name="isSortingAscOrderID" type="Boolean" default="true" />
+  <aura:attribute name="isSortingAscOrderDate" type="Boolean" default="false" />
+  <aura:attribute
+    name="isSortingAscOrderValue"
+    type="Boolean"
+    default="false"
+  />
+  <aura:attribute name="isSortingAscPONumber" type="Boolean" default="false" />
+  <aura:attribute name="OrderDetailData" type="Object" />
+  <aura:attribute name="fixShowPageValues" type="Integer" default="9" />
+  <aura:attribute name="sortOrder" type="String" default="desc" />
+  <aura:attribute name="sortOrderByField" type="String" default="OrderId" />
+  <aura:attribute name="OrderId" type="Integer" />
+  <aura:attribute
+    name="OrderIdLabel"
+    type="String"
+    required="false"
+    default="OrderId"
+  />
+  <aura:attribute name="PoNumber" type="Integer" />
+  <aura:attribute
+    name="PoNumberLabel"
+    type="String"
+    required="false"
+    default="PoNumber"
+  />
+  <aura:attribute name="fromdate" type="Date" />
+  <aura:attribute name="todayDate" type="Date" />
+  <aura:attribute name="minDate" type="Date" />
+  <aura:attribute name="maxDate" type="Date" />
+  <aura:attribute
+    name="searchOrderTitle"
+    type="String"
+    default="Search Order"
+  />
+  <aura:attribute name="disableSearch" type="Boolean" default="false" />
+  <aura:attribute name="firstShowRangeIndex" type="Integer" default="1" />
+  <aura:attribute name="lstPageIterationCount" type="List" default="[]" />
+  <aura:attribute name="secondShowRangeIndex" type="Integer" default="1" />
+  <aura:attribute name="totalSearchResultCount" type="Integer" default="1" />
+  <aura:attribute name="csvData" type="String" />
+  <aura:attribute name="lstDisplayPages" type="List" default="[]" />
+  <aura:attribute name="lstProductTableData" type="List" default="[]" />
+  <aura:attribute name="offsetValue" type="String" default="0" />
+  <aura:attribute name="selectedValue" type="Integer" default="1" />
+  <aura:attribute name="setSelectedTab" type="String" />
+  <aura:attribute name="showSearchData" type="boolean" default="false" />
+  <aura:attribute name="showOrderSearchPages" type="boolean" default="false" />
+  <aura:attribute name="multiResultList" type="List" default="[]" />
+  <aura:attribute name="showResultCount" type="boolean" default="false" />
+  <aura:attribute name="showOrderSearch" type="boolean" default="false" />
+  <aura:attribute name="showOrderDetail" type="boolean" default="false" />
+  <aura:attribute name="modalPopup" type="boolean" default="false" />
+  <aura:attribute
+    name="storeSelectedTabValue"
+    type="String"
+    default="OrderTab"
+  />
+  <aura:attribute name="displayOnePageData" type="Integer" default="50" />
+  <aura:attribute name="lstOrderTableData" type="List" default="[]" />
+  <aura:attribute name="lstOrderDataWrapper" type="List" default="[]" />
+  <aura:attribute
+    name="noOfRecordValidationCheck"
+    type="Boolean"
+    default="false"
+  />
+  <aura:attribute name="mySpinner" type="Boolean" default="false" />
+  <!-- Event Handler -->
+  <aura:handler name="init" action="{!c.init}" value="{!this}" />
+  <aura:if isTrue="{!v.mySpinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+      <div
+        class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative"
+        role="alert"
+      >
+        <span class="slds-assistive-text">Loading</span>
+        <div class="slds-spinner__dot-a"></div>
+        <div class="slds-spinner__dot-b"></div>
+      </div>
+    </div>
+  </aura:if>
+  <aura:if isTrue="{!v.modalPopup}">
+        <div class="demo-only" style="height: 640px;" >
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate slds-text-title_bold" style="font-size: 20px">Alert</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                      <p class="slds-align_absolute-center slds-text-title_bold">Something went wrong please try again</p>
+                      </div>
+                    <footer class="slds-modal__footer">
+                      <button class="slds-button slds-button_brand" onclick="{!c.refreshPage}">OK</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+  <div class="slds-m-top_small">
+    <aura:if isTrue="{!!v.showOrderSearch}">
+      <lightning:tabset variant="scoped" selectedTabId="{!v.setSelectedTab}">
+        <lightning:tab
+          label="Order Search"
+          id="OrderTab"
+          onactive="{!c.handleActive }"
+        >
+          <aura:if isTrue="{!!v.showOrderSearch}">
+            <div class="c-container">
+              <lightning:layout multipleRows="true">
+                <lightning:layoutItem
+                  size="12"
+                  smallDeviceSize="6"
+                  mediumDeviceSize="4"
+                  largeDeviceSize="3"
+                  padding="around-small"
+                >
+                  <div class="slds-form-element">
+                    <lightning:input
+                      name="input8"
+                      value="{!v.OrderId}"
+                      placeholder="{!v.OrderIdLabel}"
+                      label="{!v.OrderIdLabel}"
+                      class="sfdc_usernameinput"
+                    />
+                  </div>
+                </lightning:layoutItem>
+                <lightning:layoutItem
+                  size="12"
+                  smallDeviceSize="6"
+                  mediumDeviceSize="4"
+                  largeDeviceSize="3"
+                  padding="around-small"
+                >
+                  <lightning:input
+                    name="input8"
+                    value="{!v.PoNumber}"
+                    placeholder="{!v.PoNumberLabel}"
+                    label="{!v.PoNumberLabel}"
+                    class="sfdc_usernameinput"
+                  />
+                </lightning:layoutItem>
+                <lightning:layoutItem
+                  size="12"
+                  smallDeviceSize="6"
+                  mediumDeviceSize="4"
+                  largeDeviceSize="3"
+                  padding="around-small"
+                >
+                  <span onclick="{!c.pr}" class="slds-size--11-of-12">
+                    <lightning:input
+                      type="date"
+                      name="input1"
+                      variant="label-hidden"
+                      placeholder="From"
+                      class="sfdc_usernameinput"
+                      value="{!v.minDate}"
+                      max="{!v.maxDate}"
+                      min="{!v.minDate}"
+                      onClick="{!c.keyCheck}"
+                    /><br />
+                  </span>
+                  <aura:if isTrue="{!v.dateValidationError}">
+                    <div class="slds-text-color_error slds-p-left_x-small">
+                      Date must be in present or in future..
+                    </div>
+                  </aura:if>
+                  <lightning:input
+                    type="date"
+                    name="input1"
+                    variant="label-hidden"
+                    placeholder="To"
+                    class="sfdc_usernameinput"
+                    value="{!v.todayDate}"
+                    max="{!v.maxDate}"
+                    min="{!v.minDate}"
+                  />
+                </lightning:layoutItem>
+                <lightning:layoutItem
+                  size="12"
+                  smallDeviceSize="6"
+                  mediumDeviceSize="4"
+                  largeDeviceSize="3"
+                  padding="around-small"
+                >
+                  <div class="slds-grid slds-gutters">
+                    <div class="slds-col">
+                      <span
+                        ><lightning:input
+                          name="input8"
+                          value="{!v.orderValueFrom}"
+                          min="{!v.minVal}"
+                          max="{!v.orderValueTo}"
+                          placeholder="e.g. 20"
+                          label="Order Value"
+                          class="sfdc_usernameinput"
+                      /></span>
+                    </div>
+                    <div class="slds-col slds-m-top_x-large">To</div>
+                    <div class="slds-col">
+                      <span
+                        ><lightning:input
+                          name="input13"
+                          value="{!v.orderValueTo}"
+                          min="{!v.orderValueFrom}"
+                          placeholder="e.g. 123"
+                          class="sfdc_usernameinput slds-m-top_small"
+                        />
+                      </span>
+                    </div>
+                  </div>
+                </lightning:layoutItem>
+              </lightning:layout>
+              <br />
+              <div class="srchBtn">
+                <lightning:button
+                  variant="brand"
+                  label="{!v.searchOrderTitle}"
+                  title="{!v.searchOrderTitle}"
+                  onclick="{!c.searchOrder}"
+                  disabled="{!v.disableSearch}"
+                />
+              </div>
+            </div>
+          </aura:if>
+        </lightning:tab>
+      </lightning:tabset>
+    </aura:if>
+  </div>
+  <div>
+    <aura:if isTrue="{!v.showSearchData}">
+      <div id="container_Paging">
+        <div class="left_paging">
+          <aura:if isTrue="{!v.showOrderSearchPages}">
+            <aura:if isTrue="{!v.showResultCount}">
+              <b
+                >Showing Results {!v.firstShowRangeIndex} -
+                {!v.secondShowRangeIndex} of {!v.totalSearchResultCount}</b
+              >
+              <br />
+            </aura:if>
+            <aura:if isTrue="{!v.totalSearchResultCount>v.displayOnePageData}">
+              <lightning:button
+                variant="base"
+                label="Prev"
+                title="Base action"
+                onclick="{!c.showPrevPage}"
+                disabled="{!v.selectedValue==1?true:false}"
+              />
+              |
+              <lightning:button
+                variant="base"
+                label="Next"
+                title="Base action"
+                onclick="{!c.showNextPage}"
+                disabled="{!v.selectedValue==v.lstPageIterationCount.length?true:false}"
+              />
+            </aura:if>
+          </aura:if>
+        </div>
+        <div class="right_paging">
+          <!--  <br/>
+                    <button class="slds-button-Exel"><lightning:icon iconName="doctype:excel" alternativeText="Audio file" /></button>
+                    <a onclick="{!c.downloadExcel}" style="color:#04accc" class="clickDownload">Export To Excel</a> -->
+        </div>
+      </div>
+      <div class="c-container">
+        <table
+          class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal"
+        >
+          <thead>
+            <aura:if isTrue="{!v.storeSelectedTabValue == 'OrderTab'}">
+              <tr class="slds-text-title_caps">
+                <th scope="col" data-id="orderId">
+                  <div
+                    data-id="orderId"
+                    class="slds-truncate"
+                    title="Order Id"
+                    onclick="{!c.sorting}"
+                    >Order Id
+                    <aura:if isTrue="{!v.showOrderIDArrownUp}">
+                      <lightning:icon
+                        iconName="utility:arrowup"
+                        size="xx-small"
+                        alternativeText="Ascending"
+                      />
+                      <aura:set attribute="else">
+                        <lightning:icon
+                          iconName="utility:arrowdown"
+                          size="xx-small"
+                          alternativeText="Descending"
+                        />
+                      </aura:set>
+                    </aura:if>
+                  </div>
+                </th>
+                <th scope="col" data-id="poNumber">
+                  <div
+                    data-id="poNumber"
+                    class="slds-truncate"
+                    title="PO Number"
+                    onclick="{!c.sorting}"
+                    >PO Number
+                    <aura:if isTrue="{!v.showPONumberArrownUp}">
+                      <lightning:icon
+                        iconName="utility:arrowup"
+                        size="xx-small"
+                        alternativeText="Ascending"
+                      />
+                      <aura:set attribute="else">
+                        <lightning:icon
+                          iconName="utility:arrowdown"
+                          size="xx-small"
+                          alternativeText="Descending"
+                        />
+                      </aura:set>
+                    </aura:if>
+                  </div>
+                </th>
+                <th scope="col" data-id="orderDate">
+                  <div
+                    data-id="orderDate"
+                    class="slds-truncate"
+                    title="Order Date"
+                    onclick="{!c.sorting}"
+                    >Order Date
+                    <aura:if isTrue="{!v.showOrderDateArrownUp}">
+                      <lightning:icon
+                        iconName="utility:arrowup"
+                        size="xx-small"
+                        alternativeText="Ascending"
+                      />
+                      <aura:set attribute="else">
+                        <lightning:icon
+                          iconName="utility:arrowdown"
+                          size="xx-small"
+                          alternativeText="Descending"
+                        />
+                      </aura:set>
+                    </aura:if>
+                  </div>
+                </th>
+                   <th scope="col" data-id="trackingNumbers">
+                  <div
+                    data-id="trackingNumbers"
+                    class="slds-truncate"
+                    title="Tracking Number"
+                    onclick="{!c.sorting}"
+                    >Tracking Number
+                    <aura:if isTrue="{!v.showTrackingNoArrownUp}">
+                      <lightning:icon
+                        iconName="utility:arrowup"
+                        size="xx-small"
+                        alternativeText="Ascending"
+                      />
+                      <aura:set attribute="else">
+                        <lightning:icon
+                          iconName="utility:arrowdown"
+                          size="xx-small"
+                          alternativeText="Descending"
+                        />
+                      </aura:set>
+                    </aura:if>
+                  </div>
+                </th>
+                   <th scope="col" data-id="OrderStatus">
+                  <div
+                    data-id="OrderStatus"
+                    class="slds-truncate"
+                    title="Order Status"
+                    onclick="{!c.sorting}"
+                    >Order Status
+                    <aura:if isTrue="{!v.showOrderStatusArrownUp}">
+                      <lightning:icon
+                        iconName="utility:arrowup"
+                        size="xx-small"
+                        alternativeText="Ascending"
+                      />
+                      <aura:set attribute="else">
+                        <lightning:icon
+                          iconName="utility:arrowdown"
+                          size="xx-small"
+                          alternativeText="Descending"
+                        />
+                      </aura:set>
+                    </aura:if>
+                  </div>
+                </th>
+                <th scope="col" data-id="orderValue">
+                  <div
+                    data-id="orderValue"
+                    class="slds-truncate"
+                    title="Line Value"
+                    onclick="{!c.sorting}"
+                    >Line Value
+                    <aura:if isTrue="{!v.showOrderValueArrownUp}">
+                      <lightning:icon
+                        iconName="utility:arrowup"
+                        size="xx-small"
+                        alternativeText="Ascending"
+                      />
+                      <aura:set attribute="else">
+                        <lightning:icon
+                          iconName="utility:arrowdown"
+                          size="xx-small"
+                          alternativeText="Descending"
+                        />
+                      </aura:set>
+                    </aura:if>
+                  </div>
+                </th>
+              </tr>
+            </aura:if>
+          </thead>
+          <tbody class="tableBody">
+            <aura:iteration
+              items="{!v.lstOrderDataWrapper}"
+              var="ordr"
+              indexVar="ordIndex"
+            >
+              <tr class="slds-hint-parent">
+                <th scope="row" data-label="Opportunity Name">
+                  <div class="slds-truncate" title="OrderId">
+                    <!-- <lightning:button variant="base" label="{!ordr.orderId}" title="" onclick="{! c.openOrderDetailPage }" />-->
+                    <a
+                      href="{!'/AgentExtranet/s/orderdetail?orderData='+ordr.orderId}"
+                      data-attriVal="{!ordIndex}"
+                      target="_blank"
+                      >{!ordr.orderId}</a
+                    >
+                  </div>
+                </th>
+                <td data-label="PO Number"
+                  ><div class="slds-truncate" title="{!ordr.poNumber }"
+                    >{!ordr.poNumber}</div
+                  ></td
+                >
+                <td data-label="Order Date"
+                  ><div class="slds-truncate" title="{!ordr.orderDate}"
+                    >{!ordr.orderDate }</div
+                  ></td
+                >
+                   <td data-label="Tracking Number"
+                  ><div class="slds-truncate" title="{!ordr.trackingNumbers}"
+                    >{!ordr.trackingNumbers }</div
+                  ></td
+                >
+                   <td data-label="Order Status"
+                  ><div class="slds-truncate" title="{!ordr.orderStatus}"
+                    >{!ordr.orderStatus }</div
+                  ></td
+                >
+
+                <td data-label="Order value"
+                  ><div class="slds-truncate" title="{!ordr.orderValue>'0'?'Invoice':'Credit'}"
+                    >{!ordr.orderValue}</div
+                  ></td
+                >
+              </tr>
+            </aura:iteration>
+          </tbody>
+        </table>
+      </div>
+    </aura:if>
+  </div>
+  <aura:if isTrue="{!v.showOrderSearch}">
+    <c:TF_AG_OrderDetail orderData="{!v.OrderDetailData}" />
+  </aura:if>
+</aura:component>

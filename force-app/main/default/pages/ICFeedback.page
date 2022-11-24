@@ -1,0 +1,98 @@
+<!-- 16.02.2021 Matthew Smith (01803839) - with the Spring 21 release, Salesforce updated guest user access. So to allow the guest user to enter in the input field. I've added the tag ignoreEditPermissionForRendering="true" -->
+<apex:page controller="CASInspectionCopyController"
+    showHeader="false"
+    standardStylesheets="true"
+    action="{!isValidId}">
+    
+    <apex:composition template="ICSiteTemplate">
+        <apex:define name="body">
+
+            <h1 style="color: #80B4E4">Welcome!</h1>
+            <p>Welcome to the Taylor &amp; Francis online feedback form. Thank you for considering <b><i><apex:outputField value="{!ic.Book_Title__c}"/></i></b> for your course.</p>
+            <apex:form >
+                <apex:pageBlock mode="detail" id="BookSection">
+             
+                <apex:pageBlockButtons location="bottom">
+                     <apex:commandButton value="Submit" action="{!save}" />
+                </apex:pageBlockButtons>
+    
+                <apex:pageBlockSection title="Course Information" columns="1" collapsible="false" id="courseBlock">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Reference Number" for="bookOrder"  />
+                        <apex:outputField id="bookOrder" value="{!ic.Book_Order__c}"/>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputField value="{!ic.ISBN__c}"/>
+                    <apex:outputField value="{!ic.Book_Title__c}"/>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="What would you like to do with this book?" for="adoptionStage" /> 
+                         <apex:actionRegion >
+                        <apex:inputField id="adoptionStage" value="{!ic.Adoption_Stage__c}" required="true" ignoreEditPermissionForRendering="true">
+                            <apex:actionSupport event="onchange" rerender="courseBlock" action="{!renderRequiredText}" focus="requiredText"/>
+                        </apex:inputField>
+                        </apex:actionRegion>
+                    </apex:pageBlockSectionItem>
+                    
+                    <apex:pageBlockSection showHeader="false" columns="1" rendered="{!showDecisionDate}">
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="I expect to make my decision by" for="decisionDate"  />
+                        <apex:inputField id="decisionDate" value="{!ic.Decision_Date__c}" ignoreEditPermissionForRendering="true"/>
+                    </apex:pageBlockSectionItem>
+                    </apex:pageBlockSection>
+                    
+                    
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="What level of recommendation would you like to give this book?" for="adoptionLevel" rendered="{!NOT(renderRequiredTextbook)}"/>
+                        <apex:inputField id="adoptionLevel" value="{!ic.Adoption_Level__c}" required="true" rendered="{!NOT(renderRequiredTextbook)}" ignoreEditPermissionForRendering="true"/>
+                    </apex:pageBlockSectionItem>
+                     <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Do you have questions about this book or other Taylor and Francis products?" for="needHelp" /> 
+                        <apex:inputField id="needHelp"  value="{!ic.QuestionAboutT_FProduct__c}" ignoreEditPermissionForRendering="true"/> 
+                    </apex:pageBlockSectionItem> 
+                    <apex:inputField value="{!ic.Required_Text__c}" id="requiredText" style="width:300px" rendered="{!renderRequiredTextbook}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Course_Start_Date__c}" required="true" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Number_of_Students__c}" required="true" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Year_of_Study__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Which other members of your department might be interested in this book?" for="potentialLeads"  />
+                        <apex:inputField id="potentialLeads" value="{!ic.Potential_Leads__c}" style="width:300px" ignoreEditPermissionForRendering="true"/>
+                    </apex:pageBlockSectionItem>
+                </apex:pageBlockSection> 
+                
+                <apex:pageBlockSection title="Strengths & Weaknesses" columns="2" collapsible="false"> 
+                    <apex:inputField value="{!ic.Book_Strengths__c}" style="width: 300px" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Book_Weaknesses__c}" style="width: 300px" ignoreEditPermissionForRendering="true"/>
+                </apex:pageBlockSection> 
+                
+                <apex:pageBlockSection title="Your Course Recommended Reading List" columns="3" collapsible="false">
+                 
+                    <apex:inputField value="{!ic.Title_1__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Title_2__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Title_3__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Author_1__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Author_2__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Author_3__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Publisher_1__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Publisher_2__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Publisher_3__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Level_of_Recommendation_1__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Level_of_Recommendation_2__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Level_of_Recommendation_3__c}" ignoreEditPermissionForRendering="true"/>
+                     <apex:pageBlockSectionItem >
+                        <apex:outputLabel value="Did you recommend this title the last time this course ran ?" for="Recommend"  />
+                        <apex:inputField id="Recommend" value="{!ic.Recommend_title__c}" style="width:300px" required="true" ignoreEditPermissionForRendering="true"/>
+                    </apex:pageBlockSectionItem>
+                                          
+                </apex:pageBlockSection>    
+                
+                <apex:pageBlockSection title="Your Bookstore Details" columns="1" collapsible="false">
+                    <apex:inputField value="{!ic.Bookstore_Name__c}" style="width: 350px" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Bookstore_Phone__c}" ignoreEditPermissionForRendering="true"/>
+                    <apex:inputField value="{!ic.Bookstore_Manager__c}" style="width: 300px" ignoreEditPermissionForRendering="true"/>
+                </apex:pageBlockSection>            
+ 
+                </apex:pageBlock>
+            </apex:form>
+        </apex:define>
+    </apex:composition>
+    
+</apex:page>

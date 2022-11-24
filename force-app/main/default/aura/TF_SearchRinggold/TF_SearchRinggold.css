@@ -1,0 +1,21 @@
+.THIS label.uiLabel {
+    padding-right: 12px;
+}
+
+.THIS .field{
+  padding: 5px;
+  border: 1px solid #dce4ec;
+  border-radius: 2px;
+}
+.THIS .slds-table .slds-truncate {
+    text-overflow: inherit;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word; 
+}
+.THIS .slds-table .slds-row-number:after {
+    content: counter(none) !important ;
+    display: none !important ;
+}
+
+.THIS .slds-grid_align-end { justify-content: left !important; }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>15.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>CAS Flex application to perform bulk assignment of subject codes to campaign members.</description>
+    <label>CAS Bulk Lead Assignment</label>
+</ApexPage>

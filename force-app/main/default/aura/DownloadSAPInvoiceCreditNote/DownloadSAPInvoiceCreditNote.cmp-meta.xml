@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuraDefinitionBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <description>Using this component to download the credit note invoice for those orders who aren&apos;t created from Salesforce.</description>
+</AuraDefinitionBundle>

@@ -1,0 +1,5 @@
+<aura:component >
+    <aura:attribute name='recordIdToEdit' type='Id' />
+	<force:recordEdit aura:id="editOpportunity" recordId="{!v.recordIdToEdit}"/>
+    <lightning:button label="Save" class="slds-button slds-button_brand" iconName='utility:save' onclick="{!c.doHandleOnSave}" />
+</aura:component>

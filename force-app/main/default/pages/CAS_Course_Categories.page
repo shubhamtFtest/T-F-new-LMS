@@ -1,0 +1,284 @@
+<!-- Created by Jeff Lup - 2015.11.09 - CHG0069310 - Lightning Look & Feel -->
+<!-- Modified by Jeff Lup - 2017.07.20 - CHG0036312 - Remove North_America__c -->
+
+<apex:page standardController="Opportunity" showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">    
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">    
+
+<head>
+  <title>Salesforce Lightning Design System Trailhead Module</title>
+  <apex:stylesheet value="{!URLFOR($Resource.SLDS, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+</head>    
+    
+<apex:remoteObjects >
+    <!--<apex:remoteObjectModel name="CAS_Course_Cat1__c" fields="Id,Name,North_America__c" />    CHG0036312 -->
+    <apex:remoteObjectModel name="CAS_Course_Cat1__c" fields="Id,Name" />
+    <apex:remoteObjectModel name="CAS_Course_Cat2__c" fields="Id,Name,CAS_Course_Cat1__c" />
+    <apex:remoteObjectModel name="CAS_Course_Cat3__c" fields="Id,Name,CAS_Course_Cat2__c" />
+    <apex:remoteObjectModel name="Opportunity" fields="Id,Name,CAS_Course_Cat1__c,CAS_Course_Cat2__c,CAS_Course_Cat3__c" />
+</apex:remoteObjects>    
+
+<body>    
+
+  <div class="slds"> <!-- REQUIRED SLDS WRAPPER -->   
+     
+      <div class="slds-page-header">
+        <div class="slds-grid">
+            <div class="slds-col slds-has-flexi-truncate">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon__container slds-icon-standard-opportunity"> <!--uses opportunity color (orange)-->
+                          <svg aria-hidden="true" class="slds-icon slds-icon--large">
+                            <use xlink:href="{!URLFOR($Resource.SLDS, 'assets/icons/standard-sprite/svg/symbols.svg#article')}"></use>
+                          </svg>                            
+                          <span class="slds-assistive-text">Course Categories</span>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-text-heading--label">Course Categories</p>
+                        <div class="slds-grid">
+                            <h1 class="slds-text-heading--medium slds-m-right--small slds-truncate slds-align-middle" title="{!Opportunity.Name}">{!Opportunity.Name}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-col slds-no-flex slds-align-bottom">
+                <div class="slds-button-group" role="group">
+                    <button class="slds-button slds-button--neutral" onclick="SaveCategories()">Save</button>
+                </div>
+            </div>
+        </div>
+        <br/>
+    </div>   
+
+    <form role="form" class="slds-form--stacked">
+        
+        <div class="slds-col--padded slds-container--small slds-form-element">
+            <label class="slds-form-element__label" for="selectCourseCat1">Course Category 1</label>
+            <div class="slds-form-element__control">
+                <select id="selectCourseCat1" class="slds-select" onchange="updateCourseCat2Choices();">
+                    <!-- populated by javascript -->
+                </select>
+            </div>
+        </div>        
+
+        <div class="slds-col--padded slds-container--small slds-form-element">
+            <label class="slds-form-element__label" for="selectCourseCat2">Course Category 2</label>
+            <div class="slds-form-element__control">
+                <select id="selectCourseCat2" class="slds-select" onchange="updateCourseCat3Choices();"> <!--onchange="if (this.selectedIndex) updateCourseCat3Choices();">-->
+                    <!-- populated by javascript -->
+                </select>
+            </div>
+        </div>        
+
+        <div class="slds-col--padded slds-container--small slds-form-element">
+            <label class="slds-form-element__label" for="selectCourseCat3">Course Category 3</label>
+            <div class="slds-form-element__control">
+                <select id="selectCourseCat3" class="slds-select">
+                    <!-- populated by javascript -->
+                </select>
+            </div>
+        </div>        
+        
+    </form>
+      
+  </div> <!-- / REQUIRED SLDS WRAPPER -->    
+
+</body>
+
+<script>
+    var courseCat1 = new SObjectModel.CAS_Course_Cat1__c();
+    var courseCat2 = new SObjectModel.CAS_Course_Cat2__c();
+    var courseCat3 = new SObjectModel.CAS_Course_Cat3__c();
+
+    var selectCourseCat1 = document.getElementById("selectCourseCat1");
+    var selectCourseCat2 = document.getElementById("selectCourseCat2");
+    var selectCourseCat3 = document.getElementById("selectCourseCat3");
+    
+    function updateCourseCat1Choices() {
+        //Get User's Country
+        /* CHG0036312
+        var country = '{!$User.Country}';
+        var showNorthAmerica = false;
+        if (country == 'United States' || country == 'Canada')
+            showNorthAmerica = true;
+        //Get Course Categories
+        var html = '<option>-- Choose a Category --</option>';
+        getCourseCat1(html, showNorthAmerica);
+        */
+        var html = '<option>-- Choose a Category --</option>';
+        getCourseCat1(html);
+    }
+
+    //function getCourseCat1(html, showNorthAmerica) {   CHG0036312
+    function getCourseCat1(html) {
+        courseCat1.retrieve(
+            //{where: {North_America__c: {eq: showNorthAmerica}},   CHG0036312
+            //orderby: [{Name: 'ASC'}], limit: 100},   CHG0036312
+            {orderby: [{Name: 'ASC'}], limit: 100},
+            function(error, records) {
+                if (error) {
+                    alert(error.message);
+                } else {
+                    records.forEach(function(record) {
+                        if (record.get("Id") == '{!Opportunity.CAS_Course_Cat1__c}') {
+                            html += '<option value="' + record.get("Id") + '" Selected="true">' + record.get("Name") + '</option>';
+                        } else {
+                            html += '<option value="' + record.get("Id") + '">' + record.get("Name") + '</option>';
+                        }
+                    });
+                    if (records.length == 100) {
+                        //getCourseCat1NextOffset(html, showNorthAmerica, records.length);   CHG0036312
+                        getCourseCat1NextOffset(html, records.length);
+                    } else {
+                        selectCourseCat1.innerHTML = html;
+                        updateCourseCat2Choices();
+                    }
+                }
+            }
+        );
+    }
+    
+    //used in case there are more than 100 Course Category 1 records
+    //function getCourseCat1NextOffset(html, showNorthAmerica, recordOffset) {   CHG0036312
+    function getCourseCat1NextOffset(html, recordOffset) {
+        courseCat1.retrieve(
+            //{where: {North_America__c: {eq: showNorthAmerica}},  CHG0036312
+            //orderby: [{Name: 'ASC'}], limit: 100, offset: recordOffset},  CHG0036312
+            {orderby: [{Name: 'ASC'}], limit: 100, offset: recordOffset},
+            function(error, records) {
+                if (error) {
+                    alert(error.message);
+                } else {
+                    records.forEach(function(record) {
+                        if (record.get("Id") == '{!Opportunity.CAS_Course_Cat1__c}') {
+                            html += '<option value="' + record.get("Id") + '" Selected="true">' + record.get("Name") + '</option>';
+                        } else {
+                            html += '<option value="' + record.get("Id") + '">' + record.get("Name") + '</option>';
+                        }
+                    });
+                    if (records.length == 100) {
+                        //getCourseCat1NextOffset(html, showNorthAmerica, recordOffset + records.length);   CHG0036312
+                        getCourseCat1NextOffset(html, recordOffset + records.length);
+                    } else {
+                        selectCourseCat1.innerHTML = html;
+                        updateCourseCat2Choices();
+                    }
+                }
+            }
+        );
+    }
+    
+    //if( isLightningExperienceOrSalesforce1() )
+        updateCourseCat1Choices();
+    //else            
+    //    window.location.href = "/apex/cas_course_categories_edit?id={!Opportunity.Id}";
+    
+    function updateCourseCat2Choices() {
+        selectCourseCat2.innerHTML = "";
+        selectCourseCat3.innerHTML = "";
+        if (selectCourseCat1.selectedIndex > 0) {
+            //Get selected Course Category 1
+            var selectCourseCat1Id = selectCourseCat1.options[selectCourseCat1.selectedIndex].value;
+            //Get Course Categories 2
+            courseCat2.retrieve(
+                {where: {CAS_Course_Cat1__c: {eq: selectCourseCat1Id}},
+                orderby: [{Name: 'ASC'}], limit: 100},
+                function(error, records) {
+                    if (error) {
+                        alert(error.message);
+                    } else {
+                        var html = '<option>-- Choose a Category --</option>';
+                        records.forEach(function(record) {
+                            if (record.get("Id") == '{!Opportunity.CAS_Course_Cat2__c}') {
+                                html += '<option value="' + record.get("Id") + '" Selected="true">' + record.get("Name") + '</option>';
+                            } else {
+                                html += '<option value="' + record.get("Id") + '">' + record.get("Name") + '</option>';
+                            }
+                        });
+                        selectCourseCat2.innerHTML = html;
+                        updateCourseCat3Choices();
+                    }
+                }
+            );
+        }
+    }
+
+    function updateCourseCat3Choices() {
+        selectCourseCat3.innerHTML = "";
+        if (selectCourseCat2.selectedIndex > 0) {
+            //Get selected Course Category 2
+            var selectCourseCat2Id = selectCourseCat2.options[selectCourseCat2.selectedIndex].value;
+            //Get Course Categories 3
+            courseCat3.retrieve(
+                {where: {CAS_Course_Cat2__c: {eq: selectCourseCat2Id}},
+                orderby: [{Name: 'ASC'}], limit: 100},
+                function(error, records) {
+                    if (error) {
+                        alert(error.message);
+                    } else {
+                        var html = '<option>-- Choose a Category --</option>';
+                        records.forEach(function(record) {
+                            if (record.get("Id") == '{!Opportunity.CAS_Course_Cat3__c}') {
+                                html += '<option value="' + record.get("Id") + '" Selected="true">' + record.get("Name") + '</option>';
+                            } else {
+                                html += '<option value="' + record.get("Id") + '">' + record.get("Name") + '</option>';
+                            }
+                        });
+                        selectCourseCat3.innerHTML = html;
+                    }
+                }
+            );
+        }
+    }
+    
+    function SaveCategories() {
+        //Change Cursor to Wait
+        var elementToChange = document.getElementsByTagName("html")[0];
+        elementToChange.style.cursor = "wait";
+        //Save (if required field populated)
+        if (selectCourseCat1.selectedIndex > 0) {
+            var selectCourseCat1Id = selectCourseCat1.options[selectCourseCat1.selectedIndex].value;
+            var selectCourseCat2Id = '';
+            var selectCourseCat3Id = '';
+            if (selectCourseCat2.selectedIndex > 0) {
+                selectCourseCat2Id = selectCourseCat2.options[selectCourseCat2.selectedIndex].value;
+            }
+            if (selectCourseCat3.selectedIndex > 0) {
+                selectCourseCat3Id = selectCourseCat3.options[selectCourseCat3.selectedIndex].value;
+            }    
+            var record = new SObjectModel.Opportunity({
+                Id: '{!Opportunity.Id}',
+                CAS_Course_Cat1__c: selectCourseCat1Id,
+                CAS_Course_Cat2__c: selectCourseCat2Id,
+                CAS_Course_Cat3__c: selectCourseCat3Id
+            });
+            record.update(updateCallback);
+        } else {
+            alert('Course Category 1 is Required.  Please select a category.');    
+        }
+    }
+    
+    function isLightningExperienceOrSalesforce1() {
+        return((typeof sforce != 'undefined') && sforce && (!!sforce.one));
+    }
+    
+    function updateCallback(err, ids){
+        if (err) {
+            alert('Error: ' + err.message);
+        } else {
+            var oppId = '{!Opportunity.Id}';
+            if( isLightningExperienceOrSalesforce1() ) {
+                sforce.one.navigateToSObject(oppId);
+            } else {
+                window.location.href = "/" + oppId; 
+            }
+        }
+    }
+    
+
+
+</script>    
+    
+</html>
+</apex:page>

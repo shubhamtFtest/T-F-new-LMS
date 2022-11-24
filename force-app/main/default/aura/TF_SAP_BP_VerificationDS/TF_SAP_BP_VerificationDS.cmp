@@ -1,0 +1,288 @@
+<!--
+ * Author : Shalini Singh   
+ * Detail : This component is used to create the Sap Bp from OppDetailPageSapBpLookup component. 
+ -->
+
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="OppDetailPageSapBpLookupCtr">
+    
+    <!-- CSS to increase the size of Quick Action Component -->
+    <!--<aura:html tag="style">
+        .slds-modal__container{
+        height : auto;
+        width: 60%;
+        max-width: 70rem;
+        }
+        .modal-body{
+        height : 500px !important;
+        max-height: 500px !important;
+        }
+        
+        .customFooter{
+        display: inline !important;
+        }
+    </aura:html>-->
+    
+    <!-- picklist value attribute-->
+    <aura:attribute name="listControllingValues" type="list" default="[]" description="to store controller field values"/>
+    <aura:attribute name="listDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="depnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="bDisabledDependentFld" type="boolean" default="true"/> 
+    <aura:attribute name="Account" type="Account" default="{'sobjectType': 'Account','Name': '','Phone': '','Website': '','BillingStreet': '','BillingCity': '','BillingPostalCode': '','Mailing_Country_List__c': '','Billing_State_List__c': '','Mailing_State_List__c': '','Shipping_State_List__c': '','ShippingStreet': '','ShippingCity': '','ShippingPostalCode': '','Shipping_Country_List__c': '','ShippingState': '','Billing_Street__c': '','Billing_City__c': '','Billing_ZIP__c': '','Billing_Country_List__c': '','Billing_State__c': '','Ringgold_Account_ID__c': ''}"/>
+    <aura:attribute name="objDetail" type="account" default="{'sobjectType':'account'}"/>
+    <aura:attribute name="controllingFieldAPI" type="string" default="Mailing_Country_List__c" description="store field API name of Controller field"/>
+    <aura:attribute name="dependingFieldAPI" type="string" default="Mailing_State_List__c" description="store field API name of dependent field"/>
+    <!-- END-->
+    
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:attribute name="spin" type="boolean" default="true"/>
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="isEventFire" type="Boolean" default="false"/>
+    <aura:attribute name="bpDetail" type="String"/>
+    <aura:attribute name="isAddVerificationFailed" type="Boolean" default="false"/>
+    <aura:attribute name="addVerificationFailedErrorMsg" type="String"/>
+    <aura:attribute name="oppRecordId" type="String"/>
+    
+    <!--Attributes inside Quick Action Pop-Up-->
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="Options" type="List"/>
+    <aura:attribute name="contactType" type="String" />
+    <aura:attribute name="addressLine1" type="String" />
+    <aura:attribute name="addressLine2" type="String" />
+    <aura:attribute name="addressLine3" type="String" />
+    <aura:attribute name="postalCode" type="String" />
+    <aura:attribute name="phone" type="String" />
+    <aura:attribute name="careOf" type="String" />
+    <aura:attribute name="department" type="String" default=""/>
+    <aura:attribute name="state" type="String" />
+    <aura:attribute name="city" type="String" />
+    <aura:attribute name="country" type="String" />
+    <aura:attribute name="emailAddress" type="String" />
+    <aura:attribute name="title" type="String" />
+    <aura:attribute name="firstName" type="String" />
+    <aura:attribute name="lastName" type="String" />
+    <aura:attribute name="telephone" type="String" />
+    <aura:attribute name="taxRegistrationNumber" type="String" />
+    <aura:attribute name="taxNumberCategory" type="String" />
+    <aura:attribute name="houseNumber" type="String" />
+    <!-- END-->
+    
+    
+    
+    
+    <!--Attributes For contact lookup-->
+    <aura:attribute name="objectName" 	type="String" default="Contact" required="true" />
+    <aura:attribute name="fieldName" 	type="String" default="Name" required="true" />
+    <aura:attribute name="value" 		type="String" default="" description="To pre-populate a value" />
+    <aura:attribute name="recordCount" 	type="string" default="5" description="Records visible at once"/>
+    <aura:attribute name="iconName" 	type="string" default="standard:contact" description="complete icon name eg. standard:account" />
+    <aura:attribute name="label" 		type="string" default="Contact Name" description="Label will be displayed above input Box" />
+    <aura:attribute name="placeholder" 	type="string" default="Enter Value" description="placeholder for input Box" />
+
+    <aura:attribute name="searchString"   type="string" access="private" default="" description="String to search"/>
+    <aura:attribute name="selectedRecord" type="Object" access="private" default="" description="selected Record Details" />
+    <aura:attribute name="recordsList" 	  type="List"   access="private" description="List of Records having data" />
+    <aura:attribute name="message" 		  type="String" access="private" default="" />
+    
+    
+    
+    
+    
+    
+    
+    
+    <!--doInit handler-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <!-- END-->
+    
+    <!-- Spinner on quick action upload... -->
+    <aura:if isTrue="{!v.spin}">
+        <div class="demo-only" style="height:6rem">
+            
+            <div class="slds-spinner_container">
+                
+                <center>
+                    <p style="padding: 100px; font-size:150%;" ><br/>
+                    </p>
+                </center>
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    
+                    <div class="slds-spinner__dot-a"></div>
+                    
+                    <div class="slds-spinner__dot-b"></div>
+                    
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- END-->
+    
+    <!-- Spinner while the verifying process continues... -->
+    <aura:if isTrue="{!v.spinner}">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+                <center>
+                    <p style="padding: 100px; font-size:150%;" ><b>Adding SAP BP...</b><br/>
+                    </p>
+                </center>
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- END-->
+    
+    <!-- Input fields inside the Quick Action component. -->
+    <div class="slds-box slds-box" >
+        <h3><b>Add SAP BP</b></h3>
+        
+        <aura:if isTrue="{!v.isAddVerificationFailed}">
+            <!-- Show the message to ui -->
+            <div class="slds-notify_container slds-is-relative">
+                <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                    <div class="slds-notify__content">
+                        <h2 class="slds-text-heading_small">{!v.addVerificationFailedErrorMsg}</h2>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+        
+        <div class="slds-card slds-scrollable__y"  >
+            <div class="slds-grid slds-wrap slds-gutters">
+                <div class="slds-col slds-size_6-of-12">
+                    <span> 
+                        
+                        <lightning:recordEditForm objectApiName="Case" >
+                            <lightning:inputField required="true" fieldName="AccountId" value="{!v.recordId}" onchange="{!c.handleChange}" />
+                        </lightning:recordEditForm>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <!-- Component Markup -->
+                        <div>
+                            <aura:if isTrue="{!!empty(v.label)}">
+                                <label class="slds-form-element__label">{!v.label}</label>
+                            </aura:if>
+                            <div class="slds-combobox_container">
+                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" aura:id="resultsDiv" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                                        <div aura:id="lookup-pill" class="{! 'slds-pill-container ' + if(v.selectedRecord == '','slds-hide','') }">
+                                            <!-- Selected Value Pill -->
+                                            <lightning:pill class="fullWidth" label="{!v.selectedRecord.label}" name="{!v.selectedRecord.value}" onremove="{! c.removeItem }">
+                                                <aura:set attribute="media">
+                                                    <lightning:icon iconName="{!v.iconName}" size="x-small" alternativeText="icon"/>
+                                                </aura:set>
+                                            </lightning:pill>
+                                        </div>
+                                        <div aura:id="lookupField" class="{! if(v.selectedRecord == '','slds-show','slds-hide') }">
+                                            <!-- Icon, Search Bar, Search Icon -->
+                                            <lightning:icon class="slds-combobox__input-entity-icon" iconName="{!v.iconName}" size="large" alternativeText="icon"/>
+                                            <lightning:input aura:id="inputLookup" class="inputBox" placeholder="{!v.placeholder}" onblur="{!c.blurEvent}" onclick="{!c.showRecords}" onkeyup="{!c.searchRecords}" value="{!v.searchString}" autoComplete="off" variant="label-hidden" id="combobox-id-1" />
+                                            <lightning:icon class="slds-input__icon" iconName="utility:search" size="x-small" alternativeText="search"/>
+                                            <lightning:spinner class="slds-hide" aura:id="Spinner" alternativeText="Loading" size="small" variant="brand"/>
+                                        </div>
+                                    </div>
+                                    <!-- Dropdown List -->
+                                    <div aura:id="LookupOnload" id="listbox-id-1" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" style="{! 'max-height:' + (8 + (v.recordCount * 40)) + 'px' }">
+                                        <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                                            <aura:if isTrue="{!empty(v.message)}" >
+                                                <!-- To display Drop down List -->
+                                                <aura:iteration items="{!v.recordsList}" var="rec" >
+                                                    <li id="{!rec.value}" class="slds-listbox__item eachItem" onmousedown="{!c.selectItem}">
+                                                        <div class="slds-media slds-listbox__option_entity">
+                                                            <lightning:icon iconName="{!v.iconName}" size="medium" alternativeText="icon" />
+                                                            <span class="verticalAlign slds-truncate">{!rec.label}</span>
+                                                        </div>
+                                                    </li>
+                                                </aura:iteration>
+                                                <!-- To display Error Message -->
+                                                <aura:set attribute="else">
+                                                    <li class="slds-listbox__item">
+                                                        <span class="slds-media slds-listbox__option_entity">{!v.message}</span>
+                                                    </li>
+                                                </aura:set>
+                                            </aura:if>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        <lightning:Input aura:id="firstName" required="true" messageWhenValueMissing="Complete this field." name="" label="First Name :" value="{!v.firstName}" ></lightning:Input>         
+                        <lightning:Input aura:id="lastName" required="true" messageWhenValueMissing="Complete this field." name="" label="Last Name :" value="{!v.lastName}" ></lightning:Input>
+                        <lightning:Input aura:id="emailAddress" required="true" messageWhenValueMissing="Complete this field." name="" label="Email:" value="{!v.emailAddress}" pattern="^(([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)(\s*;\s*|\s*$))*$" messageWhenPatternMismatch="Please enter a valid email address."></lightning:Input>         
+                        <lightning:Input aura:id="phone" required="false" messageWhenValueMissing="Complete this field." name="" label="Phone :" value="{!v.phone}" ></lightning:Input>
+                    	
+                    </span>
+                </div>
+                <div class="slds-col slds-size_6-of-12">
+                    <span>
+                        <lightning:Input aura:id="department" name="" label="Department:" value="{!v.department}" ></lightning:Input>         
+                        <lightning:Input aura:id="careOf" name="" label="CareOf:" value="{!v.careOf}" ></lightning:Input>         
+                        <lightning:Input aura:id="addressLine1" required="true" name="" messageWhenValueMissing="Complete this field." label="Address Line 1:" value="{!v.addressLine1}" ></lightning:Input>         
+                        <lightning:Input aura:id="addressLine2" name="" label="Address Line 2:" value="{!v.addressLine2}" ></lightning:Input> 
+                        <lightning:Input aura:id="addressLine3" name="" label="Address Line 3:" value="{!v.addressLine3}" ></lightning:Input>         
+                                 
+						<lightning:Input aura:id="postalCode" required="true" name="" messageWhenValueMissing="Complete this field." label="PostalCode:" value="{!v.postalCode}"></lightning:Input>         
+                        <lightning:Input aura:id="city" name="" messageWhenValueMissing="Complete this field." label="City:" value="{!v.city}" ></lightning:Input>
+                        <lightning:Input aura:id="state" name="" label="State:" value="{!v.state}" ></lightning:Input>
+                        <lightning:Input aura:id="country" name="" label="Country:" value="{!v.country}" ></lightning:Input>
+                        <!-- picklist set-->
+                        <!--
+                        <lightning:select aura:id="country" name="controllerFld"
+                                          value="{!v.objDetail.Mailing_Country_List__c}"
+                                          label="Country"
+                                          onchange="{!c.onControllerFieldChange}" required="true" >
+                            <aura:iteration items="{!v.listControllingValues}" var="val">
+                                <option value="{!val}">{!val}</option>
+                            </aura:iteration>
+                        </lightning:select> -->
+                        <!-- END-->
+                        
+                        <!--dependent value-->
+                        <!--
+                        <ui:inputSelect aura:id="state" 
+                                        value="{!v.objDetail.Mailing_State_List__c}"
+                                        label="State"
+                                        disabled="{!v.bDisabledDependentFld}" required="false">
+                            <aura:iteration items="{!v.listDependingValues}" var="val">
+                                <ui:inputSelectOption text="{!val}" label="{!val}"/>
+                            </aura:iteration>
+                        </ui:inputSelect> -->
+                        <!-- END--> 
+                        
+                    </span>
+                </div>
+                
+            </div>
+            <br/>
+            <br/>
+            <div>
+                <center>              
+                    <lightning:button label="Add SAP BP" class="slds-button_brand" onclick="{!c.VerifyAddress}"/>
+                </center>
+                
+            </div>
+        </div>
+    </div>
+    <!-- END-->
+</aura:component>

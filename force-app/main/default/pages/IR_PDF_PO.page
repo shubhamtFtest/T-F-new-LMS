@@ -1,0 +1,164 @@
+<apex:page showheader="false" controller="IR_PdfGeneratorController" renderAs="pdf">
+    <html>
+        <apex:repeat value="{!PrintOrderList}" var="printvar">
+            <table style="width:100%;border-collapse: collapse;" >
+                <tr>
+                    <td style="width:10%;"><img src="{!$Resource.IR_Logo}" width="90%"/></td>
+                    <td><h1 style="font-weight: 100;font-size: x-large;">Taylor &amp; Francis Group plc</h1></td>
+                </tr>
+                <tr>
+                    <td style="width:10%;"></td>
+                    <td><p>From - {!loginusername}<br/>Date: {!createddate}</p></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><p><b>OFFICIAL PRINT and BIND ORDER</b><br/>
+                        <b>Please print and bind from the following specification.</b> </p></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td> <p  style="text-decoration: underline;"><b>Purchase Order(Printing and Binding)</b></p></td>
+                </tr>
+                <tr >
+                    <td></td>
+                    <td width="25%;"><p  style="text-decoration: underline;"><b>T &amp; F Invoice No </b></p></td>
+                    <td width="20%;">{!printvar.Print_Order__r.Invoice_Number__c}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td  width="25%;"><p  style="margin-top:1px;"><b>Reference Number </b></p></td>
+                    <td ><p  style="margin-top:1px;">{!printvar.Reference_Number__c}</p></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td width="25%;"><p style="margin-top:1px;" ><b>TO </b></p></td>
+                    <td ><p  style="margin-top:1px;">{!printvar.Print_Order__r.Printer__r.Name}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Author </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Author__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Title </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Title__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Indian ISBN </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Indian_Isbn__c}</p></td>
+                </tr><!--tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Impression </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Impression__c}</p></td>
+                </tr--><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Print Run </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Print_Run__c}</p></td>
+                </tr>
+                <tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Gratis</b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.gratis__c}</p></td>
+                </tr>
+                <tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Size in inches </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Size_in_inches__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Pages  </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Pages__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Inserts  </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Inserts__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Text Color </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Text_Color__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Cover Color </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Cover_Color__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Insert Color </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Insert_Color__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Paper Text </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Paper_Text__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Paper Cover </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Paper_Cover__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Paper Insert  </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Paper_Insert__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Binding </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Binding__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Packing Instructions  </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Print_Order__r.Packing_Instructions__c}</p></td>
+                </tr>
+                <tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>Lamination  </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Lamination__c}</p></td>
+                </tr>
+                <tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Agreed Price Per Copy </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.umc__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Customer Name </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Print_Order__r.Customer__r.name} {!printvar.Print_Order__r.To__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Delivery Date </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Print_Order__r.Delivery_Date__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Special Instructions if Any </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Print_Order__r.Special_Instructions__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p  style="margin-top:1px;"><b>Payment Terms </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.Print_Order__r.Payment_Terms__c}</p></td>
+                </tr><tr>
+                <td></td>
+                <td width="25%;"><p style="margin-top:1px;" ><b>List Price in INR  </b></p></td>
+                <td ><p  style="margin-top:1px;">{!printvar.mrp__c}</p></td>
+                </tr>
+                <tr >
+                    <td></td>
+                    <td width="25%;"><p style="margin-top:1px;" ><b>List Price In Pound </b></p></td>
+                    <td ><p  style="margin-top:1px;">{!printvar.List_Price_GBP__c}</p></td>
+                </tr>
+            </table>
+        </apex:repeat>
+    </html>
+    
+        <table style="height:40px;"></table>
+
+    <table style="width:100%;border-collapse: collapse;" >
+        <tr>
+          <td><small> <font style="  margin-right: 214px;    font-family: auto;">Group Headquarters 2
+                Park Square, Milton Park, Abingdon, Oxfordshire OX14 4RN Psychology Press Tel: +44 (0) 20 7107 5000
+              Fax: +44 (0) 20 7842 2298  www.tandf.co.uk</font></small></td>
+            <td style="width:33px;"> <small><font style="    margin-right: 62px;    font-family: auto;">
+                Martin Dunitz</font></small></td>
+            <td style="width:33px;  "><small> <font style="  margin-right: 214px;    font-family: auto;">
+                Routledge Taylor and Francis Routledge Falmer Garland Science Europa Publications
+                Spon Press Brunner-Routledge Carfax
+                Publishing RoutledgeCurzon BIOS Scientific Publishers Fitzroy Dearborn CRC Press Registered Office 2
+                Park Square, Milton Park, Abingdon, Oxfordshire OX14 4RN. Registered No 3215483 Parthenon</font></small></td>
+        </tr>      
+        
+    </table>
+    <p>Registered Office 2 Park Square, Milton Park, Abingdon, Oxfordshire OX14 4RN. Registered No 3215483</p>
+</apex:page>

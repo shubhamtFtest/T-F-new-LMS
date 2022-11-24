@@ -1,0 +1,25 @@
+<apex:page lightningStylesheets="true" controller="ReleaseNotesPDF_ctr" action="{!getParameter}" renderAs="pdf" showHeader="false">
+    
+    <div style="text-align: center; font-size: 25px; color:#00008B; padding-top: 50px;padding-bottom: 25px;">
+        Salesforce Release Notes 
+        <br/> 
+        <div style="text-align: center; font-size: 15px; color:#00008B;"> Reporting Period: {!valuestart} to {!valueend} </div>
+    </div>
+    <br/>
+    <div style="padding-left: 30px; font-family:lato; font-size: 1rem;">
+        <apex:repeat value="{!caseList}" var="item">  
+            <br/>
+            <b> Case Number: {!item.CaseNumber}</b>
+            <div style="color: #006400;"><b> Department: {!item.Application__c}</b></div>
+            <b> Release Date: 
+            <apex:outputText value="{0,date,yyyy-MM-dd}">
+                <apex:param value="{!item.Target_Resolution_Date__c}" />
+            </apex:outputText>
+            </b>
+            <br/>
+            <br/>
+            <apex:outputText value="{!item.Release_Notes_Rich__c}" escape="false"/>  
+            <br/>
+        </apex:repeat>   
+    </div>
+</apex:page>

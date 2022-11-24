@@ -1,0 +1,201 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="GenreList" type="List" default="[]" description="Picklist Values"/>
+    <aura:attribute name="typeOfField" type="String"/>
+    <aura:attribute name="index" type="Integer"/>
+    <aura:attribute name="multiResultList" type="List" default="[]"/>
+    <aura:attribute name="multiResultCodes" type="List" default="[]"/>
+    <aura:attribute name="selectedType" type="String" />
+    <aura:attribute name="grandParent" type="String" default=""/>
+    <aura:attribute name="items" type="List"/>
+    <aura:attribute name="selectedNetbaseValues" type="List" default="[]" />
+    <aura:attribute name="queryObject" type="Object[]" access="global"/>
+    <aura:attribute name="identifier" type="String" default="Book"/>
+    <aura:attribute name="timeStamp" type="String" default="T00:00:00.000Z"/>        
+    
+    <aura:attribute name="selectedFieldVal" type="String" />
+    
+    <aura:attribute name="value1" type="String"/>
+    <aura:attribute name="value2" type="String" />
+    <aura:attribute name="value3" type="String" />
+    <aura:attribute name="valueOp" type="String" />
+    <aura:attribute name="valueInp" type="String" />
+    
+    <aura:attribute name="hasChild1" type="Boolean" default="false"/>
+    <aura:attribute name="hasChild2" type="Boolean" default="false"/>
+    
+    <aura:attribute name="fileUpload" type="Boolean" default="false"/>
+    <aura:attribute name="hasOperator" type="Boolean" default="false"/>
+    <aura:attribute name="typeChangedToBook" type="Boolean" default="false"/>
+
+    
+    
+    <aura:attribute name="optionsLevel1" type="List" default="[]"/>
+    <aura:attribute name="optionsLevel2" type="List" default="[]"/>
+    <aura:attribute name="optionsLevel3" type="List" default="[]"/>
+    
+    <aura:attribute name="AllSelectedOptions" type="List" default="[]"/>
+
+    
+    <aura:attribute name="condition" type="List" default="[]"/>
+    
+    <aura:attribute name="multiSelectOptions" type="List" default="[]"/>
+    <aura:attribute name="inputOptions" type="List" default="[]"/>
+    <aura:attribute name="selectedList" type="List" default="[]"/>
+    <aura:attribute name="consumer" type="String"/>
+    
+    <aura:registerEvent name="inputChangeEvt" type="c:PPDSearchUnitInputEvent"/>
+
+    <aura:registerEvent name="autoPopulate" type="c:PPDUIValueChangeEvt"/>
+    
+    <!--<aura:handler event="c:TF_AG_SendSelectSubjectClassifyEvt" action="{!c.handleSelectedListEvt}"/>-->
+    <!--<aura:handler event="c:TF_AG_SendSelectNetbaseEvt" action="{!c.handleSelectedNetbaseEvt}"/>-->
+    
+    <aura:handler name="autoPopulate" event="c:PPDUIValueChangeEvt" action="{!c.handleChangelevel1}"/>
+    
+    <aura:handler name="change" value="{!v.selectedType}" action="{!c.init}"/>
+    <aura:handler name="change" value="{!v.valueInp}" action="{!c.buildQuery}"/>
+    <!--aura:handler name="change" value="{!v.value1}" action="{!c.handleChangelevel1}" /-->
+
+
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    
+    <lightning:layout> 
+        <lightning:layoutItem padding="around-large" >                    
+            <lightning:badge label="AND"/>            
+        </lightning:layoutItem>
+        
+        <lightning:layoutItem>
+            <lightning:combobox name="selectFields" class="" value="{! v.value1}" placeholder="Please Select" dropdownAlignment="auto" options="{! v.optionsLevel1 }" onchange="{! c.handleChangelevel1}"/>
+        </lightning:layoutItem>
+        
+        <aura:if isTrue="{!v.hasChild1=='true'}">
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:combobox name="selectFields" value="{! v.value2}" placeholder="Please Select" dropdownAlignment="auto" options="{! v.optionsLevel2 }" onchange="{! c.handleChangelevel2}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.hasChild2=='true'}">
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:combobox name="selectFields" value="{! v.value3}" placeholder="Please Select" dropdownAlignment="auto" options="{! v.optionsLevel3 }" onchange="{! c.handleChangelevel3}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.hasOperator=='true'}">
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:combobox name="selectCondition" value="{! v.valueOp}" placeholder="Please Select" dropdownAlignment="auto" options="{! v.condition }" onchange="{! c.handleConditionChange }"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Text Box'}">
+            <lightning:layoutItem padding="horizontal-small" size="2">
+                <lightning:input name="inputSearchText" />
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Text Box Year'}">
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:input name="inputSearchDate" value="{! v.valueInp}" placeholder="YYYY" message-when-pattern-mismatch="Invalid format!" pattern="[1-9][0-9]{3}" />
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Text Area'}">
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:textarea name="inputSearchTextArea" value="{! v.valueInp}" placeholder="Enter comma-separated/Return-key-seperated values."/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.fileUpload=='true'}">
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:input name="file1" type="file" multiple="true" accept=".csv" onchange="{! c.handleFilesChange }"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Text'}">
+           
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:combobox name="selectInputVal" value="{! v.valueInp}" placeholder="Please Select" dropdownAlignment="auto" options="{! v.inputOptions }"/>
+                
+                </lightning:layoutItem>
+          
+            
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Date'}">
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:input type="date" name="inputDate" onchange="{!c.onChangeInput}"  value="{! v.valueInp}"/>
+           
+                <!--<lightning:input type="date" name="inputDate" value="{! v.valueInp + v.timeStamp}"/>-->
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Number'}">
+            <lightning:layoutItem padding="horizontal-small">
+                <lightning:input type="number" name="input1" value="{! v.valueInp}" min="0"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Multi Select'}">
+            <lightning:layoutItem padding="around-small">
+                <lightning:dualListbox aura:id="selectMultiField"
+                                       name="selectMulti" 
+                                       sourceLabel="Available" 
+                                       size="3"
+                                       selectedLabel="Selected" 
+                                       options="{!v.inputOptions}"
+                                       value="{!v.selectedList}"
+                                       onchange="{!c.handleMultiSelectChange}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Netbase'}">
+            <lightning:layoutItem padding="around-small" >
+                <c:PPDNetBaseCollectionCmp values="{!v.selectedNetbaseValues}" backToProductDetail="{!v.eventFromProdDetail}" checkedValuesListBox="{!v.multiResultCodes}" typeOfClassification="NetBase" valueInp="{!v.valueInp}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Subject-Select'}">
+            <lightning:layoutItem padding="around-small" >
+                <c:PPDCommonClassificationGrid checkedValuesListBox="{!v.multiResultList}" typeOfClassification="Subject" valueInp="{!v.valueInp}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        
+        <aura:if isTrue="{!v.typeOfField=='BISAC-Select'}">
+            <lightning:layoutItem padding="around-small" >
+                <c:PPDCommonClassificationGrid checkedValuesListBox="{!v.multiResultList}" typeOfClassification="BISAC" valueInp="{!v.valueInp}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Dewey'}">
+            <lightning:layoutItem padding="around-small" >
+                <c:PPDCommonClassificationGrid checkedValuesListBox="{!v.multiResultList}" typeOfClassification="Dewey" valueInp="{!v.valueInp}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='WC-Select'}">
+            <lightning:layoutItem padding="around-small" >
+               <!-- <c:PPDCommonClassificationGrid checkedValuesListBox="{!v.multiResultList}" typeOfClassification="WC_Code" valueInp="{!v.valueInp}"/>-->
+            <c:PPDNetBaseCollectionCmp values="{!v.selectedNetbaseValues}" backToProductDetail="{!v.eventFromProdDetail}" checkedValuesListBox="{!v.multiResultCodes}" typeOfClassification="WC_Code" valueInp="{!v.valueInp}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.typeOfField=='Country-Select'}">
+            <lightning:layoutItem padding="around-small" >
+               <!-- <c:PPDCommonClassificationGrid checkedValuesListBox="{!v.multiResultList}" typeOfClassification="WC_Code" valueInp="{!v.valueInp}"/>-->
+            <c:PPDNetBaseCollectionCmp values="{!v.selectedNetbaseValues}" backToProductDetail="{!v.eventFromProdDetail}" checkedValuesListBox="{!v.multiResultCodes}" typeOfClassification="Country-Select" valueInp="{!v.valueInp}"/>
+            </lightning:layoutItem>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.selectedType!='Identifiers'}">
+            <lightning:layoutItem padding="around-small"> 
+                <lightning:layoutItem padding="around-small"> 
+                    <lightning:buttonIcon iconName="utility:new"  size="large" alternativeText="Add Criteria" variant="bare"  onclick="{!c.handleAndOperatorClick}" value="{!item}" />                            
+                    <lightning:buttonIcon iconName="utility:clear"  size="large" alternativeText="Remove Criteria" variant="bare"  onclick="{!c.handleRemoveOperatorClick}" value="{!item}" />
+                </lightning:layoutItem>
+            </lightning:layoutItem>
+        </aura:if>
+        
+    </lightning:layout>
+    
+</aura:component>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>15.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Loads a Flex component and allows a user to assign subject codes to a specific lead.</description>
+    <label>CAS_Lead_Subject_Codes_2</label>
+</ApexPage>

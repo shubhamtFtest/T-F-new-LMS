@@ -1,0 +1,133 @@
+<!-- 
+ Created by Jeff Douglas
+ jeff.douglas@informausa.com / 941-554-3584
+ ** Last Modified by Gopinath Punniakotti 2022-08-10 [https://taylorfrancis.atlassian.net/browse/BAU-17745 or GRQ0311452] 
+	Added Contact_Phone__c to display in the Inspection Copy. 
+ ** Last Modified by Gopinath Punniakotti 2022-08-10 [https://taylorfrancis.atlassian.net/browse/BAU-19357 or GRQ0325471]
+    Added Potential_Leads__c to display in the Inspection Copy.
+ -->
+
+<apex:page standardController="CAS_Inspection_Copy__c" extensions="CASInspectionCopyDisplayController">
+    <apex:sectionHeader title="Inspection Copy" subtitle="{!CAS_Inspection_Copy__c.name}"/>
+    <apex:form >
+    <apex:pageBlock title="Inspection Copy Detail"> 
+      
+        <apex:pageBlockButtons location="both">
+            <apex:commandButton value="Edit" action="{!edit}" />     
+        </apex:pageBlockButtons>    
+        
+        <apex:outputText value="{!CAS_Inspection_Copy__c.Opportunity_Product__c}" rendered="false"/>
+        
+        <apex:pageBlockSection columns="2">
+          
+            <apex:outputField value="{!CAS_Inspection_Copy__c.name}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.ownerId}"/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Opportunity__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Adoption_Level__c}"/>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Opportunity Product"/>
+                <apex:outputLink value="/{!CAS_Inspection_Copy__c.Opportunity_Product__c}"><apex:outputText value="{!oliName}"/></apex:outputLink>
+            </apex:pageBlockSectionItem>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Adoption_Stage__c}"/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Book_Order__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Year_of_Study__c}"/>
+             <apex:outputField value="{!CAS_Inspection_Copy__c.QuestionAboutT_FProduct__c}"/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Book_Title__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Required_Text__c}"/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.ISBN__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Course_Start_Date__c}"/>          
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Product__r.Lead_Author_Editor__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Number_of_Students__c}"/>     
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Product__r.Edition_Number__c}"/>
+            <apex:outputText value=""/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Contact_Name__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Contact_Email__c}"/>
+            <!--<apex:outputField value="{!CAS_Inspection_Copy__c.Contact_Phone__c}"/>-->
+            <apex:outputText value=""/><apex:outputText value=""/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Adoption_Short__c}"/>         
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Reason_Lost__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Contact_Rep__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Additional_Comments__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Potential_Leads__c}"/>
+        </apex:pageBlockSection> 
+        
+        <apex:pageBlockSection title="Strengths & Weaknesses" columns="2">
+          
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Book_Strengths__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Book_Weaknesses__c}"/>        
+          
+        </apex:pageBlockSection> 
+        
+        <apex:pageBlockSection title="Recommended Reading List" columns="2">
+          
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Title_1__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Title_2__c}"/>        
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Author_1__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Author_2__c}"/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Publisher_1__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Publisher_2__c}"/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Level_of_Recommendation_1__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Level_of_Recommendation_2__c}"/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Title_3__c}"/>
+            <apex:outputText value=""/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Author_3__c}"/>
+            <apex:outputText value=""/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Publisher_3__c}"/>
+            <apex:outputText value=""/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Level_of_Recommendation_3__c}"/>
+            <apex:outputText value=""/> 
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Recommend_title__c}"/>
+            <apex:outputText value=""/>          
+          
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Bookstore Details" columns="2">
+          
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Bookstore_Name__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Bookstore_Manager__c}"/>
+            
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Bookstore_Phone__c}"/>
+            <apex:outputText value=""/> 
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Do_Not_Send__c}"/>
+            <apex:outputField value="{!CAS_Inspection_Copy__c.Do_Not_Send_Reason__c}"/>
+          <apex:outputField value="{!CAS_Inspection_Copy__c.Do_Not_Send_Date__c}"/>
+            <apex:outputText value=""/>
+            
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Created By"/>
+                <apex:outputPanel >
+                    <apex:outputField value="{!CAS_Inspection_Copy__c.CreatedByID}"/>,&nbsp;
+                    <apex:outputField value="{!CAS_Inspection_Copy__c.CreatedDate}" style="padding-left:5px"/>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>    
+            <apex:pageBlockSectionItem >
+                <apex:outputLabel value="Last Modified By"/>
+                <apex:outputPanel >
+                    <apex:outputField value="{!CAS_Inspection_Copy__c.LastModifiedById}"/>,&nbsp;
+                    <apex:outputField value="{!CAS_Inspection_Copy__c.LastModifiedDate}" style="padding-left:5px"/>
+                </apex:outputPanel>
+            </apex:pageBlockSectionItem>  
+          
+        </apex:pageBlockSection>    
+        
+    </apex:pageBlock>
+    </apex:form>    
+     
+</apex:page>

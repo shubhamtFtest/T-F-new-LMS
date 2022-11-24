@@ -1,0 +1,13 @@
+<!-- 
+ Created by Jeff Lup on 2013.03.20, CHG0048679
+-->
+
+<apex:page controller="OppRenewalPromptLbController" showHeader="false" sidebar="false">
+    <apex:form >
+        <apex:outputText value="Would you like to create a renewal for this opportunity?" />
+        <br/><br/>
+        <apex:commandButton action="{!yesRenewal}" value="Yes" oncomplete="parent.document.location.replace('/{!renewalId}');" />
+        &nbsp;
+        <apex:commandButton action="{!noRenewal}" value="No" oncomplete="parent.document.getElementById('lnkHideBox').click();" />
+    </apex:form>
+</apex:page>

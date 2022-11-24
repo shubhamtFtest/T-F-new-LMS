@@ -1,0 +1,6 @@
+<!-- 
+ Created by Jeff Lup - 2015.01.20 - CHG0063461
+-->
+<apex:page >
+    <apex:pageMessage summary="You may only create a new opportunity from a contact." severity="error" strength="2" rendered="true" />
+</apex:page>

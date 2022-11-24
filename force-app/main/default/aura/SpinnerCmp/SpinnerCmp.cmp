@@ -1,0 +1,14 @@
+<aura:component >
+    <aura:attribute name="isSending" type="boolean" />
+    <!-- Spinner Start  -->
+    <aura:if isTrue="{!v.isSending}">
+        <div class="slds-spinner_container">
+            <div class="slds-spinner--brand slds-spinner slds-spinner--large" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- Spinner End -->
+</aura:component>

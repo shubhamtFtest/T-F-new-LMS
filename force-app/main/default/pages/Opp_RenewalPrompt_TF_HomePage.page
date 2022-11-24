@@ -1,0 +1,13 @@
+<!-- ******* CHG0057797 ******* -->
+<!-- ******* Force Opp Renewal Question ******* -->
+
+<apex:page controller="OppRenewalPromptTFHomePageController" showHeader="false" sidebar="false">
+    <apex:outputpanel >
+        <script type="text/javascript">
+            var objectId = window.top.location.href.substring( window.top.location.href.indexOf('.com/') + 5, window.top.location.href.indexOf('.com/') + 20 );
+            var oppId = '{!oppId}';
+            if (oppId != '' && oppId.substring(0,15) != objectId.substring(0,15))
+                window.top.location.replace('/' + oppId);
+        </script>
+    </apex:outputpanel>
+</apex:page>

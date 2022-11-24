@@ -1,0 +1,153 @@
+<aura:component controller="TF_GenerateCouponCode" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="configRows" type="Object[]"/>
+    <aura:attribute name="isValidUser" type="Boolean" default="true" />
+    <aura:attribute name="startDate" type="Date" default=""/>
+    <aura:attribute name="endDate" type="Date" default=""/>
+    <aura:attribute type="String" name="isValidProduct" default="true" />
+    
+    <aura:attribute name="producttitle" type="String"/>
+    <aura:attribute name="pid" type="String"/>
+    
+    <aura:attribute name="recordTypeId" type="String" />
+    <aura:attribute name="recordList" type="List" />
+    <aura:attribute name="discountCategoryLst" type="String[]" default="[]"/>
+    <aura:attribute name="currMap" type="Map"/>
+    <aura:attribute name="sd" type="Sales_Deal__c" default="{'sobjectType':'Sales_Deal__c', 
+                                                       'Name': '',
+                                                       'CurrencyIsoCode': ''}"/>     
+ 
+    <lightning:card>        
+        <lightning:layout class="slds-page-header slds-page-header--object-home">
+            <lightning:layoutItem>
+                <lightning:icon iconName="standard:scan_card" alternativeText="Generate Coupon Code"/>
+            </lightning:layoutItem>
+            <lightning:layoutItem padding="horizontal-small">
+                <div class="page-section page-header">
+                    <h2 class="slds-text-heading--medium">Generate Promo Code</h2>
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>    
+        
+        <aura:if isTrue="{!v.isValidUser}">
+                <lightning:layout>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <ui:inputText aura:id="productcode" label="Product Code" keyup="{!c.performSearch}" updateOn="keyup" maxlength="4" required="true" />  
+                    	<!--<lightning:input aura:id="productcode" name="productcode" label="Product Code" required="true" maxlength="4" onchange="{!c.performSearch}"/>-->
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:select aura:id="couponcat" name="couponcat" label="Discount Category" required="true">
+                            <option value="">choose one...</option>
+                            <aura:iteration items="{!v.discountCategoryLst}" var="discat">
+                                <option value="{!discat}" text="{!discat}"></option>
+                            </aura:iteration>
+                        </lightning:select> 
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:input type="date" aura:id="startdate" label="Start Date" name="startdate" required="true" />
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:input type="date" aura:id="enddate" label="End Date" name="enddate" required="true" />
+                    </lightning:layoutItem>            
+                </lightning:layout>            
+                
+                <lightning:layout>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:input aura:id="productname" label="Product Name" name="productname" value="{!v.producttitle}" readonly="true" /> 
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:select aura:id="singleuse" name="singleuse" label="Single Use?" required="true">
+                            <option value="">choose one...</option>
+                            <option value="YES">Yes</option>
+                            <option value="NO">No</option>
+                        </lightning:select>
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:select aura:id="discounttype" name="discounttype" label="Discount Type" required="true" messageWhenValueMissing="Complete this field.">
+                            <option value="">choose one...</option>
+                            <option value="% Discount">% Discount</option>
+                            <option value="Fixed Amount Discount">Fixed Amount Discount</option>
+                        </lightning:select> 
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:input name="discountvalue"
+                                         label="Discount Value" aura:id="discountvalue"
+                                         pattern="^\d{1,4}(?:(\.)\d{1,2})?$" maxlength="6" minlength="1"
+                                         messageWhenBadInput="Discount value is not valid."
+                                         messageWhenPatternMismatch="Discount value is not valid."
+                                         messageWhenValueMissing="This field is required." required="true"/>  
+                    </lightning:layoutItem>            
+                </lightning:layout>
+                <lightning:layout>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:select aura:id="pcurrency" value="{!v.sd.CurrencyIsoCode}" name="pcurrency" label="Currency" required="true">
+                            <option value="">--None--</option>
+                            <aura:iteration items="{!v.currMap}" var="i" indexVar="key">
+                                <option text="{!i.key +' - '+ i.value}" value="{!i.key}" selected="{!i.key==v.sd.CurrencyIsoCode}" />
+                            </aura:iteration>
+                        </lightning:select>                      
+                  	<!--<lightning:inputField aura:id="pcurrency" fieldName="CurrencyIsoCode" required="true"/> -->                            
+                        
+                    </lightning:layoutItem>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:input aura:id="email" label="Email ID(Coupon code will be send to this email ID)" placeholder="" pattern="^(([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)(\s*;\s*|\s*$))*$" messageWhenPatternMismatch="Invalid email ID" required="true"/>  
+                    </lightning:layoutItem>
+                    <lightning:layoutItem flexibility="auto" padding="around-small">
+                        <lightning:select aura:id="numberofuniquecouponcodes" name="numberofuniquecouponcodes" label="Number of Unique Coupon Codes Required to be Generated" required="true">
+                            <option value="">choose one...</option>
+                            <option value="1">1</option><option value="2">2</option>
+                            <option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option>
+                            <option value="7">7</option><option value="8">8</option>
+                            <option value="9">9</option><option value="10">10</option>
+                            <option value="11">11</option><option value="12">12</option>
+                            <option value="13">13</option><option value="14">14</option>
+                            <option value="15">15</option><option value="16">16</option>
+                            <option value="17">17</option><option value="18">18</option>
+                            <option value="19">19</option><option value="20">20</option>
+                        </lightning:select>                          
+                    </lightning:layoutItem>           
+                </lightning:layout>
+                <lightning:layout>
+                    <lightning:layoutItem size="3" padding="around-small">
+                        <lightning:button aura:id="generatecode" variant="brand" class="slds-m-top--large" type="submit" name="save" label="Generate Promo Code" disabled="true" onclick="{! c.handleSubmit}"/>  
+                    </lightning:layoutItem>          
+                </lightning:layout>
+        </aura:if>
+        <aura:if isTrue="{!not(empty(v.recordList))}">
+            <div class="slds-p-top_medium"></div>    
+            <div class="slds-border_top">
+                <table class="slds-table slds-table--bordered" role="grid" style="width: 66.75rem;" align="center">
+                    <thead>
+                        <tr class="slds-text-heading--label">
+                            <th scope="col"><div class="slds-truncate" title="Name">Name</div></th>
+                            <th scope="col"><div class="slds-truncate" title="Email">Product Code</div></th>
+                            <th scope="col"><div class="slds-truncate" title="Select">Promo Code</div></th>
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        <aura:iteration items="{!v.recordList}" var="rec">
+                            <tr>
+                                <td><div class="slds-truncate" title="{!rec.Name}">
+                                    <a href="{!'/one/one.app?#/sObject/'+ rec.Id + '/view'}" target="_blank">
+                                        {!rec.Name}
+                                    </a></div></td>
+                                <td><div class="slds-truncate" title="{!rec.Product_Code__c}">{!rec.Product_Code__c}</div></td>
+                                <td><div class="slds-truncate" title="{!rec.Promocode__c}">{!rec.Promocode__c}</div></td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        </aura:if>         
+        
+        <aura:if isTrue="{!!v.isValidUser}">
+            <lightning:layout class="slds-page-header slds-page-header--object-home">
+                <lightning:layoutItem padding="horizontal-small">
+                    You do not have permission to access this page.
+                </lightning:layoutItem>
+            </lightning:layout>
+        </aura:if>         
+        
+    </lightning:card>
+</aura:component>

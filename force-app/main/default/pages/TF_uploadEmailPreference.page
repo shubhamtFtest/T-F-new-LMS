@@ -1,0 +1,73 @@
+<apex:page controller="TF_upLoadEmailPrefrenceCtrl" lightningStylesheets="true">
+    <apex:form >
+         <apex:pageBlock >
+            <div  style="font-weight:600;text-align:center;font-size:xx-large;">
+                GDPR UPLOAD
+            </div> 
+            <div style="width:100%; height:5px; background:rgba(27, 82, 151, 1);"></div>
+            <apex:pagemessages />
+            <br/>
+            <apex:pageBlockSection columns="4"> 
+               <apex:inputFile value="{!csvFileBody}"  filename="{!csvAsString}" />
+                <apex:commandButton value="Import GDPR" action="{!importCSVFile}" id="loadStatus" status="status"/>
+                
+                <apex:actionStatus id="status">
+            <apex:facet name="start">
+            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.75; z-index: 1000; background-color: black;">
+                &nbsp;
+            </div>
+            <div style="position: fixed; left: 0; top: 0; bottom: 0; right: 0; z-index: 1001; margin: 30% 50%">
+                <img src="http://upload.wikimedia.org/wikipedia/commons/e/ed/Cursor_Windows_Vista.gif" />
+            </div>
+            </apex:facet>
+        </apex:actionStatus>
+    
+                
+               <!-- <apex:commandButton value="Import GDPR" action="{!importCSVFile}" />-->
+                   
+            </apex:pageBlockSection>
+            <br/>
+            <apex:dataTable value="{!ListEmpfDisplay}" var="empf" cellPadding="4" border="1" rendered="{!if(ListEmpfDisplay!=null , true ,false)}" >
+                <apex:column >
+                    <apex:facet name="header">Email</apex:facet>
+                    {!empf.Email}
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">Reason</apex:facet>
+                    {!empf.Reason}
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">Status</apex:facet>
+                    {!empf.Status}
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">Success/Error</apex:facet>
+                    <apex:outputPanel rendered="{!if(empf.SuccessOrFailure=='Success' , true ,false)}">  
+                        <div class="columnnull" style="color:green">
+                            
+                            {!empf.SuccessOrFailure}
+                        </div> 
+                    </apex:outputPanel>
+                     <apex:outputPanel rendered="{!if(empf.SuccessOrFailure=='Update Success', true ,false)}">  
+                        <div class="columnnull" style="color:green">
+                            
+                            {!empf.SuccessOrFailure}
+                        </div> 
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!if(empf.SuccessOrFailure!='Success' && empf.SuccessOrFailure!='Update Success' , true ,false)}">  
+                        <div class="columnnull" style="color:red">
+                            
+                            {!empf.SuccessOrFailure}
+                        </div> 
+                    </apex:outputPanel>
+                </apex:column>
+            </apex:dataTable>
+        </apex:pageBlock>
+        <apex:includeLightning />
+
+
+       <!-- <apex:commandButton value="Previous" rerender="pbId" action="{!previous}" disabled="{!NOT(hasPrevious)}" status="paginationStatus"/>&nbsp;Page {!pageNumber} of {!totalPages}&nbsp;
+          <apex:commandButton value="Next" rerender="pbId" action="{!next}" disabled="{!NOT(hasNext)}" status="paginationStatus"/>
+        --> </apex:form>
+    
+</apex:page>

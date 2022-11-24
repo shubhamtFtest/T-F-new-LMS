@@ -1,0 +1,79 @@
+<aura:component access="global" controller="TF_ProcessUnsiloresponse">
+    <aura:attribute name="activeAccordion" type="String"/>
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="selectedRows" type="List"/> 
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="data" type="Object[]"/>
+    <aura:attribute name="prdDetails" type="Object[]"/>
+    <aura:attribute name="fullData" type="List"/>
+    <aura:attribute name="recordCount" type="Integer" default="0"/> 
+    <aura:attribute name="selectedCuratedContentDetails" type="Object"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="selectedRowsList" type="List"/>
+    <aura:attribute name="filter" type="String" />   
+    
+    
+    <!-- New Pagination and sorting attributes --> 
+    <aura:attribute type="Boolean" name="sortAsc" />
+    <aura:attribute type="Integer" name="pageNumber" default="1" />
+    <aura:attribute type="Integer" name="maxPage"	default="1" />
+    <aura:attribute type="String" name="sortField" />
+    <aura:attribute name="sortedBy" type="String"/>
+    <aura:attribute name="sortedDirection" type="String"/>
+    
+    <!-- Events-->
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    <aura:handler name="change" value="{!v.pageNumber}" action="{!c.renderPage}" />
+    
+    
+    <!-- spinner -->
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing.." variant="brand" size="medium" />
+    </aura:if>
+    
+    <!-- body -->
+    <lightning:accordion aura:id="accordion" activeSectionName="{#v.activeAccordion}" >
+        <lightning:accordionSection name="criteria" label="Content Curation">           
+            <lightning:layoutItem size="3" padding="around-small">
+                <lightning:button variant="brand" label="Get Content" onclick="{!c.getContentCurator}"/>
+                <br/>
+            </lightning:layoutItem>
+        </lightning:accordionSection>
+        <lightning:accordionSection name="result" label="Curation Result" > 
+            <lightning:layout>
+                
+                <lightning:layoutItem size="3" padding="around-small">
+                    <lightning:button label="Add Content" variant="brand" onclick="{!c.addSelectedContent}" disabled="{!empty(v.data)}"/>   
+                    <p>Number of records : {!v.recordCount}</p>
+                </lightning:layoutItem>
+                
+                <lightning:layoutItem size="5" padding="around-small"> 
+                    <div>
+                    <lightning:input  onchange="{!c.filter}" value="{!v.filter}" placeholder="Search By Content.." type="search" />
+                    </div>
+                    </lightning:layoutItem>
+                
+                <lightning:layoutItem size="4" padding="around-small">
+                    <div class="right">
+                        <c:PPDPagination currentPageNumber="{!v.pageNumber}" maxPageNumber="{!v.maxPage}" />
+                    </div>
+                </lightning:layoutItem>
+                
+            </lightning:layout>
+            <lightning:datatable
+                                 columns="{! v.columns }"
+                                 data="{! v.data }"
+                                 keyField="id"
+                                 selectedRows="{! v.selectedRows }"
+                                 hideCheckboxColumn="false"
+                                 onsort="{!c.sortColumn}"
+                                 sortedBy="{!v.sortedBy}"
+                                 sortedDirection="{!v.sortedDirection}" 
+                                 onrowselection="{!c.handleSelectedRow}"
+                                 />
+        </lightning:accordionSection>
+    </lightning:accordion>	
+    
+    
+</aura:component>

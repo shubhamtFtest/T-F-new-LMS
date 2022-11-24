@@ -1,0 +1,218 @@
+<!-- 
+Modified By Hailey Niemand - 2013.06.04 - CHG0050810 - "Netbase Select" require same setting as Pick and Mix product 
+Modified by Hailey Niemand - 2014.01.13 - CHG0055795 - Display Subject Area
+Modified by Hailey Niemand - 2015.07.28 - CHG0067203 - Revised Product Structure to Include Category
+Modified by Hailey Niemand - 2015.11.05 - CHG0069531 - New Article Pass Field
+Modified by Jeff Lup - 2016.03.28 - CHG0072245 - Errors on New Opportunity in Lightning
+Modified by Piyush Jain -2017.7.17 -CHG0035801 for sorting the record based on Invoice Date
+Modified by Rishabh Singh - 2017.08.24 - CHG0036420 - Article Pass piclist field will appear for Article Pass product
+Modified by Chetan Bhatla - 2018.03.08 - CHG0042234- Expiry Date field will appear for Article Pass product
+Modified by Amit Kumar - 2018.07.17 - CHG0043878: Invoice System (SAP,PT,Quickfill), invoice number validation rule
+Modified by Sidhant Chauhan - 2021.03.30 - 01815201 - Updating VF Page to Lightning Style. 
+Modified by Kam Chandi - 2021.06.18 - 01913279 - Added field Agent's Name to VF page
+-->
+
+<apex:page standardController="Opportunity" extensions="OpportunityProductExtension" showHeader="false" lightningStylesheets="true">
+
+    <style>
+        div.bPageBlock.brandSecondaryBrd.apexDefaultPageBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }
+    </style>
+
+    <apex:form >
+        <apex:pageBlock mode="view" rendered="{!Opportunity.Id == null}"> <!-- CHG0072245 -->
+            You may add products after first saving the opportunity.
+        </apex:pageBlock>
+        <apex:pageBlock id="SectiontblOpps" mode="view" rendered="{!NOT(Opportunity.Id == null)}"> <!-- CHG0072245 -->
+            <apex:pageBlockButtons location="Top">
+                <apex:messages />
+                <apex:commandButton value="Edit/Add Products" action="{!AddProducts}"/>
+            </apex:pageBlockButtons>
+            <apex:outputPanel id="out" style="overflow:auto;height:250px" layout="block">
+                <apex:actionstatus id="status" startText="Loading Calls....">
+                    <apex:facet name="stop">
+                        <apex:outputPanel >
+
+                            <!-- NOT eBooks (original code) -->
+                            <!-- <apex:pageBlockTable value="{!allOppls}" var="Oppl" rendered="{!NOT(isBooks)}"> -->
+                            <apex:pageBlockTable value="{!productWrapperList}" var="w" rendered="{!NOT(isBooks)}">
+                                <apex:column headervalue="Product">    
+                                    <apex:outputText value="{!w.oli.ProductName__c}" escape="false" />
+                                </apex:column>
+                                
+                                <!--CHG0067203-->
+                                <!--
+                                <apex:column headervalue="Category" rendered="{!hasCategoryProduct}">    
+                                    <apex:outputText value="{!w.oli.Category__c}" escape="false" rendered="{!hasCategoryProduct}"/>
+                                </apex:column>
+                                -->
+                                <apex:column headerValue="Token Quantity" rendered="{!hasTokenProduct}" > <!-- CHG0069531 -->
+                                    <apex:outputField value="{!w.oli.Token_Quantity__c}" rendered="{!w.isToken}" />
+                                </apex:column>
+                            
+                                <apex:column headerValue="Subject Area" width="150" rendered="{!hasTokenProduct}"> <!-- CHG0049016 -->
+                                    <!--<apex:outputField value="{!Oppl.Subject_Area__c}" rendered="{!Oppl.ProductName__c == 'Article Pass – 100 Tokens' || Oppl.ProductName__c == 'Article Pass – 250 Tokens' || Oppl.ProductName__c == 'Article Pass – 500 Tokens' || Oppl.ProductName__c == 'Article Pass – 750 Tokens' || Oppl.ProductName__c == 'Article Pass – 1000 Tokens' || Oppl.ProductName__c == 'Article Pass – 1500 Tokens' || Oppl.ProductName__c == 'Article Pass – Open Number'}" />-->
+                                    <apex:outputField value="{!w.oli.Subject_Area__c}" rendered="{!w.isToken}" />
+                                </apex:column>
+                                <!-- start CHG0036420 -->
+                                 <apex:column headervalue="Article Pass Access" rendered="{!isArticlePassProd}">
+                                    <apex:outputField value="{!w.oli.Article_Pass__c}" rendered="{!w.hasArticlePassProduct}"/>
+                                </apex:column>
+                                <!-- End CHG0036420 -->
+                                
+                                <!-- Start CHG0043363 -->
+                              <!--  <apex:column headervalue="Invoice System" rendered="{!hasFeesProduct}"> 
+                                    <apex:outputField value="{!w.oli.Invoice_System__c}" rendered="{!NOT(w.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')}" />
+                                </apex:column>-->
+                                <!-- End CHG0043363 -->
+                                
+                                <apex:column headervalue="Invoice Number" rendered="{!hasFeesProduct}"> <!-- CHG0047104 -->
+                                    <apex:outputField value="{!w.oli.Invoice_Number__c}" rendered="{!NOT(w.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription') || w.oli.PricebookEntry.Product2.name='Core Subs'}"/> <!-- CHG0048320-->
+                                </apex:column>
+
+                                <apex:column headervalue="Invoice Date" rendered="{!hasFeesProduct}"> <!-- CHG0047104 -->
+                                  <!-- CHG0035801 Start Sort Functionality -->
+                                <apex:facet name="header">
+                                    <apex:commandLink action="{!getAllOppls}" value="Invoice Date{!IF(sortExpression=='Invoice_Date__c',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                                     <apex:param value="Invoice_Date__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                       </apex:commandLink>
+                                </apex:facet>
+                                <!--End Sort Functionality -->
+                                
+                                
+                                    <apex:outputField value="{!w.oli.Invoice_Date__c}" rendered="{!NOT(w.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')|| w.oli.PricebookEntry.Product2.name='Core Subs'}"/> <!-- CHG0048320-->
+                                </apex:column>
+                                <!-- CHG0042234-->
+                               <apex:column headervalue="Expiry Date" rendered="{!isArticlePassProd}">                               
+                               <apex:outputField value="{!w.oli.Expiry_date__c}" rendered="{!w.hasArticlePassProduct}"/>
+                                </apex:column>
+                              
+                                  <!--END CHG0042234-->
+                                
+                                <apex:column value="{!w.oli.Description}"/>
+                                   
+
+                                <!-- CHG0049016 
+                                <apex:column value="{!Oppl.TotalPrice_EUR__c}"/>
+                                <apex:column value="{!Oppl.TotalPrice_GBP__c}"/>
+                                <apex:column value="{!Oppl.TotalPrice_USD__c}"/>
+                                <apex:column value="{!Oppl.TotalPrice_AUD__c}"/>
+                                -->
+                                 
+                                <apex:column headervalue="Total Price ({!oppCurrency})"> <!-- CHG0049016 -->
+                                    <apex:outputText value="{!w.oli.TotalPrice}"/>
+                                </apex:column>  
+
+                                 
+                                <apex:column headervalue="Net Price ({!oppCurrency})" rendered="{!hasFeesProduct}"> <!-- CHG0047104 & CHG0048320 -->
+                                    <apex:outputText value="{!w.oli.Net_Price__c}" rendered="{!NOT(w.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')|| w.oli.PricebookEntry.Product2.name='Core Subs'}"/>
+                                </apex:column>  
+
+                            </apex:pageBlockTable> 
+
+                            <!-- eBooks - CHG0045928 -->
+                            <!-- <apex:pageBlockTable value="{!allOppls}" var="Oppl" rendered="{!isBooks}"> -->
+                            <apex:pageBlockTable id="SectiontblOpps" value="{!productWrapperList}" var="w" rendered="{!isBooks}">
+                                <apex:column headervalue="Product">    
+                                    <apex:outputText value="{!w.oli.ProductName__c}" escape="false" />
+                                </apex:column>
+                                
+                                <!--CHG0067203-->
+                                <apex:column headervalue="Category" rendered="{!hasCategoryProduct}">    
+                                    <apex:outputText value="{!w.oli.Category__c}" escape="false" rendered="{!hasCategoryProduct}"/>
+                                </apex:column>
+                            <!--THIS IS ONLY FOR TESTING REMOVE BEFORE UPLOAD-->
+                                <apex:column headerValue="Product Name" width="150" rendered="{!hasCategoryProduct}"> 
+                                    <apex:outputField value="{!w.oli.Product_Name__c}" rendered="{!w.isCategory}" />
+                                </apex:column>
+                                <apex:column headerValue="Product Code" width="150" rendered="{!hasCategoryProduct}"> 
+                                    <apex:outputField value="{!w.oli.Product_Code__c}" rendered="{!w.isCategory}" />
+                                </apex:column>
+                            <!--THIS IS ONLY FOR TESTING REMOVE BEFORE UPLOAD-->
+                                
+                                <apex:column headerValue="Token Quantity" rendered="{!hasTokenProduct}" > <!-- CHG0069531 -->
+                                    <apex:outputField value="{!w.oli.Token_Quantity__c}" rendered="{!w.isToken}" />
+                                </apex:column>
+
+                                <apex:column headerValue="Subject Area" width="150" rendered="{!hasTokenProduct}" > <!-- CHG0049016 -->
+                                    <!--<apex:outputField value="{!Oppl.Subject_Area__c}" rendered="{!Oppl.ProductName__c == 'Article Pass – 100 Tokens' || Oppl.ProductName__c == 'Article Pass – 250 Tokens' || Oppl.ProductName__c == 'Article Pass – 500 Tokens' || Oppl.ProductName__c == 'Article Pass – 750 Tokens' || Oppl.ProductName__c == 'Article Pass – 1000 Tokens' || Oppl.ProductName__c == 'Article Pass – 1500 Tokens' || Oppl.ProductName__c == 'Article Pass – Open Number'}" />--> <!-- CHG0049016 -->
+                                    <apex:outputField value="{!w.oli.Subject_Area__c}" rendered="{!w.isToken}" />
+                                </apex:column>
+
+                                <!-- <apex:column value="{!w.oli.eBook_Order_Type__c}"/> --> <!-- eBooks Renewals Project -->
+                                <apex:column value="{!w.oli.Seats_Users__c}"/>
+                                <!-- <apex:column value="{!Oppl.ServiceDate}"/> -->
+                                
+                                
+
+                                
+                                
+                                
+                                <!-- start CHG0036420 -->
+                                <apex:column headervalue="Article Pass Access" rendered="{!isArticlePassProd}">
+                                    <apex:outputField value="{!w.oli.Article_Pass__c}" rendered="{!w.hasArticlePassProduct}"/>
+                                </apex:column>
+                                <!-- End CHG0036420 -->
+                                
+                                <!-- Start CHG0043363 -->
+                              <!--  <apex:column headervalue="Invoice System" rendered="{!hasFeesProduct}"> 
+                                    <apex:outputField value="{!w.oli.Invoice_System__c}" rendered="{!NOT(w.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')}"/>
+                                </apex:column>-->
+                                <!-- End CHG0043363 -->
+                                
+                                <apex:column headervalue="Invoice Number" rendered="{!hasFeesProduct}"> <!-- CHG0047104 -->
+                                    <apex:outputField value="{!w.oli.Invoice_Number__c}" rendered="{!NOT(w.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')}"/> <!-- CHG0048320-->
+                                </apex:column>
+
+                               <!-- <apex:column headervalue="Invoice Date" rendered="{!hasPickAndMixProduct}">--> <!-- CHG0047104 & CHG0048678 -->
+                                 <apex:column headervalue="Invoice Date">
+                                 <!-- CHG0035801 Start Sort Functionality -->
+                                 <apex:facet name="header">
+                                    <apex:commandLink action="{!getAllOppls}" value="Invoice Date{!IF(sortExpression=='Invoice_Date__c',IF(sortDirection='ASC','▼','▲'),'')}" reRender="SectiontblOpps">
+                                     <apex:param value="Invoice_Date__c" name="column" assignTo="{!sortExpression}" ></apex:param>
+                                       </apex:commandLink>
+                                </apex:facet>
+                                <!--End Sort Functionality -->
+                                    <!-- <apex:outputField value="{!Oppl.Invoice_Date__c}" rendered="{!NOT(Oppl.PricebookEntry.Product2.Service_Description__c == 'Subscription')}"/>  -->
+                                     <!--<apex:outputField value="{!w.oli.Invoice_Date__c}" rendered="{!w.oli.PricebookEntry.Product2Id == '01t60000001q7zXAAQ' || w.oli.PriceBookEntry.Product2Id == '01t600000040n5LAAQ'}" />--> <!-- only for Pick & Mix, per CHG0048678. CHG0050810 - include Netbase Select Product-->
+                                      <apex:outputField value="{!w.oli.Invoice_Date__c}" rendered="{!isBooks}" /> <!-- Invoice date should visible for all ebooks products as per CHG0043155 -->
+                                </apex:column>
+                                    <!-- CHG0042234-->
+                               <apex:column headervalue="Expiry Date" rendered="{!isArticlePassProd}">                               
+                               <apex:outputField value="{!w.oli.Expiry_date__c}" rendered="{!w.hasArticlePassProduct}"/>
+                                </apex:column>
+                                
+                                  <!--END CHG0042234-->              
+                                                                
+                                <!-- CHG0049016
+                                <apex:column value="{!Oppl.TotalPrice_GBP__c}"/>
+                                <apex:column value="{!Oppl.TotalPrice_USD__c}"/>
+                                -->
+                                <apex:column headervalue="Total Price ({!oppCurrency})"> <!-- CHG0049016 -->
+                                    <apex:outputText value="{!w.oli.TotalPrice}"/>
+                                </apex:column>  
+
+                                <!-- removed from eBooks per INC0713822
+                                <apex:column headervalue="Net Price ({!oppCurrency})"> CHG0047104
+                                    <apex:outputText value="{!Oppl.Net_Price__c}"/>
+                                </apex:column>
+                                -->
+                                
+                                <apex:column value="{!w.oli.Description}"/>
+                                
+                                
+              <!--New field added 'Agent Name'-->
+                                <apex:column value="{!w.oli.Agent_s_Name__c}"/>
+                                
+                                
+                            </apex:pageBlockTable> 
+
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionstatus>
+            </apex:outputPanel>
+        </apex:pageblock> 
+    </apex:form>
+</apex:page>

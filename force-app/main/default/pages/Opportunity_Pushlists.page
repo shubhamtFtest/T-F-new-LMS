@@ -1,0 +1,21 @@
+<!--
+ Last Modified by Shay Spoonmore (shay.spoonmore@informausa.com)2013-02-22
+ -->
+<apex:page standardController="Opportunity"  extensions="OpporttunityPushlistsCon">
+<apex:form >  
+<style>.fewerMore { display: none;}</style>
+<apex:pageblock id="CustomList" title="Related Product Pushlists"  >   
+<apex:pageBlockTable value="{!push}" var="p" rendered="{!NOT(ISNULL(push))}">        
+<apex:column value="{!p.Name}"/>   
+<apex:column value="{!p.T_F_GT_Pushlists__r.Name}" />      
+<apex:column value="{!p.PROFILE_NAME__c}"/>        
+<apex:column value="{!p.Product__r.Name}"/>       
+<apex:column value="{!p.Product__r.ISBN__c}"></apex:column>       
+<apex:column value="{!p.Product__r.Edition_Number__c}"/>  
+<apex:column value="{!p.Product__r.Author__c}"/>     
+</apex:pageBlockTable>   
+<apex:outputLabel value="No records to display" rendered="{!(ISNULL(push))}" styleClass="noRowsHeader">
+</apex:outputLabel> 
+</apex:pageblock>
+</apex:form>
+</apex:page>

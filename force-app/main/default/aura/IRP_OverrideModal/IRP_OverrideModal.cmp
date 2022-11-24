@@ -1,0 +1,47 @@
+<!-- IRP_OverrideModal -->
+<aura:component controller="TF_IndiaRePrintCtr">
+    <aura:attribute name="isOverrideModalOpen" type="boolean" default="false"/> 
+    <aura:attribute name="opportunityLineItemId" type="string"/>
+    <aura:attribute name="comment" type="string"/>
+    <aura:attribute name="opportunityLineItemRemark" type="string"/>
+    
+    <aura:attribute name="oppOwnerId" type="Id"/>
+    <aura:attribute name="oppCreatedById" type="Id"/>
+    <aura:attribute name="userId" type="Id" default=""/>
+    <aura:handler name="init" value="this" action="{!c.doInit}"/>
+    <aura:if isTrue="{!v.isOverrideModalOpen}">        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeOverrideModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                <h1 class="slds-text-heading--medium">Approve Override Request</h1>    
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p><b>Reprint Eligibility Failed Reason :</b> {!v.opportunityLineItemRemark}</p>
+                    <p>
+                        <lightning:textarea aura:id="comment" name="comment" value="{!v.comment}" placeholder="Please give your comments"/>                       
+                        <aura:if isTrue="{!(v.oppOwnerId == v.userId || v.oppCreatedById == v.userId)}" >
+                            <lightning:button variant="brand" label="Submit Approval" onclick="{!c.approveOverrideRequest}" />
+                            <aura:set attribute="else">
+                                <lightning:button variant="brand" label="Submit Approval" onclick="{!c.approveOverrideRequest}" disabled="true"/>
+                            	<i>Only opportunity owner OR opportunity created by user can override.</i>
+                            </aura:set>
+                        </aura:if>                       
+                        <div style="float:right"><span style="color:red">*</span>Comment is mandatory field.</div>
+                    </p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Close"
+                                      title="Close"
+                                      onclick="{! c.closeOverrideModel }"/>
+                </footer>
+            </div>
+        </section>       
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>   
+</aura:component>

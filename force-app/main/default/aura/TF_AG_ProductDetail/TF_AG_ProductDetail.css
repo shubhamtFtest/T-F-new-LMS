@@ -1,0 +1,4 @@
+.THIS #container {height: 100%; width:100%;}
+.THIS .left,.THIS .right {display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 12px;}
+.THIS .left {width: 50%; }
+.THIS .right {width: 50%;}

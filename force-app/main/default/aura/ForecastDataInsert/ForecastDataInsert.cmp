@@ -1,0 +1,76 @@
+<aura:component controller="CreateForecastQuotaRecords"  implements="force:appHostable,flexipage:availableForAllPageTypes" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="showTable" type="boolean" default="false"/>
+    <aura:attribute name="showFormQuota" type="boolean" default="false"/>
+    <aura:attribute name="showMenu" type="boolean" default="false"/>
+    <aura:attribute name="InsertQuotaType" type="String" default="Revenue"/>           
+        <!-- territory , producttype , Revenue -->
+    <aura:attribute name="editMode" type="boolean" default="false"/> 
+    <aura:attribute name="objForecastingQuota" type="ForecastingQuota"/>
+
+
+    
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>    
+    <article class="slds-card">
+        <div class="slds-grid slds-einstein-header slds-card__header">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-grid slds-grid_vertical-align-center slds-size_3-of-4 slds-medium-size_2-of-3">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-utility-salesforce1">
+                            
+                            <lightning:Icon  iconName="utility:salesforce1" alternativeText="Approved" size="medium"
+                                            class="slds-icon  slds-icon-text-default"  />
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-truncate" title="FORECAST QUOTA">
+                            <a href="javascript:void(0);" class="slds-card__header-link" title="FORECAST QUOTA">
+                                <span class="slds-text-heading_small">FORECAST QUOTA   </span>
+                            </a>
+                        </h2>
+                    </div>
+                </div>
+                <div class="slds-einstein-header__figure slds-size_1-of-4 slds-medium-size_1-of-3"></div>
+            </header>
+            <div class="slds-einstein-header__actions">
+                <div class="slds-button-group" role="group">
+                    <lightning:buttonIcon iconName="utility:add" onclick="{!c.showForm}"  variant="border-filled" alternativeText="New forecast quote" />
+                    
+                    <aura:if isTrue="{!v.showMenu}"> 
+                        <lightning:buttonMenu aura:id="menu" class="slds-m-left_x-small" menuAlignment="right" iconName="utility:settings" alternativeText="Show menu" onselect="{! c.handleSelect }">
+                            <lightning:menuItem aura:id="menuItems"  checked="true" label="forecast quote by Revenue" value="Revenue" />
+                            <lightning:menuItem aura:id="menuItems"  checked="false" label="forecast quote by territory" value="territory" />
+                            <lightning:menuItem aura:id="menuItems" checked="false" label="forecast quote by product type" value="producttype" />
+                        </lightning:buttonMenu> 
+                    </aura:if>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <!-- table here   showTable showFormQuota-->
+            <aura:if isTrue="{!v.showTable}" > 
+                <c:ForecastQuotaDataTable editMode="{!v.editMode}" objForecastingQuota="{!v.objForecastingQuota}"  showTable="{!v.showTable}" showFormQuota="{!v.showFormQuota}" />
+            </aura:if>
+            <!-- insert form -->  
+            <aura:if isTrue="{!v.showFormQuota}" > 
+                 <c:ForecastQuotaForm showTable="{!v.showTable}" showFormQuota="{!v.showFormQuota}" Spinner="{!v.Spinner}"  InsertQuotaType="{!v.InsertQuotaType}" showMenu="{!v.showMenu}" editMode="{!v.editMode}" objForecastingQuota="{!v.objForecastingQuota}"/> 
+            </aura:if>    
+        </div>
+        <footer class="slds-card__footer">
+            <a class="slds-card__footer-action" href="javascript:void(0);"> <!--End -->
+                <span class="slds-assistive-text"> 
+                </span>
+            </a>
+        </footer>
+    </article>
+</aura:component>

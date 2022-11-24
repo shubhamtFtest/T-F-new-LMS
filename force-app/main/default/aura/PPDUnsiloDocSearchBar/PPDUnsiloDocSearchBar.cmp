@@ -1,0 +1,10 @@
+<aura:component implements="flexipage:availableForAllPageTypes,lightning:isUrlAddressable" access="global" controller="TF_ProcessUnsiloresponse">
+    <aura:attribute name="recordId" type="String"/>  
+    <aura:attribute name="issearching" type="Boolean"/>
+    <aura:attribute name="calledFrom" type="String" default = ""/>
+    <aura:registerEvent name="contentSearchEvent" type="c:PPDContentSearchEvent"/>
+    
+    <div onkeyup="{! c.handleKeyUp }">
+        <lightning:input aura:id="contentSearch" name="contentSearch" placeholder="Search By Content..." type="search" isLoading="{! v.issearching }" onchange ="{! c.changeEvt }"/>
+    </div>
+</aura:component>

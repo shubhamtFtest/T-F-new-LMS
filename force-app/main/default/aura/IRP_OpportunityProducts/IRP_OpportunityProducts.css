@@ -1,0 +1,50 @@
+.THIS .Active {background-color: green;    }
+.THIS .Inactive {background-color: red;    }
+
+.THIS .greencolor svg { fill : green; }
+.THIS .greencolor, .THIS .greencolor a { color: green ; }
+.THIS .greencolor svg { fill: green !important; }
+
+.THIS .redcolor svg { fill : red; }
+.THIS .redcolor, .THIS .greencolor a { color: red ; }
+.THIS .redcolor svg { fill: red !important; }
+
+.THIS .bluecolor svg { fill : blue; }
+.THIS .bluecolor, .THIS .greencolor a { color: blue ; }
+.THIS .bluecolor svg { fill: blue !important; }
+
+.THIS .blackcolor svg{fill : black; }
+.THIS .blackcolor{color : black ;}
+.THIS .blackcolor a{color : black ;}
+.THIS .blackcolor svg{color : black !important;}
+
+.THIS .orangecolor svg { fill : #FFA500; }
+.THIS .orangecolor, .THIS .greencolor a { color: #FFA500; }
+.THIS .orangecolor svg { fill: #FFA500 !important; }
+
+.THIS .purplecolor svg { fill : #800080; }
+.THIS .purplecolor, .THIS .greencolor a { color: #800080; }
+.THIS .purplecolor svg { fill: #800080 !important; }
+
+.THIS .tealcolor svg { fill : #008080; }
+.THIS .tealcolor, .THIS .greencolor a { color: #008080; }
+.THIS .tealcolor svg { fill: #008080 !important; }
+
+.THIS .olivecolor svg { fill : #808000; }
+.THIS .olivecolor, .THIS .greencolor a { color: #808000; }
+.THIS .olivecolor svg { fill: #808000 !important; }
+
+.THIS .hotpinkcolor svg { fill : #FF69B4; }
+.THIS .hotpinkcolor, .THIS .greencolor a { color: #FF69B4; }
+.THIS .hotpinkcolor svg { fill: #FF69B4 !important; }
+
+.THIS #addproductmodal .slds-modal__container{ height : auto; width: 100%; max-width: 200vh; } 
+.THIS #historymodal .slds-modal__container{ height : auto; width: 100%; max-width: 200vh; }
+.THIS #InvoiceUploadModal .slds-modal__container{ height : auto; width: 80%; max-width: 200vh; }
+.THIS .custom-box {text-align: center;padding: 1rem;}
+.THIS .custom-box-button{text-align: center;} 
+.THIS .custom-box-button-right{float:right} 
+.THIS #datatbl div.slds-scrollable_y { 
+     min-height: 200px;
+}
+.THIS .custom-box-button-new { background-color: #f5f5f5; padding: 5px }

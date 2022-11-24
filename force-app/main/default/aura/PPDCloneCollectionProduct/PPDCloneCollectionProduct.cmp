@@ -1,0 +1,28 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_ProcessUnsiloresponse">
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="clonedProductId" type="String"/>
+    <aura:attribute name="totalRecs" type="Integer"/>
+    <aura:attribute name="processedRecs" type="Integer" default = "0"/>
+    <aura:attribute name="pstn" type="Integer" default = "0"/>
+    <aura:attribute name="ShowModal" type="String"/>
+    <aura:attribute name="IsSpinner" type="Boolean"/>
+    <aura:attribute name="IsEmailSent" type="Boolean"/>
+    
+    
+    
+    <!--<aura:handler event="c:PPDGenericEvent" action="{!c.copyBundleItems}"/>-->
+    <aura:handler event="c:PPDGenericEvent" action="{!c.copyBundleLineItemsFromParts}"/>
+    
+    <!-- spinner -->
+    <aura:if isTrue="{!v.IsSpinner}">
+        <lightning:spinner aura:id="lgtSpinner" alternativeText="Processing.." title="Processing. You will be redirceted to the new product version" variant="brand" size="medium" />
+    </aura:if>
+    
+    <div class="slds-box">
+        <div class="Row">
+            <div class=".slds-text-heading_medium">Are you sure you want to edit this record, this would create a new version of this product?</div> 
+            <lightning:button label="Proceed"  iconPosition="left"  variant="brand" onclick="{!c.cloneProductRecord}"/>
+            <lightning:button label="Cancel"  iconPosition="left"  variant="brand" onclick="{!c.closeModal}"/>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,369 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="IR_Controller" >
+    <c:IR_CommonServerAction aura:id="server" />
+    <c:IR_CommonToastService aura:id="toast" />
+    <!--declare attributes--> 
+    <aura:attribute name="OrderLineItem" type="List" />
+    <aura:attribute name="CreateButtDisabled" type="boolean" default="false" />
+    <aura:attribute name="ApprovedButtDisabled" type="boolean" default="false" />
+    <aura:attribute name="SelectIds" type="List" />
+    <aura:attribute name="ProfileCheack" type="boolean" />
+    <aura:attribute name="SelectPrinterOrNot" type="List" />
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:attribute name="selectedRecord" type="sObject" default="{'Id':'','Name':''}" description="Use,for store SELECTED sObject Record"></aura:attribute>
+    <aura:attribute name="listOfSearchRecords" type="List" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="SearchKeyWord" type="string"/>
+    <aura:attribute name="objectAPIName" type="string" default=""/>
+    <aura:attribute name="IconName" type="string" default=""/>
+    <aura:attribute name="label" type="string" default=""/>
+    <aura:attribute name="Message" type="String" default=""/>
+    <aura:attribute name="Idrec" type="String" default=""/>
+    <aura:attribute name="OrliId" type="String" default=""/>
+    <aura:attribute name="isOrderPlaced" type="boolean" default="false"/>
+    <aura:attribute name="showError" type="boolean" default="false"/>
+   <aura:attribute name="invoicenotthere" type="boolean" default="true"/>
+
+    <!--declare attributes--> 
+    <aura:handler name="oSelectedRecordEvent" event="c:IR_selectedAccountEvent" action="{!c.handleComponentEvent}"/>
+    <aura:attribute name="OrderLineItemList" type="List" default="[]" access="private" />
+    <aura:attribute name="columns" type="List" default="[]" access="private" />
+    <aura:attribute name="sortedDirection" type="String" default="asc"/>
+    <aura:attribute name="sortedBy" type="String" default="Name"/>
+    <aura:attribute name="hasModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="selectedDocumentId" type="string"/>
+    <aura:attribute name="selectedId" type="String" />
+    <aura:attribute Name="selItem2" type="object"  access="public" />
+    <!--declare attributes--> 
+    <!--declare events hendlers-->  
+    <aura:handler name="oSelectedAccountEvent" event="c:IR_selectedAccountEvent" action="{!c.handleComponentEvent}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onInit}" />  
+                   <aura:if isTrue="{!v.invoicenotthere}">
+
+    <lightning:layoutItem size="12" padding="around-small">
+        <div  class="slds-text-align_left tableshow" style="width: 100%;">
+            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Order Line Items</h2>
+            <header class="slds-modal__header">
+                
+                <aura:if isTrue="{!v.isOrderPlaced}">
+                    <lightning:datatable class="wideCell"
+                                         columns="{! v.columns }"
+                                         data="{!v.OrderLineItemList}"
+                                         keyField="Id"
+                                         hideCheckboxColumn="true"
+                                         sortedBy="{!v.sortedBy}"  
+                                         onsort="{!c.updateColumnSorting}"
+                                         sortedDirection="{!v.sortedDirection}"
+                                         
+                                         />   
+                    
+                    <aura:set attribute="else">
+                        
+                        <aura:if isTrue="{!v.OrderLineItemList.length > 0}">
+                            
+                            <div style="height: 100%" id="datatbl">
+                                <aura:if isTrue="{!v.ProfileCheack}">
+                                    <lightning:button  variant="brand" label="Place Print Order"  onclick="{! c.CreatePrintOrder }"  disabled="{!v.CreateButtDisabled}"/>
+                                    <aura:set attribute="else">
+                                        <lightning:button  variant="brand"  label="Place Print Order"  onclick="{! c.SendToProd }" disabled="{!v.ApprovedButtDisabled}" />
+                                        
+                                    </aura:set>
+                                </aura:if>
+                                <lightning:datatable class="wideCell"
+                                                     columns="{! v.columns }"
+                                                     data="{!v.OrderLineItemList}"
+                                                     keyField="Id"
+                                                     hideCheckboxColumn="false"
+                                                     sortedBy="{!v.sortedBy}" 
+                                                     onsort="{!c.updateColumnSorting}"
+                                                     sortedDirection="{!v.sortedDirection}"
+                                                     onrowaction="{!c.buttonAction}" 
+                                                     onrowselection="{!c.getSelectedName}"
+                                                     
+                                                     />
+                                
+                                
+                                <aura:set attribute="else">
+                                    <b> No Record Found</b>
+                                </aura:set>
+                            </div>
+                            
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+                
+            </header>
+            
+        </div>      
+        
+    </lightning:layoutItem>
+    </aura:if>
+    <aura:if isTrue="{!v.hasModalOpen}">
+        <div class="demo-only" >
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" >
+                    <header class="slds-modal__header" >
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.HideMe }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"  />
+                        <h2 id="modal-heading-01" class="slds-text-heading_Small slds-hyphenate">Edit Order Item</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-col slds-size_1-of-3">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Product Name :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Name}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Reprint Type :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Type}" />
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Quantity :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placehold="" class="slds-output" value="{!v.OrderLineItem[0].Quantity}" />
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                            </div>
+
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Reference Number :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].ReferenceNumber}" />
+                                    </div>
+                                </div> 
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Global ISBN :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].ISBN}" />
+                                    </div>
+                                </div> 
+                            </div>
+                             <div class="slds-col slds-size_1-of-3">
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Indian ISBN:</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].IndianISBN}" />
+                                    </div>
+                                </div> 
+                                
+                            </div>
+                            
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Author:</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Author}" />
+                                    </div>
+                                </div> 
+                            </div>
+                             <div class="slds-col slds-size_1-of-3">
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">UMC :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].UMC}" />
+                                    </div>
+                                </div> 
+                                
+                            </div>
+                            
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Status:</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Status}" />
+                                    </div>
+                                </div> 
+                            </div>
+                             <div class="slds-col slds-size_1-of-3">
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Binding Type :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Binding}" />
+                                    </div>
+                                </div> 
+                                 
+                            </div>
+                           
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Cover Paper:</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Cover_Paper}" />
+                                    </div>
+                                </div> 
+                            </div>
+                             <div class="slds-col slds-size_1-of-3">
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Text Colour :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Text_Colour}" />
+                                    </div>
+                                </div> 
+                                
+                            </div>
+							<div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Insert Paper:</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Insert_Paper}" />
+                                    </div>
+                                </div> 
+                            </div>
+                             <div class="slds-col slds-size_1-of-3">
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">MRP :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].MRP}" />
+                                    </div>
+                                </div> 
+                                
+                            </div>
+							<div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Version Type:</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Version_Type}" />
+                                    </div>
+                                </div> 
+                            </div>
+                             <div class="slds-col slds-size_1-of-3">
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Paper Type GSM :</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Paper_Type_GSM}" />
+                                    </div>
+                                </div> 
+                                
+                            </div>
+							<div class="slds-col slds-size_1-of-3">
+                                  <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Popular Format:</label>
+                                    <div class="slds-form-element__control">
+                                        <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Popular_Format}" />
+                                    </div>
+                                </div> 
+                            </div>
+                           
+                                <div class="slds-col slds-size_1-of-3">
+                            </div> 
+                            
+                            
+                                
+                            <div class="slds-col slds-size_1-of-3">
+                                <aura:if isTrue="{!v.OrderLineItem[0].ProfileCheack}">
+                                    <div onmouseleave="{!c.onblur}" aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+                                        <label class="slds-form-element__label" for="lookup-348">Printer Name</label>
+                                        <!--This part is for display search bar for lookup-->  
+                                        <div class="slds-form-element__control">
+                                            
+                                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                                <!-- This markup is for when an record is selected -->
+                                                <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                                                    <lightning:pill class="pillSize" label="{!v.selectedRecord.Name}" name="{!v.selectedRecord.Name}" onremove="{! c.clear }">
+                                                        <aura:set attribute="media">
+                                                            <lightning:icon iconName="{!v.IconName}" size="x-small" alternativeText="{!v.IconName}"/>
+                                                        </aura:set>
+                                                    </lightning:pill>
+                                                </div>
+                                                <div aura:id="lookupField" class="slds-show">
+                                                    <lightning:icon class="slds-input__icon slds-show" iconName="utility:search" size="x-small" alternativeText="search"/>
+                                                    <span class="slds-icon_container  slds-combobox__input-entity-icon" title="record">
+                                                        <lightning:icon class="slds-icon slds-icon slds-icon_small slds-icon-text-default" iconName="{!v.IconName}" size="x-small" alternativeText="icon"/>
+                                                        <span class="slds-assistive-text"></span>
+                                                    </span>
+                                                    <ui:inputText click="{!c.onfocus}" updateOn="keyup" keyup="{!c.keyPressController}" class="slds-lookup__search-input slds-input leftPaddingClass" value="{!v.SearchKeyWord}" placeholder="search.."/>
+                                                </div>   
+                                            </div>
+                                        </div>
+                                        <!--This part is for Display typehead lookup result List-->  
+                                        <ul style="min-height:40px;margin-top:0px !important" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                                            <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+                                            <center> {!v.Message}</center>
+                                            <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec" indexVar="idx">
+                                                
+                                                <li role="presentation"  data-record="{!idx}" class="slds-listbox__item" onclick="{!c.selectRecord}">
+                                                    <span id="listbox-option-unique-id-01" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                        <span class="slds-media__figure">
+                                                            <span class="slds-icon_container" title="Description of icon when needed">
+                                                                <lightning:icon iconName="{!v.IconName}" class="slds-icon slds-icon_small" size="small" alternativeText="icon"/>
+                                                                <span class="slds-assistive-text">Description of icon</span>
+                                                            </span>
+                                                        </span>    
+                                                        <span class="slds-media__body">  
+                                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!singleRec.Name}</span>
+                                                        </span>
+                                                    </span>
+                                                </li>
+                                                <!--c:IR_CustomLookupResult oRecord="{!singleRec}" IconName="{!v.IconName}"/-->
+                                                
+                                            </aura:iteration>
+                                        </ul>
+                                    </div>
+                                    
+                                    <aura:set attribute="else">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="text-input-id-1">Status:</label>
+                                        <div class="slds-form-element__control">
+                                            <output type="text" id="text-input-id-1" readonly="true" placeholder="" class="slds-output" value="{!v.OrderLineItem[0].Printer}" />
+                                        </div>
+                                        </div>       
+                                    </aura:set>
+                                </aura:if>`
+                            </div>
+                            
+                        </div>
+                        <center>   <aura:if isTrue="{!v.OrderLineItem[0].ProfileCheack}">
+                            
+                            <lightning:button variant="brand" label="Save" iconName="utility:save" iconPosition="left" onclick="{! c.SaveRecord }" />
+                            </aura:if></center>
+                    </div>
+                    
+                    
+                </div>
+                
+            </section>
+            
+        </div>
+        
+    </aura:if>  
+    <!-- Splinner-->
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    
+</aura:component>

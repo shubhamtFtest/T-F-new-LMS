@@ -1,0 +1,53 @@
+<apex:page standardController="Case" extensions="BulkUpdateCase" lightningStylesheets="true" standardStylesheets="true" recordSetVar="cases"> 
+<apex:form id="updateStatus">
+
+    <script type="text/javascript">
+        
+        function backWin(updated){ 
+         
+           if (updated == 'true'){
+           
+                 window.history.back();
+           }
+        }
+                
+    </script>
+    
+<apex:sectionHeader title="Change Case Status"/>
+
+    <apex:actionStatus id="pageStatus">
+        <apex:facet name="start">
+            <apex:outputPanel >
+                <img src="/img/loading32.gif" width="25" height="25" />
+                <apex:outputLabel value="Processing..."/>
+            </apex:outputPanel>            
+        </apex:facet>
+    </apex:actionStatus>
+
+
+    <apex:pageBlock mode="Edit">
+        <apex:pageMessages id="message" ></apex:pageMessages>
+        
+        <div style="text-align:left; margin-bottom:0.5em; font-size: 20px; font-weight:bold; Color: #000000;">
+            <apex:outputLabel value="{!selectedCount} Case Selected"  rendered="{!selectedCount == 1}"/>
+            <apex:outputLabel value="{!selectedCount} Cases Selected"  rendered="{!selectedCount != 1}"/>
+        </div>
+        
+        <apex:pageBlockButtons location="bottom">
+            <apex:commandButton value="Save" action="{!updateStatus}" disabled="{! IF(selectedCount == 0, true, false)}" rerender="updateStatus" status="pageStatus" oncomplete="backWin('{!updated}')" />
+            <apex:commandButton action="{!cancel}" value="Cancel" immediate="true"/>
+        </apex:pageBlockButtons>
+        
+        <br/>
+        <apex:pageBlockSection title="Select New Status" collapsible="false">
+        <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="New Status " for="theStatus"/>
+                    <apex:inputField value="{!cas.status}" label="Status" id="theStatus" required="true"/>
+        </apex:pageBlockSectionItem>       
+        </apex:pageBlockSection>
+    
+</apex:pageBlock>
+    
+</apex:form>
+    
+</apex:page>

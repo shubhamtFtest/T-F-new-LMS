@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION" description="Event template" >
+    <aura:attribute name="totalPriceUSD" type="Decimal" />
+    <aura:attribute name="totalPriceGBP" type="Decimal" />
+    <aura:attribute name="isStatic" type="String" />
+</aura:event>

@@ -1,0 +1,84 @@
+.THIS .Column
+{
+    display: table-cell;
+}
+
+.THIS .Row
+{
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    border-spacing: 10px;
+}
+
+.THIS .custom-background {
+    background-color: grey;
+}
+
+.THIS .customRequired{
+ font-weight: 400; } .THIS .customRequired:before{    
+ content: "*";
+ margin: 0 0.125rem 0 0.125rem;
+ color: rgb(194, 57, 52);
+ float: left; } 
+
+.THIS .none{
+ display:none; }
+
+
+.THIS .label { 
+  padding-left: 2px;
+}
+
+.THIS .labelRow { 
+  padding-top:5px;
+  padding-bottom:5px;
+  margin-top:10px;
+  
+}
+
+.THIS .tile { 
+  padding: 5px;
+}
+
+.THIS .align {
+    margin:5px;
+}
+
+.THIS .select { 
+  width:25%;
+    padding-left:25px;
+}
+
+.THIS.c-containerOuter {
+    border: 1px solid #d8dde6;
+    background-color: white;
+    margin-top: 15px;    
+   
+}
+
+.THIS.desc-scroll {
+    overflow:auto;
+    height:50px;
+    display:block;   
+    background-color:#DCDCDC;
+    margin-top: 15px;  
+}
+
+.THIS.bg-modal{
+    background-color: grey;
+    
+}
+
+/*.THIS .checkBox{
+    left: -130px;
+}*/
+
+/*.THIS .slds-checkbox{
+    float: left; position: relative;  display: block; top: -20px; width: 80%;	
+    
+}
+
+.THIS .slds-checkbox__label{
+    padding-right: 80px; position: relative; z-index: 1; display: block; width: auto;
+}*/

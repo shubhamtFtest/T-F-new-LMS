@@ -1,0 +1,3 @@
+<aura:component controller="TF_PrePopulateRecords" implements="flexipage:availableForAllPageTypes,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global">
+    <lightning:button class="slds-button slds-button--brand" onclick="{!c.fetchMyCaseDetails}">Create Contact</lightning:button>        
+</aura:component>

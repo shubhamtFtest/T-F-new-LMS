@@ -1,0 +1,16 @@
+.THIS.c-container {
+    border: 1px solid #d8dde6;
+    margin-top:2px;
+    margin-bottom: 5px;
+}
+
+.THIS .align {
+    margin:10px;
+    font-weight: bold;
+}
+
+
+.THIS .select { 
+  width:60%;
+    padding-left:5px;
+}

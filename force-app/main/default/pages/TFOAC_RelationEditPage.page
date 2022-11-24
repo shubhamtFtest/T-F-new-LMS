@@ -1,0 +1,65 @@
+<apex:page standardcontroller="TFOAC_Relationship__c">
+<apex:pageMessages />
+	<apex:sectionheader title="{!$ObjectType.TFOAC_Relationship__c.label} Edit" subtitle="{!IF(ISNULL(TFOAC_Relationship__c.Name), 'New Relationship',TFOAC_Relationship__c.Name)}"/>
+	<apex:form >
+		<apex:pageblock mode="edit" title="{!$ObjectType.TFOAC_Relationship__c.label} Edit">
+			<apex:pageblockbuttons >
+				<apex:commandbutton value="Save" action="{!Save}"/>
+				<apex:commandbutton value="Cancel" action="{!Cancel}"/>
+                <div class="btn" style="padding: 4px;font-weight: bold;font-size: .9em;">
+                	<a target="_blank" style="text-decoration: blink;"  href="{!URLFOR($Action.Contact.NewContact)}"><span>Create Contact</span></a> 
+                </div>
+
+			</apex:pageblockbuttons>
+			<apex:outputpanel >
+				<apex:pageblocksection title="Information" showheader="true" columns="1">
+					<apex:outputfield value="{!TFOAC_Relationship__c.Name}"/>
+                    <apex:inputField value="{!TFOAC_Relationship__c.ContactId__c}" required="true"/>
+                    <apex:pageBlockSectionItem id="levelSection" helpText="{!$ObjectType.TFOAC_Relationship__c.fields.Level__c.inlineHelpText}">
+                    	
+                        <apex:outputLabel value="Level" for="levelField"/>
+                            <apex:actionRegion id="levelRegion">
+                                <apex:inputField value="{!TFOAC_Relationship__c.Level__c}" id="levelField" required="true">
+                                    <apex:actionSupport event="onchange" reRender="sociatyName" />
+                                </apex:inputField>
+                            </apex:actionRegion>
+                    </apex:pageBlockSectionItem>    
+                    
+                    
+                    <apex:pageBlockSectionItem id="roleSection">
+                                <apex:outputLabel value="Role" for="rolefield"/>
+                                <apex:actionRegion id="roleRegion">
+                                   <apex:inputField value="{!TFOAC_Relationship__c.Role__c}" id="rolefield" required="true">
+                                        <apex:actionSupport event="onchange" reRender="roleOther" />
+                                    </apex:inputField>
+                                </apex:actionRegion>
+                    </apex:pageBlockSectionItem>
+                </apex:pageblocksection>
+                <apex:outputPanel id="roleOther">
+                        <apex:pageBlockSection rendered="{!TFOAC_Relationship__c.Role__c == 'Other'}" columns="1"> 
+                            <apex:inputField required="true" value="{!TFOAC_Relationship__c.Role_Other__c}"/>
+                        </apex:pageBlockSection>    
+                </apex:outputPanel>
+                 <apex:outputPanel id="sociatyName">
+                        <apex:pageBlockSection rendered="{!TFOAC_Relationship__c.Level__c == 'Level 1a - Society Officer'}" columns="1"> 
+                            <apex:inputField value="{!TFOAC_Relationship__c.SocietyName__c}"/>
+                        </apex:pageBlockSection>    
+                </apex:outputPanel>
+                <apex:pageblocksection title="Information" showheader="false" columns="1">
+                    
+                    <apex:inputField value="{!TFOAC_Relationship__c.Email__c}" required="true"/>
+                    <apex:inputField value="{!TFOAC_Relationship__c.SecondaryEmail__c}"/>
+                    <apex:inputField value="{!TFOAC_Relationship__c.AdditionalInformation__c}"/>
+                </apex:pageblocksection>
+               
+                   
+                <apex:pageBlockSection columns="1">
+                    <apex:inputField value="{!TFOAC_Relationship__c.OpportunityID__c}"/>
+                    <apex:inputField value="{!TFOAC_Relationship__c.ProductID__c}"/>
+					<apex:pageblocksectionitem />
+				</apex:pageblocksection>
+			</apex:outputpanel>
+		</apex:pageblock>
+	</apex:form>
+	
+</apex:page>

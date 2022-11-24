@@ -1,0 +1,22 @@
+<apex:page showHeader="false" standardStylesheets="true">
+    <apex:composition template="ICSiteTemplate">
+        <apex:define name="body">
+        
+        <h1 style="color: #80B4E4">Welcome!</h1><p/>
+        
+        Welcome to Taylor and Francis textbook feedback site. This site allows professors to 
+        provide valuable information on book adoptions, levels of recommendation, product 
+        strengths and weaknesses, bookstore contact details and competitive title information.  <p/> 
+
+        Please enter your feedback number to begin.<p/>
+        
+        <form action="ICFeedback" method="post">
+            <input type="text" name="id" style="width: 150px;">
+            <input type="submit" value="Submit">
+        </form>
+        
+        <div style="padding: 50px"/>
+        
+        </apex:define>
+    </apex:composition>
+</apex:page>

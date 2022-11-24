@@ -1,0 +1,60 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="TF_PPDProcessController">
+    <aura:attribute name="IsRecordLocked" type="String" default="false"/>
+    <aura:attribute name="activeAccordion" type="String"/>
+    <aura:attribute name="activeCmp" type="String" default="False"/>
+    <aura:attribute name="items" type="List"/>
+    <aura:attribute name="itemsDefault" type="List" default="[0]"/>
+    <aura:attribute name="queryObjectLst" type="Object[]" access="global"/>
+    <aura:attribute name="queryObjectUnitLst" type="Object[]" access="global"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="consumer" type="String"/>
+    <aura:attribute name="implicitFltrValues" type="Object[]" access="global"/>
+    
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>      
+    <aura:registerEvent name="productSearchResetEvent" type="c:productSearchResetEvent"/>
+    <aura:registerEvent name="PPDDynamicUiSearchEvent" type="c:PPDDynamicUiSearchEvent"/>
+
+    <!--<div class="c-container">-->
+    
+    <!-- <lightning:layout>
+              <lightning:layoutItem padding="around-small" size="12">  
+           <lightning:badge label="Advanced Search"/> 
+        <br></br>
+          <lightning:badge label="Where"/> 
+            </lightning:layoutItem>      
+        </lightning:layout>-->
+    
+    <!-- New Code-->
+    <lightning:layout>
+        <lightning:layoutItem size="12" padding="around-small">               
+            <!-- Calling PPDProductDynamicSearch in iteration -->
+            <aura:iteration  items="{! v.items }" var="item" indexVar="index">
+                <lightning:layout>  
+                    <lightning:layoutItem size="12">
+                        <c:PPDProductDynamicSearch aura:id="ProductDynamicSearch" consumer="{! v.consumer}" implicitFltrValues="{! v.implicitFltrValues}" recordId="{! v.recordId }" index="{#index}"></c:PPDProductDynamicSearch>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                <div class="c-container-light">
+                    <lightning:layout>
+                        <lightning:layoutItem  alignmentBump="top">             
+                            <lightning:button label="OR" iconName="utility:add" iconPosition="right"  variant="brand" onclick="{!c.handleOrClick}"/>
+                            <lightning:button label="REMOVE" iconName="utility:close" iconPosition="right" variant="destructive" onclick="{!c.handleRemoveClick}" value="{!item}"/>
+                        </lightning:layoutItem>           
+                    </lightning:layout>
+                </div>
+            </aura:iteration>
+        </lightning:layoutItem>
+        
+    </lightning:layout>
+    
+    <lightning:layout>
+        <lightning:layoutItem padding="around-small" alignmentBump="left">          
+            <lightning:button label="Reset" iconName="utility:refresh" iconPosition="right" variant="brand" onclick="{!c.handleResetClick}"/>
+              <lightning:button label="Search" iconName="utility:search" iconPosition="right" variant="brand" onclick="{!c.loopChildComp}" />
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <!-- End of new code -->
+    <!--</div>-->
+</aura:component>

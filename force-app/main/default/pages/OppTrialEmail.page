@@ -1,0 +1,15 @@
+<!-- 
+ Created by Jeff Lup on 2013.04.08, CHG0049011
+-->
+<apex:page id="pg" standardController="Opportunity" extensions="OppTrialEmailController" >
+    <apex:form id="frm">
+        <apex:pageBlock title="Hidden Fields" rendered="false">
+            <apex:outputField value="{!Opportunity.Date_Sent__c}" />
+            <apex:outputField value="{!Opportunity.Trial_Start__c}" />
+            <apex:outputField value="{!Opportunity.Fees_Amount_GBP__c}" />
+        </apex:pageBlock>
+        <apex:outputField value="{!Opportunity.Date_Sent__c}" rendered="{!NOT(showSendButton)}"/>
+        <apex:outputText value="{!errorMessage}" style="color:red; font-style:italic" rendered="{!showErrorMessage}"/>
+        <apex:commandButton value="Send" action="{!sendTrialEmail}" rendered="{!AND(showSendButton,NOT(showErrorMessage))}" />
+    </apex:form>
+</apex:page>

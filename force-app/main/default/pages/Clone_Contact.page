@@ -1,0 +1,17 @@
+<apex:page standardController="Contact">
+
+	<script src="/soap/ajax/8.0/connection.js"></script>
+	<script src="/desktop/desktopApi.js"></script>
+
+    <script type="text/javascript">
+
+		var desktop = new DesktopApi();
+		if (desktop.desktopPageWindow) {
+			window.parent.location.href = "/{!Contact.Id}/e?clone=1&00N300000013H0m=&00N300000013H0h=&isdtp=mn&nooverride=1&retURL=/{!Contact.Id}";
+		}
+		else {
+			window.parent.location.href = "/{!Contact.Id}/e?clone=1&00N300000013H0m=&00N300000013H0h=&nooverride=1&retURL=/{!Contact.Id}";
+		}
+
+    </script>
+</apex:page>

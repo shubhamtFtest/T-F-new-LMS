@@ -1,0 +1,158 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader" access="global" 
+                Controller="OrderCancellationCtrl">
+    
+    <!--quick action dialog width -->
+    <aura:html tag="style">
+        .slds-modal__container{
+        max-width: 80rem !important;
+        width:80% !important;
+        }
+    </aura:html>
+    <!--end of quick action dialog width -->
+    
+    <!--attributes -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="recordId" type="Id" description="use to get current record id"/>
+    <aura:attribute name="oliList" type="Object"/>
+    <aura:attribute name="cancelReason" type="String" description="use to store order cancel reason"/>
+    <aura:attribute name="dispCancelOrdrBtn" type="Boolean" description="use to disabled cancel order button from UI"/>
+    <!--<aura:attribute name="chkboxvalue" type="boolean"/>--> 
+    <aura:attribute name="showErrorOrdType" type="boolean" default ="false" description="use to show error if current order is not an original order"/>
+    <aura:attribute name="dispTabData" type="boolean" description="use to display oli table"/>
+    <aura:attribute name="isOliAvailable" type="boolean" default="true" description="use to hide table of oli if no oli is present"/>
+    <aura:attribute name="showErrorCancelledOrdType" type="boolean" default ="false" description="use to show error if order type is cancelled"/>
+    <aura:attribute name="cancelOrderSpinner" type="boolean" default="false" description="use to show spinner after clicking on cancel order button"/>
+    <aura:attribute name="showErrorOrdOppNotClosedWon" type="boolean" default ="false" description="use to show error if opportunity of order is not closed won"/>
+    <aura:attribute Name="ordCancellationReasonList" type="List" />
+    <!--end of attributes -->
+    
+    <!--If current order is not an original order then show error message-->
+    <aura:if isTrue="{!v.showErrorOrdType}">
+        <!-- Show the message to ui -->
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                <div class="slds-notify__content">
+                    <h2 class="slds-text-heading_small">This is not an original Order.</h2>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!--If order type of order is cancelled that means order is already cancelled then show error message-->
+    <aura:if isTrue="{!v.showErrorCancelledOrdType}">
+        <!-- Show the message to ui -->
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                <div class="slds-notify__content">
+                    <h2 class="slds-text-heading_small">This Order is already Cancelled!</h2>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!--If opportunity of order is not closed won ie. order is not posted on order hub then show error message-->
+    <aura:if isTrue="{!v.showErrorOrdOppNotClosedWon}">
+        <!-- Show the message to ui -->
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                <div class="slds-notify__content">
+                    <h2 class="slds-text-heading_small">We can not cancel this Order because this is not present on Order Hub.</h2>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <!--Define Spinner- After clicking on cancel order button-->
+    <aura:if isTrue="{!v.cancelOrderSpinner}">
+        <div class="demo-only" style="height:6rem">
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Loading</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    <!--cancellation fields -->
+    <aura:if isTrue="{!not(empty(v.dispTabData))}">
+        <div class="modal-header slds-modal__header slds-size_1-of-1">
+            <h4 class="title slds-text-heading--medium" >Order Products Summary</h4>
+            <br></br>
+        </div>
+        <br></br>
+        <div class="slds-clearfix">
+            <div class="slds-float_left">
+                <!--<lightning:input aura:id="cancelReason" type="string" required="true" messageWhenValueMissing="Cancellation reason is required" label="Cancellation Reason" value="{!v.cancelReason}"/>-->                
+                
+                <lightning:select aura:id="cancelReasons" name="select" label="Cancellation Reason" required="true" value="{!v.cancelReason}" messageWhenValueMissing="Cancellation reason is required">
+                    <option value="">--None--</option>
+                    <aura:iteration items="{!v.ordCancellationReasonList}" var="val">
+                        <option value="{!val}">{!val}</option>
+                    </aura:iteration>
+                </lightning:select>
+            </div>  
+            <div class="slds-float_right">
+                <lightning:button variant="brand" Title="Cancel Order" label="Cancel Order" onclick="{!c.cancelOLIs}" disabled="{!v.dispCancelOrdrBtn}"/>
+            </div>
+        </div>
+        <br></br>
+        <!-- table start-->  
+            <lightning:card  title="Order Products" class="slds-card_boundary">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped" title="Order Products">
+                    <thead>
+                        <tr class="slds-text-title_caps">
+                            <!--header checkbox for select all-->
+                            <th scope="col">
+                                <div class="slds-truncate" title="Quantity To Reduce">Quantity To Reduce</div> 
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Product">Product</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Quantity">Quantity</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Price">Price</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.oliList}" var="obj">
+                            <tr>
+                                <th scope="row" class="slds-text-align_right" >
+                                    <div class="slds-truncate">
+                                        <lightning:input variant="label-hidden" 
+                                                         type="number" 
+                                                         aura:id="inputQtyVal"
+                                                         value="{!obj.qtyToReduce}"
+                                                         placeholder="{!'Value should be less or equal to '+ obj.ordItem.Quantity}"
+                                                         label="{!obj.ordItem.Quantity}"
+                                                         onchange="{!c.checkQuantityVal}"/>  
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="slds-truncate slds-line-clamp" title="{!obj.ordItem.Product2.Name}">
+                                        {!obj.ordItem.Product2.Name}
+                                    </div>
+                                </th> 
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!obj.ordItem.Quantity}">
+                                        {!obj.ordItem.Quantity}
+                                    </div>
+                                </th>
+                                <th scope="row">
+                                    <div class="slds-truncate" title="{!obj.ordItem.UnitPrice}">
+                                        {!obj.ordItem.UnitPrice}
+                                    </div>
+                                </th>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </lightning:card>
+            <!-- Table End -->
+            <!--end of table code -->
+            
+    </aura:if>
+</aura:component>

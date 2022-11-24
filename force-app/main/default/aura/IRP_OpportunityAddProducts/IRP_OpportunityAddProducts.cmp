@@ -1,0 +1,106 @@
+<!-- IRP_OpportunityAddProducts-->
+<aura:component controller="TF_IndiaRePrintCtr" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction">
+    <aura:attribute name="oppRecordId" type="String" />
+    <aura:attribute name="oName" type="String" />
+    <aura:attribute name="products" type="list"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="Opp" type="Opportunity"/> 
+    <aura:attribute name="productName" type="String"/>
+    <aura:attribute name="selectedProductIds" type="List"/>
+    <aura:attribute name="isSending" type="boolean" />
+    <!-- Start Event Handling -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+	<!-- End Event Handling -->  
+
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div id="addproductmodal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Find Products</h2>
+                </header>
+                <div class="demo-only slds-grid" style="background: rgb(244, 246, 249); padding: 1rem;">
+                    <div class="slds-panel slds-grid slds-grid_vertical slds-nowrap">
+                        <div class="slds-form slds-form_stacked slds-grow slds-scrollable_y">
+                            <div class="slds-panel__section slds-border_bottom">
+                                <div class="slds-media">                        
+                                    <div class="slds-media__body">
+                                        <h2 class="slds-truncate slds-text-heading_small">Product Search</h2>                            
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="slds-panel__section slds-border_bottom" id="searchBox">
+                                <div class="slds-form-element">                                    
+                                    <lightning:layout multipleRows="true">
+                                        <lightning:layoutItem padding="around-small" size="6" smallDeviceSize="12" mediumDeviceSize="6">
+                                            <lightning:input  aura:id="productName" type="text"  placeholder="Search by products" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem padding="around-small" size="6" smallDeviceSize="12" mediumDeviceSize="6">
+                                            <lightning:input  aura:id="isbn" type="text"  placeholder="Search by ISBN" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem padding="around-small" size="12" smallDeviceSize="12" mediumDeviceSize="12">
+                                            <div class="slds-panel__section" align="center">
+                                                <lightning:button variant="brand" label="Search" onclick="{!c.search}" />
+                                            </div> 
+                                        </lightning:layoutItem>                                        
+                                    </lightning:layout>                              
+                                </div> 
+                    
+                            </div>   
+                            
+                        </div>
+                    </div>
+                </div>            
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p> 
+                        <!-- Show Spinner -->
+                        <c:IRPSpinnerCmp isSending='{!v.isSending}'/>
+                        <!-- Show Spinner End -->                  
+                                
+                        <div class="slds-truncate"><lightning:button variant="brand" label="Add Products" title="Add Products" onclick="{! c.addMultipleProducts }" /></div> 
+                        <p>&nbsp;</p>
+                        <table class="slds-table slds-table--bordered slds-table--striped slds-table--cell-buffer slds-table--fixed-layout">
+                            <thead>
+                                <tr class="slds-text-heading--label">
+                                    <th scope="col" width="5%"><div class="slds-truncate" title="Index">#</div></th>
+                                    <th scope="col"><div class="slds-truncate" title="Product Name">Product Name</div></th>
+                                    <th scope="col"><div class="slds-truncate" title="Product Code">Product Code</div></th>
+                                    <th scope="col"><div class="slds-truncate" title="Product Code">Version Type</div></th>
+                                    <th scope="col"><div class="slds-truncate" title="Product Code">Price</div></th>
+                                    <th scope="col"><div class="slds-truncate" title="action"></div></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.products}" var ="prod">
+                                    <tr>
+                                        <td><div class="slds-truncate" title="index"><ui:inputCheckbox text="{!prod.Product2.Id}" aura:id="boxPack" value=""/></div></td>
+                                        <td><div class="slds-truncate" title="accountId">{!prod.Product2.Name}</div></td>
+                                        <td><div class="slds-truncate" title="ProductCode">{!prod.Product2.ProductCode}</div></td>
+                                        <td><div class="slds-truncate" title="Version Type">{!prod.Product2.Version_Type__c}</div></td>
+                                        <td><div class="slds-truncate" title="CurrencyIsoCode">{!prod.UnitPrice} ({!prod.CurrencyIsoCode})</div></td>
+                                        <td>
+                                            <div class="slds-truncate" title="">
+                                                <lightning:button value="{!prod.Product2.Id}" variant="brand" label="Select" title="Select" onclick="{! c.createOLI }" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </aura:iteration>                            
+                            </tbody>
+                        </table>                         
+                    </p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand" label="Close" title="Close" onclick="{! c.closeModel }"/>
+                </footer>
+            </div>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>       
+</aura:component>

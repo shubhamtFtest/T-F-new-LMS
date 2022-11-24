@@ -1,0 +1,26 @@
+<apex:page Controller="ServiceNowLicensingController" contentType="txt/xml#{!fileName}" 
+           cache="true">
+     <apex:pageBlock >
+	 <apex:pageBlockSection >
+	            <apex:outputText value="{!numberUsersActive}" label="# Users Active"/>
+                <apex:outputText value="{!numberUsersMatchedSnUsers}" label="# Users Matched in SN"/>
+                <apex:outputText value="{!numberUsersMissingActiveDirectory}" label="# Missing in AD"/>
+                <apex:outputText value="{!numberUsersMissingLicenseType}" label="# Missing SN License Type"/>
+         <apex:outputText value="{!numberUsersNotMatchServiceNow}" label="# Users Not Matched in SN"/>
+         <apex:outputText value="{!numberUsersMutiLicenseing}" label="# Users with  Multiple Licensing"/>
+	</apex:pageBlockSection>
+
+    <apex:pageblockTable value="{!ulpList}" var="u" >
+        <apex:column headervalue="Problem" value="{!u.Problem}"></apex:column>
+        <apex:column headervalue="Id">
+            <apex:outputLink target="_blank" value="{!orgUrl}/{!u.Id}">{!u.Id}</apex:outputLink>
+        </apex:column>
+        <apex:column headervalue="Name" value="{!u.Name}"></apex:column>
+        <apex:column headervalue="Email" value="{!u.Email}"></apex:column>
+        <apex:column headervalue="Username" value="{!u.Username}"></apex:column>
+        <apex:column headervalue="License Type" value="{!u.LicenseType}"></apex:column>
+        <apex:column headervalue="Active Directory Username" value="{!u.DomainUsername}"></apex:column>
+        
+    </apex:pageblockTable>
+    </apex:pageBlock>
+</apex:page>

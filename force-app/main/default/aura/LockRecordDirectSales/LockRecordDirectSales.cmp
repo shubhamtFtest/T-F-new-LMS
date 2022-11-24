@@ -1,0 +1,18 @@
+<aura:component
+    implements="flexipage:availableForAllPageTypes,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:hasSObjectName"
+    controller="LockRecorddirectSalesCntrl">
+    <aura:attribute name="show" type="boolean" default="false"></aura:attribute>
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="sObjectName" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"></aura:handler>
+    <aura:renderIf isTrue="{!v.show}">
+        <div class="alert">
+            <!-- <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> -->
+            <lightning:icon iconName="utility:lock" alternativeText="lock" variant="inverse" title="Locked Record"
+                size="xx-small" class="slds-p-bottom" />
+            <strong> &nbsp;Info!</strong> This record is locked. When the opportunity is Closed Won, you can not edit
+            this record.
+        </div>
+    </aura:renderIf>
+</aura:component>

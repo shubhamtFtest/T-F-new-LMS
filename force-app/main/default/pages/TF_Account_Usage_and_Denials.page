@@ -1,0 +1,235 @@
+<apex:page standardController="Account" extensions="Account_Usage_Denials_Ctr" standardStylesheets="true" lightningStylesheets="true" showHeader="false" >
+    <apex:form >
+        <apex:pageBlock title="Usage & Denials" mode="Read" > 
+            <apex:outputPanel layout="none">
+                <table border="0" cellspacing="0" cellpadding="0" style="padding-bottom:8px;">
+                    <tr>
+                    <td><apex:outputLink rendered="{!Account.Mastervision__c!= null}" value="{!Account.Mastervision__c}" id="masterVisionLink" target="_blank">View in Mastervision</apex:outputLink></td>
+                    </tr>
+                </table>
+            </apex:outputPanel>  
+            
+    <!-- JOURNALS SECTION -->
+                       
+            <apex:pageBlockSection title="Journals" columns="3" >  
+                <apex:pageBlockSectionItem > <!--added this pbsItem as part of 01468515 -->
+            
+    <!-- JOURNALS ROW 1 -->    
+                    <apex:outputLabel style="width:160px" > Journals - Last Refresh Date : </apex:outputLabel> 
+                    <Apex:outputfield value="{!UDdata.Last_Refresh_Date__c}"/>
+                </apex:pageBlockSectionItem>
+                   
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > <!--Blank 1--> </apex:outputLabel> 
+                </apex:pageBlockSectionItem>    
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > <!--Blank 2--> </apex:outputLabel> 
+                </apex:pageBlockSectionItem>
+               
+    <!-- JOURNALS ROW 2 -->   
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials YTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Journals_Denials_YTD__c}"/> 
+                </apex:pageBlockSectionItem>        
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Total Usage YTD </apex:outputLabel> 
+                    <Apex:outputfield value="{!UDdata.Journals_Usage_YTD__c}"/>
+                </apex:pageBlockSectionItem>                
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Unique Usage YTD </apex:outputLabel> 
+                     <Apex:outputfield value="{!UDdata.Journals_Unique_Usage_YTD__c}"/>    <!-- *****UPDATE VALUE REF**** -->  
+                </apex:pageBlockSectionItem>
+  
+    <!-- JOURNALS ROW 3 -->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials PYTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Journals_Denials_PYTD__c}"/> 
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Total Usage PYTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Journals_Usage_PYTD__c}"/>
+                </apex:pageBlockSectionItem> 
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Unique Usage PYTD </apex:outputLabel> 
+                    <Apex:outputfield value="{!UDdata.Journals_Unique_Usage_PYTD__c}"/>    <!-- *****UPDATE VALUE REF**** -->  
+                </apex:pageBlockSectionItem>
+    
+    <!-- JOURNALS ROW 4 -->            
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials % Change </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Journals_Denials_Change__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px"> Total Usage % Change </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Journals_Usage_Change__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Unique Usage % Change </apex:outputLabel> 
+                    <Apex:outputfield value="{!UDdata.Journals_Unique_Usage_Change__c}"/>    <!-- *****UPDATE VALUE REF**** -->  
+                </apex:pageBlockSectionItem>
+
+    <!-- JOURNALS ROW 5 -->                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials Movement </apex:outputLabel>    
+                    <apex:image width="10" height="10" value="{!IF(OR(UDdata.Journals_Denials_Change__c == 0, ISBLANK(UDdata.Journals_Denials_Change__c)), '', IF(UDdata.Journals_Denials_Change__c > 0,'/servlet/servlet.FileDownload?file=0150Y000001X5w7','/servlet/servlet.FileDownload?file=0150Y000001X5wH'))}" />
+                </apex:pageBlockSectionItem>
+                
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Total Usage Movement </apex:outputLabel>
+                    <apex:image width="10" height="10" value="{!IF(OR(UDdata.Journals_Usage_Change__c == 0, ISBLANK(UDdata.Journals_Usage_Change__c)), '', IF(UDdata.Journals_Usage_Change__c > 0,'/servlet/servlet.FileDownload?file=0150Y000001X5w7','/servlet/servlet.FileDownload?file=0150Y000001X5wH'))}" />
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Unique Usage Movement </apex:outputLabel>
+                    <apex:image width="10" height="10" value="{!IF(OR(UDdata.Journals_Unique_Usage_Change__c == 0, ISBLANK(UDdata.Journals_Unique_Usage_Change__c)), '', IF(UDdata.Journals_Unique_Usage_Change__c > 0,'/servlet/servlet.FileDownload?file=0150Y000001X5w7','/servlet/servlet.FileDownload?file=0150Y000001X5wH'))}" />
+                </apex:pageBlockSectionItem>        <!-- *****UPDATE VALUE REF FOR ABOVE**** -->  
+
+
+
+               </apex:pageBlockSection>
+            
+            
+    <!-- UBX SECTION -->       
+         
+            <apex:pageBlockSection title="UBX" columns="3">
+                <apex:pageBlockSectionItem > <!--added this pbsItem as part of 01468515 -->
+    
+    <!-- UBX ROW 1-->
+                    <apex:outputLabel style="width:160px" > UBX - Last Refresh Date : </apex:outputLabel> 
+                    <Apex:outputfield value="{!UDdata.UBX_Refresh_Date__c}"/>
+                </apex:pageBlockSectionItem> 
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > <!--Blank 3--> </apex:outputLabel> 
+                </apex:pageBlockSectionItem>    
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > <!--Blank 4--> </apex:outputLabel> 
+                </apex:pageBlockSectionItem>
+                
+    <!-- UBX ROW 2-->                                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials YTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Net_Bases_eBooks_Denials_YTD__c}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Total Usage YTD </apex:outputLabel> 
+                    <Apex:outputfield value="{!UDdata.Net_Bases_eBooks_Total_Usage_YTD__c}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Unique Usage YTD </apex:outputLabel>
+                    <Apex:outputfield value="{!UDdata.Net_Bases_eBooks_usage_YTD__c}"/>
+                </apex:pageBlockSectionItem>  
+                              
+
+
+    <!-- UBX ROW 3-->                  
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials PYTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Net_Bases_eBooks_Denials_PYTD__c}"/> 
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Total Usage PYTD </apex:outputLabel> 
+                    <apex:outputfield value="{!UDdata.Net_Bases_eBooks_Total_Usage_PYTD__c}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Unique Usage PYTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Net_Bases_eBooks_Usage_PYTD__c}"/>
+                </apex:pageBlockSectionItem>
+           
+
+           
+    <!-- UBX ROW 4-->                   
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials % Change </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Net_Bases_eBooks_Denials_Change__c}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Total Usage % Change </apex:outputLabel> 
+                    <apex:outputfield value="{!UDdata.Net_Bases_eBooks_Total_Usage_Change__c}"/>
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel style="width:150px" > Unique Usage % Change </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.Net_Bases_eBooks_Usage_Change__c}"/>
+                </apex:pageBlockSectionItem>
+                
+
+                
+    <!-- UBX ROW 5-->
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials Movement </apex:outputLabel>    
+                    <apex:image width="10" height="10" value="{!IF(OR(UDdata.Net_Bases_eBooks_Denials_Change__c == 0,ISBLANK(UDdata.Net_Bases_eBooks_Denials_Change__c)), '', IF(UDdata.Net_Bases_eBooks_Denials_Change__c > 0,'/servlet/servlet.FileDownload?file=0150Y000001X5w7','/servlet/servlet.FileDownload?file=0150Y000001X5wH'))}" />
+                </apex:pageBlockSectionItem>
+                       
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Total Usage Movement </apex:outputLabel>
+                    <apex:image width="10" height="10" value="{!IF(OR(UDdata.Net_Bases_eBooks_Total_Usage_Change__c == 0,ISBLANK(UDdata.Net_Bases_eBooks_Total_Usage_Change__c)), '', IF(UDdata.Net_Bases_eBooks_Total_Usage_Change__c > 0,'/servlet/servlet.FileDownload?file=0150Y000001X5w7','/servlet/servlet.FileDownload?file=0150Y000001X5wH'))}" />
+                </apex:pageBlockSectionItem>
+
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Unique Usage Movement </apex:outputLabel>
+                    <apex:image width="10" height="10" value="{!IF(OR(UDdata.Net_Bases_eBooks_Usage_Change__c == 0,ISBLANK(UDdata.Net_Bases_eBooks_Usage_Change__c)), '', IF(UDdata.Net_Bases_eBooks_Usage_Change__c > 0,'/servlet/servlet.FileDownload?file=0150Y000001X5w7','/servlet/servlet.FileDownload?file=0150Y000001X5wH'))}" />
+                </apex:pageBlockSectionItem>
+
+
+
+                
+            </apex:pageBlockSection>
+            
+            <!--<apex:pageBlockSection title="eBooks" columns="2">
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Usage YTD </apex:outputLabel>
+                    <Apex:outputfield value="{!UDdata.TFE_eBooks_Usage_YTD__c}"/>
+                </apex:pageBlockSectionItem>                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials YTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.TFE_eBooks_Denials_YTD__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Usage PYTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.TFE_eBooks_Usage_PYTD__c}"/> 
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials PYTD </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.TFE_eBooks_Denials_PYTD__c}"/> 
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Usage % Change </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.TFE_eBooks_Usage_Change__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials % Change </apex:outputLabel>
+                    <apex:outputfield value="{!UDdata.TFE_eBooks_Denials_Change__c}"/>
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Usage Movement </apex:outputLabel>
+                    <apex:image width="10" height="10" value="{!IF(OR(UDdata.TFE_eBooks_Usage_Change__c == 0,ISBLANK(UDdata.TFE_eBooks_Usage_Change__c)), '', IF(UDdata.TFE_eBooks_Usage_Change__c > 0,'/servlet/servlet.FileDownload?file=0150Y000001X5w7','/servlet/servlet.FileDownload?file=0150Y000001X5wH'))}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel > Denials Movement </apex:outputLabel>
+                    <apex:image width="10" height="10" value="{!IF(OR(UDdata.TFE_eBooks_Denials_Change__c == 0,ISBLANK(UDdata.TFE_eBooks_Denials_Change__c)), '', IF(UDdata.TFE_eBooks_Denials_Change__c > 0,'/servlet/servlet.FileDownload?file=0150Y000001X5w7','/servlet/servlet.FileDownload?file=0150Y000001X5wH'))}" />
+                </apex:pageBlockSectionItem>
+                
+            </apex:pageBlockSection> -->
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

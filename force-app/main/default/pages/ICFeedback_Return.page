@@ -1,0 +1,39 @@
+<apex:page showHeader="false" standardStylesheets="true">
+    <apex:composition template="ICSiteTemplate">
+        <apex:define name="body">
+        
+        <h1 style="color: #80B4E4">Thank you for your feedback.</h1>
+        
+        <p></p><b>Please return your book to:</b><p></p>
+        
+        <b>UK and rest of the world:</b><br>
+        <blockquote>
+        Freepost SN926 <br>
+        130 Milton Park <br>
+        Abingdon <br>
+        Oxfordshire OX14 4SB<br> 
+        UK   <br>
+        Tel: +44 (0) 1235 400524<br>
+        Fax: +44 (0) 1235 400525<br>
+        E-mail: <a href="mailto:book.orders@tandf.co.uk">book.orders@tandf.co.uk</a>
+        </blockquote>
+        <p></p>
+        
+        <b>US, Canada and South America:</b><br>
+        <blockquote>
+        Taylor and Francis<br>
+        Returns Department<br>
+        7625 Empire Drive<br>
+        Florence <br>
+        Kentucky 41042<br>
+        USA<br>
+        Tel: Toll free 1 800 634 7064<br>
+        Fax: Toll free 1 800 248 4724<br>
+        E-mail: <a href="mailto:orders@taylorandfrancis.com">orders@taylorandfrancis.com</a>
+        </blockquote><p></p>
+        
+        For more information about our books, special offers or subject based selections please visit <a href="http://www.taylorandfrancis.com/">http://www.taylorandfrancis.com</a>
+
+        </apex:define>
+    </apex:composition>
+</apex:page>

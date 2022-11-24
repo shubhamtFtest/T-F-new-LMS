@@ -1,0 +1,381 @@
+<!--
+Modified By Hailey Niemand - 04.06.2013 - CHG0050810: "Netbase Select" require same setting as Pick and Mix product 
+Modified by Hailey Niemand - 2014.01.13 - CHG0055795: Display Subject Area
+Modified by Hailey Niemand - 2015.07.28 - CHG0067203: Revised Product Structure to Include Category
+Modified by Hailey Niemand - 2015.11.05 - CHG0069531: New Article Pass Field
+Modified by Jeff Lup - 2016.03.11 - CHG0071993
+Modified by Rishabh Singh - 2017.08.24 - CHG0036420 - Article Pass piclist field will appear for Article Pass product
+Modified by Rishabh Singh - 2017.09.11 - CHG0036420
+Modified by Tom Reed - 2017.02.26 - CHG0041833 - Updated the hard coded record ids to match the new org
+Modified By Chetan Bhatla - 09/03/2018- CHG0042234-updated new field Expiry Date for Article pass product family
+Modified by Amit Kumar - 2018.07.17 - CHG0043878: Invoice System (SAP,PT,Quickfill), invoice number validation rule
+Modified by Sidhant Chauhan - 2021.04.01 - 01815201 - Updating VF Page to Lightning Style.
+Modified by Kam Chandi - 2021.06.18 - 01913279 - Added field Agent's Name to VF page 
+-->
+
+
+<apex:page standardController="Opportunity" extensions="opportunityProductEntryExtension" action="{!priceBookCheck}" showHeader="false"  lightningStylesheets="true">
+
+    <!--<apex:sectionHeader Title="Manage {!$ObjectType.Product2.LabelPlural}" subtitle="{!opportunity.Name}"/>-->
+    <apex:messages style="color: white; font-weight: bold; background-color: #d60d0d"/>
+
+    <style>
+        .search{
+            font-size:12pt;
+            margin-right: 20px;    
+        }
+        .fyi{
+            color:red;
+            font-style:italic;
+        }
+        .label{
+            margin-right:10px;
+            font-weight:bold;
+        }
+        div.bPageBlock.brandSecondaryBrd.apexDefaultPageBlock.secondaryPalette {
+            border-top-width: 1px !important;
+            border-top-color: #eaeaea !important;
+        }
+    </style>
+    
+    <script type='text/javascript'>
+    
+        // This script assists the search bar functionality
+        // It will execute a search only after the user has stopped typing for more than 1 second
+        // To raise the time between when the user stops typing and the search, edit the following variable:
+        
+        var waitTime = 1;
+        
+    
+        var countDown = waitTime+1;
+        var started = false;
+        
+        function resetTimer(){
+        
+            countDown=waitTime+1;
+            
+            if(started==false){
+                started=true;
+                runCountDown();
+            }
+        }
+        
+        function runCountDown(){
+        
+            countDown--;
+            
+            if(countDown<=0){
+                fetchResults();
+                started=false;
+            }
+            else{
+                window.setTimeout(runCountDown,1000);
+            }
+        }
+    
+    </script>
+   
+  
+    <apex:form >
+    
+        <apex:outputPanel id="mainBody">
+        
+        <!--remove Pricebook selection and Currency from page CHG0067203
+            <apex:outputLabel styleClass="label">PriceBook: </apex:outputLabel>
+            <apex:outputText value="{!theBook.Name}"/>&nbsp;
+            <apex:commandLink action="{!changePricebook}" value="change" immediate="true"/>
+            <br/>
+        -->
+            <!-- not everyone is using multi-currency, so this section may or may not show -->
+        <!--    <apex:outputPanel rendered="{!multipleCurrencies}">
+                <apex:outputLabel styleClass="label">Currency: </apex:outputLabel>
+                <apex:outputText value="{!chosenCurrency}"/>
+                <br/>
+            </apex:outputPanel>
+            <br/>
+        -->
+            
+<!-- this is the upper table... a.k.a. the "Shopping Cart"-->
+
+            <!-- notice we use a lot of $ObjectType merge fields... I did that because if you have changed the labels of fields or objects it will reflect your own lingo -->
+            <apex:pageBlock title="Selected {!$ObjectType.Product2.LabelPlural}" id="selected" mode="view">
+            <br/>
+                <!-- NOT eBooks -->
+                <apex:pageblockTable value="{!shoppingCart}" var="s" rendered="{!NOT(isBooks)}">
+                
+                    <apex:column >
+                        <apex:commandLink value="Remove" action="{!removeFromShoppingCart}" reRender="selected,searchResults" immediate="true">
+                            <!-- this param is how we send an argument to the controller, so it knows which row we clicked 'remove' on -->
+                            <apex:param value="{!s.cartId}" assignTo="{!toUnselect}" name="toUnselect"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    
+                    
+                    <apex:column headerValue="{!$ObjectType.Product2.LabelPlural}" value="{!s.oli.PriceBookEntry.Product2.Name}"/>
+                    
+                    <!--CHG0067203-->
+                    <!--
+                    <apex:column headerValue="Category" rendered="{!hasCategoryProduct}">
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                        <apex:selectList value="{!s.oli.Category__c}" size="1" required="true" rendered="{!s.isCategory}">
+                            <apex:selectOptions value="{!s.categories}"/>
+                        </apex:selectList>
+                        </div>
+                    </apex:column>
+                    -->
+                  
+                    <apex:column headerValue="Token Quantity" rendered="{!hasTokenProduct}" > <!-- CHG0069531 -->
+                        <apex:inputField value="{!s.oli.Token_Quantity__c}" required="false" rendered="{!s.isToken}" />
+                    </apex:column>
+                  
+                    <apex:column headerValue="Subject Area" rendered="{!hasTokenProduct}" > <!-- CHG0049016 -->
+                        <!-- <apex:inputField value="{!s.oli.Subject_Area__c}" required="false" rendered="{!s.oli.PricebookEntry.Product2.Name == 'Article Pass – 100 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 250 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 500 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 750 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 1000 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 1500 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – Open Number'}" /> -->
+                        <apex:inputField value="{!s.oli.Subject_Area__c}" required="false" rendered="{!s.isToken}" /> <!-- CHG0055795 -->
+                    </apex:column>
+                    
+                    <apex:column headerValue="Account">
+                        <apex:outputField value="{!s.oli.AccountName__c}" style="width:70px"/>
+                    </apex:column>
+                    
+                    <apex:column headervalue="Article Pass Access" rendered="{!isThisArticlePass}">
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                        <apex:inputField value="{!s.oli.Article_Pass__c}" required="true" rendered="{!s.hasArticlePassProduct}"/>
+                        </div>
+                    </apex:column> 
+                    
+                    <!--start CHG0043363-->
+                   <!-- <apex:column headerValue="Invoice System" rendered="{!hasFeesProduct}">
+                        <div class="requiredInput">
+                            <apex:selectList size="1" value="{!s.oli.Invoice_System__c}" rendered="{!NOT(s.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')}" >
+                                <apex:selectOptions value="{!statusOptions}"/>
+                            </apex:selectList>
+                        </div>
+                    </apex:column>-->
+                    <!--end CHG0043363-->
+                    
+                    <apex:column headerValue="Invoice Number" rendered="{!hasFeesProduct}" > <!-- CHG0047104 -->
+                        <apex:inputField value="{!s.oli.Invoice_Number__c}"  required="false" rendered="{!NOT(s.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription') || s.oli.PricebookEntry.Product2.name='Core Subs'}" /> <!-- CHG0048320 -->
+                    </apex:column>
+                    <apex:column headerValue="Invoice Date" rendered="{!hasFeesProduct}" > <!-- CHG0047104 -->
+                        <apex:inputField value="{!s.oli.Invoice_Date__c}"  required="false" rendered="{!NOT(s.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')|| s.oli.PricebookEntry.Product2.name='Core Subs'}" /> <!-- CHG0048320 -->
+                    </apex:column>
+                     <!-- CHG0042234-->
+                             <apex:column headervalue="Expiry Date" rendered="{!isThisArticlePass}"> 
+                               <div class="requiredInput"><apex:outputPanel layout="none" rendered="{!Opportunity.Stagename=='Closed Won'}"> <div class="requiredBlock"></div> </apex:outputPanel>                        
+                               <apex:inputField value="{!s.oli.Expiry_date__c}" required="{!If(Opportunity.Stagename=='Closed Won',true,false)}" rendered="{!s.hasArticlePassProduct}"/>
+                               </div>
+                            </apex:column>
+                                
+                                  <!--END CHG0042234--> 
+
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.UnitPrice.Label}">
+                        <apex:inputField value="{!s.oli.UnitPrice}"  required="true" onkeyup="refreshTotals();"/>
+                    </apex:column>
+
+                    <apex:column headerValue="Net Price" rendered="{!hasFeesProduct}" > <!-- CHG0047104 -->
+                        <apex:inputField value="{!s.oli.Net_Price__c}"  required="false" rendered="{!NOT(s.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')|| s.oli.PricebookEntry.Product2.name='Core Subs'}" /> <!-- CHG0048320 -->
+                    </apex:column>
+                   
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Description.Label}">
+                        <apex:inputField value="{!s.oli.Description}" required="false"/>
+                    </apex:column>
+                </apex:pageblockTable>
+            
+                <!-- eBooks - CHG0045928 -->
+                <apex:pageblockTable value="{!shoppingCart}" var="s" rendered="{!isBooks}">
+                
+                    <apex:column >
+                        <apex:commandLink value="Remove" action="{!removeFromShoppingCart}" reRender="selected,searchResults" immediate="true">
+                            <!-- this param is how we send an argument to the controller, so it knows which row we clicked 'remove' on -->
+                            <apex:param value="{!s.cartId}" assignTo="{!toUnselect}" name="toUnselect"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.Product2.LabelPlural}" value="{!s.oli.PriceBookEntry.Product2.Name}"/>
+                    
+                    <!--CHG0067203-->
+                    <apex:column headerValue="Category" rendered="{!hasCategoryProduct}">
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                        <apex:selectList value="{!s.oli.Category__c}" size="1" required="true" rendered="{!s.isCategory}">
+                            <apex:selectOptions value="{!s.categories}"/>
+                        </apex:selectList>
+                        </div>
+                    </apex:column>
+                  
+                    <apex:column headerValue="Token Quantity" rendered="{!hasTokenProduct}" > <!-- CHG0069531 -->
+                        <apex:inputField value="{!s.oli.Token_Quantity__c}" required="false" rendered="{!s.isToken}" />
+                    </apex:column>
+
+                    <apex:column headerValue="Subject Area" rendered="{!hasTokenProduct}" > <!-- CHG0049016 -->
+                        <!-- <apex:inputField value="{!s.oli.Subject_Area__c}" required="false" rendered="{!s.oli.PricebookEntry.Product2.Name == 'Article Pass – 100 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 250 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 500 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 750 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 1000 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – 1500 Tokens' || s.oli.PricebookEntry.Product2.Name == 'Article Pass – Open Number'}" /> -->
+                        <apex:inputField value="{!s.oli.Subject_Area__c}" required="false" rendered="{!s.isToken}" /> <!-- CHG0055795 -->
+                    </apex:column>
+
+                    <apex:column headerValue="Account">
+                        <apex:outputField value="{!s.oli.AccountName__c}" style="width:70px"/>
+                    </apex:column>
+                    
+                    
+                    <!--
+                    <apex:column headerValue="eBook Order Type">
+                        <apex:inputField value="{!s.oli.eBook_Order_Type__c}" required="true"/>
+                    </apex:column>
+                    --> <!-- eBooks Renewals Project -->
+                                       
+                    <apex:column headerValue="Seats/Users">
+                        <apex:inputField value="{!s.oli.Seats_Users__c}" required="false"/>
+                    </apex:column>
+                    
+                    <!--
+                    <apex:column headerValue="Date">
+                        <apex:inputField value="{!s.oli.ServiceDate}" required="false"/>
+                    </apex:column>
+                    -->
+                    
+                    <apex:column headervalue="Article Pass Access" rendered="{!isThisArticlePass}">
+                        <div class="requiredInput"><div class="requiredBlock"></div>
+                        <apex:inputField value="{!s.oli.Article_Pass__c}" required="true" rendered="{!s.hasArticlePassProduct}"/>
+                        </div>
+                    </apex:column>
+                    
+                    <!--start CHG0043363-->
+                   <!-- <apex:column headerValue="Invoice System" rendered="{!hasFeesProduct}">
+                        <div class="requiredInput">
+                            <apex:selectList size="1" value="{!s.oli.Invoice_System__c}" rendered="{!NOT(s.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')}">
+                                <apex:selectOptions value="{!statusOptions}"/>
+                            </apex:selectList>
+                        </div>
+                    </apex:column>-->
+                    <!--end CHG0043363-->
+                    
+                    <apex:column headerValue="Invoice Number" rendered="{!hasFeesProduct}" > <!-- CHG0047104 -->
+                        <apex:inputField value="{!s.oli.Invoice_Number__c}"  required="false" rendered="{!NOT(s.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')}" /> <!-- CHG0048320 -->
+                    </apex:column>
+                    
+                   <apex:column headerValue="Invoice Date" rendered="{!hasPickAndMixProduct}" > <!-- CHG0047104 & CHG0048678 -->
+                   <!--<apex:column headerValue="Invoice Date"  >-->
+                                           <!-- <apex:inputField value="{!s.oli.Invoice_Date__c}" style="width:70px" required="false" rendered="{!NOT(s.oli.PricebookEntry.Product2.Service_Description__c == 'Subscription')}" /> --> <!-- CHG0048320 -->
+                       <!-- <apex:inputField value="{!s.oli.Invoice_Date__c}" style="width:70px" required="true" rendered="{!s.oli.PricebookEntry.Product2Id == '01t0Y0000080nlpQAA' || s.oli.PriceBookEntry.Product2Id == '01t0Y0000072JCPQA2'}" />--> <!-- only for Pick & Mix, per CHG0048678. CHG0050810 - include Netbase Select Product-->
+                    <apex:inputField value="{!s.oli.Invoice_Date__c}"  required="{!If(Opportunity.Stagename=='Closed Won',true,false)}"  rendered="{!isBooks}"/>
+                    </apex:column>
+                     <!-- CHG0042234-->
+                              <apex:column headervalue="Expiry Date" rendered="{!isThisArticlePass}"> 
+                               <div class="requiredInput"> <apex:outputPanel layout="none" rendered="{!Opportunity.Stagename=='Closed Won'}"><div class="requiredBlock"></div> </apex:outputPanel>
+                              <apex:inputField value="{!s.oli.Expiry_date__c}" required="{!If(Opportunity.Stagename=='Closed Won',true,false)}" rendered="{!s.hasArticlePassProduct}"/>
+                               </div>
+                               </apex:column>
+                                
+                                  <!--END CHG0042234-->
+
+                    <apex:column headerValue="Sales Price">
+                        <apex:inputField value="{!s.oli.UnitPrice}"  required="true" onkeyup="refreshTotals();"/>
+                    </apex:column>
+
+                    <!-- removed from eBooks per INC0713822
+                    <apex:column headerValue="Net Price"> CHG0047104
+                        <apex:inputField value="{!s.oli.Net_Price__c}" style="width:70px" required="false" />
+                    </apex:column>
+                    -->
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Description.Label}">
+                        <apex:inputField value="{!s.oli.Description}" required="false"/>
+                    </apex:column> 
+                    
+                    
+  
+        <!--New field added 'Agent Name'-->
+                    <apex:column headerValue="Agent Name">
+                        <apex:inputField value="{!s.oli.Agent_s_Name__c}" required="false" onkeydown="if(event.keyCode==13){this.blur();}" />
+                    </apex:column>
+                    
+                    
+                    
+                </apex:pageblockTable>
+            
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!onSave}" value="Save"/>
+                    <apex:commandButton action="{!onCancel}" value="Cancel"/> <!-- CHG0071993 -->
+                </apex:pageBlockButtons>
+            
+            </apex:pageBlock>
+<!-- this is the lower table: search bar and search results -->
+    
+            <apex:pageBlock title="Available Products" mode="view">
+            <br/>
+                
+            <!-- Remove Search from page //CHG0067203 -->
+            <!-- Put back via CHG0072374 -->
+                <apex:outputPanel styleClass="search">
+                    Search for {!$ObjectType.Product2.LabelPlural}:
+                </apex:outputPanel>
+
+                <apex:actionRegion renderRegionOnly="false" immediate="true">
+                
+                    <apex:actionFunction name="fetchResults" action="{!updateAvailableList}" reRender="searchResults" status="searchStatus"/>
+                    
+                    <!-- here we invoke the scripting to get out fancy 'no button' search bar to work -->
+               
+                    <apex:inputText value="{!searchString}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:300px"/>
+                    &nbsp;&nbsp;
+                    <i>
+               
+                        <!-- actionStatus component makes it easy to let the user know when a search is underway -->
+                 
+                        <apex:actionStatus id="searchStatus" startText="searching..." stopText=" "/>
+                    </i>
+                    
+                </apex:actionRegion>
+
+            
+                <apex:outputPanel id="searchResults">
+                
+                    <apex:pageBlockTable value="{!AvailableProducts}" var="a">
+                    
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Name.Label}" value="{!a.Product2.Name}" />
+
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.ProductCode.Label}" value="{!a.Product2.ProductCode}" /> <!-- CHG0071993 -->
+                        
+                        <!--<apex:column headerValue="{!$ObjectType.Product2.Fields.Family.Label}" value="{!a.Product2.Family}"/>-->
+                        
+                        <!--<apex:column headerValue="{!$ObjectType.Product2.Fields.Description.Label}" value="{!a.Product2.Description}"/>-->
+                        
+                        <apex:column >
+                            <!-- command button in a column... neato -->
+                            <apex:commandButton value="Select" action="{!addToShoppingCart}" reRender="selected,searchResults" immediate="true">             
+                                <!-- again we use apex:param to be able to tell the controller which row we are working with -->
+                                <apex:param value="{!a.Id}" assignTo="{!toSelect}" name="toSelect"/>
+                            </apex:commandButton>
+                        </apex:column>
+                        
+                    </apex:pageBlockTable>
+                    
+                    <!-- We put up a warning if results exceed 350 rows -->
+                    <apex:outputPanel styleClass="fyi" rendered="{!overLimit}">
+                        <br/>
+                        Your search returned over 350 results, use a more specific search string if you do not see the desired {!$ObjectType.Product2.Label}.
+                        <br/>
+                    </apex:outputPanel>
+                    
+                </apex:outputPanel>
+            
+            </apex:pageBlock>
+            
+        </apex:outputPanel>
+        
+        <apex:outputPanel id="reloadPanel" rendered="{!reloadNeeded}" >
+            <script type="text/javascript">
+                function isLightningExperienceOrSalesforce1() {
+                    return((typeof sforce != 'undefined') && sforce && (!!sforce.one));
+                }
+                // redirect the top level window
+                if( isLightningExperienceOrSalesforce1() ) {
+                    sforce.one.navigateToURL('{!pageURL}');
+                } else {
+                    window.top.location.href = '{!pageURL}';    
+                }
+            </script>   
+        </apex:outputPanel>
+
+    </apex:form>
+
+</apex:page>
